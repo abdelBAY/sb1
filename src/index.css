@@ -25,12 +25,12 @@
 
   /* Base styles */
   body {
-    @apply bg-primary text-primary transition-colors duration-200;
+    @apply bg-primary text-primary transition-colors duration-200 antialiased;
   }
 
   /* Headings */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold text-primary dark:text-light-50;
+    @apply font-bold text-primary dark:text-light-50 tracking-tight;
   }
 
   /* Links */
@@ -45,24 +45,42 @@
            border border-light-300 dark:border-dark-300
            focus:border-blue-500 dark:focus:border-blue-400
            focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
-           placeholder-light-400 dark:placeholder-dark-400;
+           focus:ring-opacity-50
+           placeholder-light-400 dark:placeholder-dark-400
+           rounded-lg;
   }
 
   /* Buttons */
   button {
-    @apply transition-colors duration-200;
+    @apply transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500;
   }
 
   /* Cards and containers */
   .card {
     @apply bg-light dark:bg-dark-50 
            shadow-lg dark:shadow-dark-900/20
-           border border-light-200 dark:border-dark-200;
+           border border-light-200 dark:border-dark-200
+           rounded-lg;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .container {
+      @apply px-4;
+    }
+
+    input, select, textarea {
+      @apply text-base; /* Larger touch targets on mobile */
+    }
+
+    button {
+      @apply py-2 px-4 text-base; /* Comfortable touch targets */
+    }
   }
 
   /* Custom scrollbar for dark mode */
   .dark ::-webkit-scrollbar {
-    width: 12px;
+    @apply w-2;
   }
 
   .dark ::-webkit-scrollbar-track {
@@ -76,6 +94,14 @@
   .dark ::-webkit-scrollbar-thumb:hover {
     @apply bg-dark-400;
   }
+
+  /* Safe area insets for modern mobile browsers */
+  .safe-padding {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* Component styles */
@@ -85,7 +111,9 @@
            text-white
            hover:bg-blue-700 dark:hover:bg-blue-600
            focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+           disabled:opacity-50 disabled:cursor-not-allowed
+           rounded-lg px-4 py-2
+           transition-all duration-200;
   }
 
   .btn-secondary {
@@ -93,7 +121,9 @@
            text-light-800 dark:text-light-50
            hover:bg-light-200 dark:hover:bg-dark-200
            focus:ring-2 focus:ring-light-500 dark:focus:ring-dark-400 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+           disabled:opacity-50 disabled:cursor-not-allowed
+           rounded-lg px-4 py-2
+           transition-all duration-200;
   }
 
   .input-field {
@@ -101,21 +131,48 @@
            bg-light-50 dark:bg-dark-50
            border border-light-300 dark:border-dark-300
            focus:border-blue-500 dark:focus:border-blue-400
-           focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400;
+           focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+           px-4 py-2;
   }
 
   .dropdown-menu {
     @apply bg-light dark:bg-dark-50
            border border-light-200 dark:border-dark-200
            shadow-lg dark:shadow-dark-900/20
-           rounded-lg;
+           rounded-lg
+           overflow-hidden;
   }
 
   .dropdown-item {
     @apply px-4 py-2
            text-light-800 dark:text-light-50
            hover:bg-light-100 dark:hover:bg-dark-100
-           focus:outline-none focus:bg-light-100 dark:focus:bg-dark-100;
+           focus:outline-none focus:bg-light-100 dark:focus:bg-dark-100
+           cursor-pointer
+           transition-colors duration-200;
+  }
+
+  /* Mobile navigation styles */
+  .mobile-menu {
+    @apply fixed inset-0 z-50
+           bg-white dark:bg-gray-800
+           transform transition-transform duration-300 ease-in-out;
+  }
+
+  .mobile-menu-enter {
+    @apply translate-x-full;
+  }
+
+  .mobile-menu-enter-active {
+    @apply translate-x-0;
+  }
+
+  .mobile-menu-exit {
+    @apply translate-x-0;
+  }
+
+  .mobile-menu-exit-active {
+    @apply translate-x-full;
   }
 }
 
@@ -127,5 +184,14 @@
 
   .text-shadow-none {
     text-shadow: none;
+  }
+
+  /* Mobile-specific utilities */
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

@@ -1,0 +1,37 @@
+{
+  "navigation": {
+    "language": "Language",
+    "signIn": "Sign In",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "signOut": "Sign Out"
+  },
+  "home": {
+    "hero": {
+      "title": "Connect, Share, Make a Difference",
+      "subtitle": "Join our community where giving meets receiving. Make a positive impact by sharing what you no longer need with those who need it most.",
+      "startDonating": "Start Donating",
+      "browseItems": "Browse Items"
+    },
+    "features": {
+      "easyDonations": {
+        "title": "Easy Donations",
+        "description": "Create listings for items you want to donate with just a few clicks"
+      },
+      "directCommunication": {
+        "title": "Direct Communication",
+        "description": "Chat directly with donors or beneficiaries to coordinate donations"
+      },
+      "smartNotifications": {
+        "title": "Smart Notifications",
+        "description": "Get notified about new matching items and message updates"
+      }
+    },
+    "cta": {
+      "title": "Ready to make a difference?",
+      "subtitle": "Join thousands of others who are already making an impact in their communities.",
+      "button": "Get Started"
+    }
+  }
+}

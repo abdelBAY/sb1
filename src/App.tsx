@@ -27,37 +27,40 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-light-50 via-light to-light-50 dark:from-dark dark:via-dark-50 dark:to-dark transition-colors duration-300">
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-light-900 dark:text-light-50 sm:text-5xl md:text-6xl tracking-tight">
-            Connect, Share, <span className="text-blue-600 dark:text-blue-400 inline-block">Make a Difference</span>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-light-900 dark:text-light-50 tracking-tight">
+            Connect, Share,{' '}
+            <span className="text-blue-600 dark:text-blue-400 inline-block">
+              Make a Difference
+            </span>
           </h1>
-          <p className="mt-6 max-w-md mx-auto text-lg text-light-600 dark:text-light-300 sm:text-xl md:mt-8 md:max-w-3xl">
+          <p className="mt-4 md:mt-6 max-w-md mx-auto text-base md:text-lg lg:text-xl text-light-600 dark:text-light-300 md:max-w-3xl">
             Join our community where giving meets receiving. Make a positive impact by sharing what you no longer need with those who need it most.
           </p>
-          <div className="mt-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-10 gap-4">
+          <div className="mt-6 md:mt-8 max-w-md mx-auto flex flex-col sm:flex-row sm:justify-center gap-4">
             <button
               onClick={handleStartDonating}
-              className="w-full sm:w-auto flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg md:text-xl md:px-12 transform hover:-translate-y-0.5 bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 mb-4 sm:mb-0"
+              className="w-full sm:w-auto flex items-center justify-center px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-medium rounded-lg transform hover:-translate-y-0.5 bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200"
             >
-              <Gift className="w-6 h-6 mr-2" />
+              <Gift className="w-5 h-5 md:w-6 md:h-6 mr-2" />
               Start Donating
             </button>
             <Link
               to="/search"
-              className="w-full sm:w-auto flex items-center justify-center px-8 py-4 text-lg font-medium rounded-lg md:text-xl md:px-12 transform hover:-translate-y-0.5 bg-light-100 dark:bg-dark-100 text-light-800 dark:text-light-50 hover:bg-light-200 dark:hover:bg-dark-200 transition-all duration-200 border border-light-200 dark:border-dark-200"
+              className="w-full sm:w-auto flex items-center justify-center px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-medium rounded-lg transform hover:-translate-y-0.5 bg-light-100 dark:bg-dark-100 text-light-800 dark:text-light-50 hover:bg-light-200 dark:hover:bg-dark-200 transition-all duration-200 border border-light-200 dark:border-dark-200"
             >
-              <Search className="w-6 h-6 mr-2" />
-              Items
+              <Search className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+              Browse Items
             </Link>
           </div>
         </div>
       </div>
 
       {/* Features */}
-      <div className="py-16">
+      <div className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
             {[
               {
                 icon: Gift,
@@ -91,17 +94,17 @@ function App() {
 
       {/* CTA Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-dark-200 dark:to-dark-300">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto py-12 md:py-16 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white">
               Ready to make a difference?
             </h2>
-            <p className="mt-4 text-xl text-blue-100 dark:text-light-300">
+            <p className="mt-4 text-lg md:text-xl text-blue-100 dark:text-light-300">
               Join thousands of others who are already making an impact in their communities.
             </p>
             <button
               onClick={handleStartDonating}
-              className="mt-8 inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-lg text-blue-600 dark:text-blue-400 bg-white dark:bg-dark-50 hover:bg-blue-50 dark:hover:bg-dark-100 transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="mt-6 md:mt-8 inline-flex items-center px-6 md:px-8 py-3 md:py-4 border border-transparent text-base md:text-lg font-medium rounded-lg text-blue-600 dark:text-blue-400 bg-white dark:bg-dark-50 hover:bg-blue-50 dark:hover:bg-dark-100 transition-all duration-200 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Get Started
             </button>

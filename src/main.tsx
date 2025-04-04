@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import CreateItem from './pages/CreateItem';
 import EditItem from './pages/EditItem';
 import Search from './pages/Search';
+import './lib/i18n';
 import './index.css';
 
 const queryClient = new QueryClient({

@@ -6,7 +6,9 @@ import {
   Settings, 
   HelpCircle, 
   Copy,
-  User
+  User,
+  Menu,
+  X
 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { Link } from 'react-router-dom';
@@ -19,6 +21,7 @@ export default function Layout() {
   const [showSettings, setShowSettings] = React.useState(false);
   const [showResources, setShowResources] = React.useState(false);
   const [copySuccess, setCopySuccess] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const user = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
   const setDarkMode = useStore((state) => state.setDarkMode);
@@ -87,16 +90,39 @@ export default function Layout() {
     return email.split('@')[0].slice(0, 2).toUpperCase();
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (isProfileOpen) setIsProfileOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-blue-100 dark:border-gray-700 relative z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <Logo size="md" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">BladiShare</span>
-            </Link>
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center">
+              <Link to="/" className="flex items-center space-x-2">
+                <Logo size="md" />
+                <span className="text-xl font-bold text-gray-900 dark:text-white">BladiShare</span>
+              </Link>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="flex md:hidden">
+              <button
+                onClick={toggleMobileMenu}
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
+            </div>
+
+            {/* Desktop navigation */}
+            <div className="hidden md:flex items-center space-x-6">
               <div className="relative">
                 <button
                   onClick={() => setIsLanguageOpen(!isLanguageOpen)}
@@ -200,7 +226,7 @@ export default function Layout() {
                   )}
                 </div>
               ) : (
-                <>
+                <div className="flex items-center space-x-4">
                   <Link
                     to="/login"
                     className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -213,9 +239,82 @@ export default function Layout() {
                   >
                     Register
                   </Link>
-                </>
+                </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 shadow-lg">
+            <div className="px-3 py-2">
+              <button
+                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
+                className="w-full text-left flex items-center justify-between text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                <span>Language</span>
+                <ChevronRight className={`w-4 h-4 transform transition-transform ${isLanguageOpen ? 'rotate-90' : ''}`} />
+              </button>
+              {isLanguageOpen && (
+                <div className="mt-2 space-y-1">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700"
+                      onClick={() => {
+                        setIsLanguageOpen(false);
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {user ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/profile"
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <div className="px-3 py-2 space-y-2">
+                <Link
+                  to="/login"
+                  className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="block w-full text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </nav>

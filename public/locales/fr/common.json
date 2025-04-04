@@ -1,0 +1,37 @@
+{
+  "navigation": {
+    "language": "Langue",
+    "signIn": "Se connecter",
+    "register": "S'inscrire",
+    "dashboard": "Tableau de bord",
+    "profile": "Profil",
+    "signOut": "Se déconnecter"
+  },
+  "home": {
+    "hero": {
+      "title": "Connectez, Partagez, Faites la différence",
+      "subtitle": "Rejoignez notre communauté où le don rencontre le besoin. Créez un impact positif en partageant ce dont vous n'avez plus besoin avec ceux qui en ont le plus besoin.",
+      "startDonating": "Commencer à donner",
+      "browseItems": "Parcourir les articles"
+    },
+    "features": {
+      "easyDonations": {
+        "title": "Dons faciles",
+        "description": "Créez des annonces pour les articles que vous souhaitez donner en quelques clics"
+      },
+      "directCommunication": {
+        "title": "Communication directe",
+        "description": "Chattez directement avec les donneurs ou les bénéficiaires pour coordonner les dons"
+      },
+      "smartNotifications": {
+        "title": "Notifications intelligentes",
+        "description": "Recevez des notifications sur les nouveaux articles correspondants et les mises à jour des messages"
+      }
+    },
+    "cta": {
+      "title": "Prêt à faire la différence ?",
+      "subtitle": "Rejoignez des milliers d'autres personnes qui ont déjà un impact dans leurs communautés.",
+      "button": "Commencer"
+    }
+  }
+}
