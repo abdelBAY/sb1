@@ -5,10 +5,9 @@ import {
   ChevronRight, 
   Settings, 
   HelpCircle, 
-  Copy,
-  User,
   Menu,
-  X
+  X,
+  LayoutDashboard
 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { Link } from 'react-router-dom';
@@ -20,7 +19,6 @@ export default function Layout() {
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
   const [showResources, setShowResources] = React.useState(false);
-  const [copySuccess, setCopySuccess] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const user = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
@@ -42,11 +40,9 @@ export default function Layout() {
   }, []);
 
   React.useEffect(() => {
-    // Check system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setDarkMode(prefersDark);
 
-    // Listen for system preference changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
     mediaQuery.addEventListener('change', handleChange);
@@ -63,18 +59,6 @@ export default function Layout() {
         navigate('/');
       } catch (error) {
         console.error('Error signing out:', error);
-      }
-    }
-  };
-
-  const handleCopyId = async () => {
-    if (user?.id) {
-      try {
-        await navigator.clipboard.writeText(user.id);
-        setCopySuccess(true);
-        setTimeout(() => setCopySuccess(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
       }
     }
   };
@@ -168,28 +152,19 @@ export default function Layout() {
                   
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-out scale-100 opacity-100 z-50">
-                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Connect ID</span>
-                            <button
-                              onClick={handleCopyId}
-                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
-                              title="Copy ID"
-                            >
-                              <Copy className={`w-4 h-4 ${copySuccess ? 'text-green-500' : 'text-gray-400 dark:text-gray-500'}`} />
-                            </button>
-                          </div>
-                          <div className="text-sm font-mono bg-gray-50 dark:bg-gray-900 p-2 rounded">
-                            {user.id}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {user.email}
-                          </div>
-                        </div>
-                      </div>
-
                       <div className="p-2">
+                        <Link
+                          to="/dashboard"
+                          className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <LayoutDashboard className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            <span>Dashboard</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </Link>
+
                         <button
                           onClick={() => setShowSettings(!showSettings)}
                           className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -282,13 +257,6 @@ export default function Layout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Dashboard
-                </Link>
-                <Link
-                  to="/profile"
-                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Profile
                 </Link>
                 <button
                   onClick={handleSignOut}

@@ -1,7 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { debounce } from 'lodash';
 import { supabase } from '../lib/supabase';
-import { Search as SearchIcon, MapPin, Calendar, Tag, Filter, Grid, List } from 'lucide-react';
+import { 
+  Search as SearchIcon, 
+  MapPin, 
+  Calendar, 
+  Tag, 
+  Grid, 
+  List,
+  Star,
+  Heart,
+  Share2,
+  Printer,
+  Clock,
+  Info,
+  Package,
+  DollarSign,
+  Truck,
+  BarChart2
+} from 'lucide-react';
+import ImageOverlay from '../components/ImageOverlay';
 
 interface SearchResult {
   id: string;
@@ -12,9 +30,54 @@ interface SearchResult {
   photos: string[];
   tags: string[];
   created_at: string;
+  condition: 'LIKE_NEW' | 'GOOD' | 'WORN' | 'BROKEN';
+  status: 'PENDING' | 'CLAIMED' | 'COMPLETED';
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  };
+  rating?: number;
+  review_count?: number;
+  pickup_instructions?: string;
+}
+
+interface SortOption {
+  label: string;
+  value: string;
 }
 
 const ITEMS_PER_PAGE = 12;
+
+const sortOptions: SortOption[] = [
+  { label: 'Newest First', value: 'created_at-desc' },
+  { label: 'Oldest First', value: 'created_at-asc' },
+  { label: 'Name A-Z', value: 'title-asc' },
+  { label: 'Name Z-A', value: 'title-desc' },
+  { label: 'Rating High-Low', value: 'rating-desc' },
+  { label: 'Rating Low-High', value: 'rating-asc' }
+];
+
+const categories = [
+  'All Categories',
+  'Furniture',
+  'Electronics',
+  'Clothing',
+  'Books',
+  'Kitchen',
+  'Sports',
+  'Toys',
+  'Tools',
+  'Other'
+];
+
+const conditions = [
+  { value: 'LIKE_NEW', label: 'Like New' },
+  { value: 'GOOD', label: 'Good' },
+  { value: 'WORN', label: 'Worn' },
+  { value: 'BROKEN', label: 'Needs Repair' }
+];
 
 export default function Search() {
   const [query, setQuery] = useState('');
@@ -24,39 +87,73 @@ export default function Search() {
   const [totalResults, setTotalResults] = useState(0);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCondition, setSelectedCondition] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('created_at-desc');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
 
-  const categories = [
-    'All Categories',
-    'Furniture',
-    'Electronics',
-    'Clothing',
-    'Books',
-    'Kitchen',
-    'Sports',
-    'Toys',
-    'Tools',
-    'Other'
-  ];
+  // Subscribe to realtime changes
+  useEffect(() => {
+    const subscription = supabase
+      .channel('announcements_changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'announcements' 
+        }, 
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            setResults(prev => prev.filter(item => item.id !== payload.old.id));
+            setTotalResults(prev => prev - 1);
+          }
+          else if (payload.eventType === 'UPDATE') {
+            setResults(prev => prev.map(item => 
+              item.id === payload.new.id ? { ...item, ...payload.new } : item
+            ));
+          }
+          else if (payload.eventType === 'INSERT') {
+            performSearch();
+          }
+        }
+      )
+      .subscribe();
 
-  const performSearch = async (searchQuery: string, category: string) => {
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [query, selectedCategory, selectedCondition, sortBy, page]);
+
+  const performSearch = async () => {
     setLoading(true);
     try {
-      let query = supabase
+      let queryBuilder = supabase
         .from('announcements')
         .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
         .range((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE - 1);
 
-      if (searchQuery) {
-        // Use ilike for basic text search until full-text search is set up
-        query = query.ilike('title', `%${searchQuery}%`);
+      // Apply filters
+      if (selectedCategory && selectedCategory !== 'All Categories') {
+        queryBuilder = queryBuilder.eq('category', selectedCategory);
       }
 
-      if (category && category !== 'All Categories') {
-        query = query.eq('category', category);
+      if (selectedCondition) {
+        queryBuilder = queryBuilder.eq('condition', selectedCondition);
       }
 
-      const { data, error, count } = await query;
+      // Apply search query
+      if (typeof query === 'string' && query.trim()) {
+        queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+      }
+
+      // Apply sorting
+      const [sortField, sortDirection] = sortBy.split('-');
+      queryBuilder = queryBuilder.order(sortField, { ascending: sortDirection === 'asc' });
+
+      const { data, error, count } = await queryBuilder;
 
       if (error) throw error;
 
@@ -70,21 +167,56 @@ export default function Search() {
   };
 
   useEffect(() => {
-    const debouncedSearch = debounce(() => {
-      performSearch(query, selectedCategory);
-    }, 300);
-
+    const debouncedSearch = debounce(performSearch, 300);
     debouncedSearch();
     return () => debouncedSearch.cancel();
-  }, [query, selectedCategory, page]);
+  }, [query, selectedCategory, selectedCondition, sortBy, page]);
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const toggleFavorite = (itemId: string) => {
+    setFavorites(prev => 
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
-    }).format(date);
+    }).format(new Date(dateString));
+  };
+
+  const getConditionColor = (condition: string) => {
+    const colors = {
+      'LIKE_NEW': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+      'GOOD': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+      'WORN': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+      'BROKEN': 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
+    };
+    return colors[condition] || '';
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors = {
+      'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+      'CLAIMED': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+      'COMPLETED': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+    };
+    return colors[status] || '';
   };
 
   return (
@@ -92,9 +224,26 @@ export default function Search() {
       <div className="max-w-7xl mx-auto">
         {/* Search Header */}
         <div className="mb-8 space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Find Available Items
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Find Available Items
+            </h1>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Filters
+              </button>
+              <button
+                onClick={handlePrint}
+                className="p-2 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                <Printer className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-grow">
               <input
@@ -106,6 +255,7 @@ export default function Search() {
               />
               <SearchIcon className="absolute left-4 top-3.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
             </div>
+
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -117,6 +267,19 @@ export default function Search() {
                 </option>
               ))}
             </select>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+            >
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode('grid')}
@@ -140,7 +303,59 @@ export default function Search() {
               </button>
             </div>
           </div>
+
+          {/* Advanced Filters */}
+          {showFilters && (
+            <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Condition
+                  </label>
+                  <select
+                    value={selectedCondition}
+                    onChange={(e) => setSelectedCondition(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">Any Condition</option>
+                    {conditions.map((condition) => (
+                      <option key={condition.value} value={condition.value}>
+                        {condition.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Add more filters as needed */}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Selected Items Bar */}
+        {selectedItems.length > 0 && (
+          <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-gray-700 dark:text-gray-300">
+                {selectedItems.length} items selected
+              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowCompareModal(true)}
+                className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+              >
+                Compare Selected
+              </button>
+              <button
+                onClick={() => setSelectedItems([])}
+                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+              >
+                Clear Selection
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Results Section */}
         {loading ? (
@@ -158,7 +373,10 @@ export default function Search() {
                   }`}
                 >
                   {/* Image Section */}
-                  <div className={viewMode === 'list' ? 'w-48 h-48 flex-shrink-0' : 'aspect-video'}>
+                  <div 
+                    className={`relative ${viewMode === 'list' ? 'w-48 h-48 flex-shrink-0' : 'aspect-video'} cursor-pointer`}
+                    onClick={() => setSelectedItem(item)}
+                  >
                     {item.photos && item.photos[0] ? (
                       <img
                         src={item.photos[0]}
@@ -167,20 +385,41 @@ export default function Search() {
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                        <SearchIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                        <Package className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(item.id);
+                      }}
+                      className={`absolute top-2 right-2 p-2 rounded-full ${
+                        favorites.includes(item.id)
+                          ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700/50 dark:text-gray-400'
+                      }`}
+                    >
+                      <Heart className="w-5 h-5" />
+                    </button>
                   </div>
 
                   {/* Content Section */}
                   <div className="p-6">
                     <div className="flex items-start justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {item.title}
-                      </h3>
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200">
-                        {item.category}
-                      </span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {item.title}
+                        </h3>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200">
+                          {item.category}
+                        </span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => toggleItemSelection(item.id)}
+                        className="h-4 w-4 text-blue-600 dark:text-blue-400 rounded border-gray-300 dark:border-gray-600"
+                      />
                     </div>
 
                     <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm line-clamp-2">
@@ -196,6 +435,36 @@ export default function Search() {
                         <Calendar className="w-4 h-4 mr-2" />
                         {formatDate(item.created_at)}
                       </div>
+                      {item.dimensions && (
+                        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                          <Package className="w-4 h-4 mr-2" />
+                          {`${item.dimensions.length}x${item.dimensions.width}x${item.dimensions.height} ${item.dimensions.unit}`}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConditionColor(item.condition)}`}>
+                          {item.condition}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      {item.rating && (
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                          <span className="text-sm text-gray-600 dark:text-gray-300">
+                            {item.rating.toFixed(1)}
+                          </span>
+                          {item.review_count && (
+                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+                              ({item.review_count})
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {item.tags && item.tags.length > 0 && (
@@ -211,6 +480,29 @@ export default function Search() {
                         ))}
                       </div>
                     )}
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <button
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                        onClick={() => setSelectedItem(item)}
+                      >
+                        View Details
+                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                          onClick={() => {/* Share item */}}
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                          onClick={() => {/* View history */}}
+                        >
+                          <Clock className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -226,7 +518,7 @@ export default function Search() {
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
+                <span className="px-4 py-2 text-sm font-medium text-gray-700 dark: text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                   Page {page} of {Math.ceil(totalResults / ITEMS_PER_PAGE)}
                 </span>
                 <button
@@ -245,6 +537,14 @@ export default function Search() {
               {query || selectedCategory ? 'No results found' : 'Start typing to search for items'}
             </p>
           </div>
+        )}
+
+        {/* Image Overlay */}
+        {selectedItem && (
+          <ImageOverlay
+            item={selectedItem}
+            onClose={() => setSelectedItem(null)}
+          />
         )}
       </div>
     </div>

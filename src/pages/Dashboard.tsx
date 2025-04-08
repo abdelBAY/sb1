@@ -46,6 +46,8 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
 
@@ -60,6 +62,7 @@ export default function Dashboard() {
   async function loadDashboardData() {
     try {
       setLoading(true);
+      setError(null);
 
       // Fetch announcements
       const { data: announcements, error: announcementsError } = await supabase
@@ -68,7 +71,10 @@ export default function Dashboard() {
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
-      if (announcementsError) throw announcementsError;
+      if (announcementsError) {
+        console.error('Error fetching announcements:', announcementsError);
+        throw new Error('Failed to load your items. Please try again.');
+      }
 
       // Calculate stats
       const stats = {
@@ -89,22 +95,78 @@ export default function Dashboard() {
   }
 
   const handleDelete = async (itemId: string) => {
-    const confirmed = window.confirm('Are you sure you want to delete this item? This action cannot be undone.');
-    if (!confirmed) return;
-
     try {
-      const { error } = await supabase
+      setDeletingItemId(itemId);
+      setDeleteError(null);
+
+      // Find the item to be deleted
+      const itemToDelete = items.find(item => item.id === itemId);
+      if (!itemToDelete) {
+        throw new Error('Item not found');
+      }
+
+      // Show confirmation dialog with item details
+      const confirmed = window.confirm(
+        `Are you sure you want to delete "${itemToDelete.title}"? This action cannot be undone.`
+      );
+
+      if (!confirmed) {
+        setDeletingItemId(null);
+        return;
+      }
+
+      // Delete associated photos from storage if they exist
+      if (itemToDelete.photos && itemToDelete.photos.length > 0) {
+        const photoUrls = itemToDelete.photos;
+        const photoKeys = photoUrls.map(url => {
+          const parts = url.split('/');
+          return parts[parts.length - 1];
+        });
+
+        const { error: storageError } = await supabase.storage
+          .from('item-photos')
+          .remove(photoKeys);
+
+        if (storageError) {
+          console.error('Error deleting photos:', storageError);
+          // Continue with item deletion even if photo deletion fails
+        }
+      }
+
+      // Delete the announcement
+      const { error: deleteError } = await supabase
         .from('announcements')
         .delete()
         .eq('id', itemId);
 
-      if (error) throw error;
+      if (deleteError) {
+        throw deleteError;
+      }
 
-      // Refresh the dashboard data
-      loadDashboardData();
+      // Update local state
+      setItems(prevItems => prevItems.filter(item => item.id !== itemId));
+      
+      // Update stats
+      setStats(prevStats => ({
+        ...prevStats,
+        totalDonations: prevStats.totalDonations - 1,
+        activeDonations: itemToDelete.status === 'PENDING' 
+          ? prevStats.activeDonations - 1 
+          : prevStats.activeDonations,
+        completedDonations: itemToDelete.status === 'COMPLETED'
+          ? prevStats.completedDonations - 1
+          : prevStats.completedDonations
+      }));
+
     } catch (error) {
       console.error('Error deleting item:', error);
-      setError('Failed to delete item');
+      setDeleteError(
+        error instanceof Error 
+          ? `Failed to delete item: ${error.message}` 
+          : 'Failed to delete item. Please try again.'
+      );
+    } finally {
+      setDeletingItemId(null);
     }
   };
 
@@ -120,7 +182,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-          <div className="flex items-center space-x-3 text-red-600 dark: text-red-400 mb-4">
+          <div className="flex items-center space-x-3 text-red-600 dark:text-red-400 mb-4">
             <AlertCircle className="w-6 h-6" />
             <h2 className="text-xl font-semibold">Error Loading Dashboard</h2>
           </div>
@@ -155,6 +217,15 @@ export default function Dashboard() {
             Create New Item
           </Link>
         </div>
+
+        {deleteError && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 mr-2" />
+              {deleteError}
+            </div>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -297,10 +368,27 @@ export default function Dashboard() {
                       </Link>
                       <button
                         onClick={() => handleDelete(item.id)}
-                        className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                        disabled={deletingItemId === item.id}
+                        className={`
+                          inline-flex items-center px-3 py-1 text-sm font-medium
+                          ${deletingItemId === item.id
+                            ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                            : 'text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300'
+                          }
+                          transition-colors
+                        `}
                       >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Delete
+                        {deletingItemId === item.id ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
+                            Deleting...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Delete
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
