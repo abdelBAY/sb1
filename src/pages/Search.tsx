@@ -4,9 +4,9 @@ import { supabase } from '../lib/supabase';
 import { 
   Search as SearchIcon, 
   MapPin, 
-  Calendar, 
-  Tag, 
-  Grid, 
+  Calendar,
+  Tag,
+  Grid,
   List,
   Star,
   Heart,
@@ -19,6 +19,7 @@ import {
   Truck,
   BarChart2
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ImageOverlay from '../components/ImageOverlay';
 
 interface SearchResult {
@@ -95,7 +96,6 @@ export default function Search() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
 
-  // Subscribe to realtime changes
   useEffect(() => {
     const subscription = supabase
       .channel('announcements_changes')
@@ -135,7 +135,6 @@ export default function Search() {
         .select('*', { count: 'exact' })
         .range((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE - 1);
 
-      // Apply filters
       if (selectedCategory && selectedCategory !== 'All Categories') {
         queryBuilder = queryBuilder.eq('category', selectedCategory);
       }
@@ -144,12 +143,10 @@ export default function Search() {
         queryBuilder = queryBuilder.eq('condition', selectedCondition);
       }
 
-      // Apply search query
       if (typeof query === 'string' && query.trim()) {
         queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
       }
 
-      // Apply sorting
       const [sortField, sortDirection] = sortBy.split('-');
       queryBuilder = queryBuilder.order(sortField, { ascending: sortDirection === 'asc' });
 
@@ -222,7 +219,6 @@ export default function Search() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Search Header */}
         <div className="mb-8 space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -304,7 +300,6 @@ export default function Search() {
             </div>
           </div>
 
-          {/* Advanced Filters */}
           {showFilters && (
             <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -325,14 +320,11 @@ export default function Search() {
                     ))}
                   </select>
                 </div>
-
-                {/* Add more filters as needed */}
               </div>
             </div>
           )}
         </div>
 
-        {/* Selected Items Bar */}
         {selectedItems.length > 0 && (
           <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex items-center justify-between">
             <div className="flex items-center">
@@ -357,7 +349,6 @@ export default function Search() {
           </div>
         )}
 
-        {/* Results Section */}
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
@@ -368,49 +359,41 @@ export default function Search() {
               {results.map((item) => (
                 <div
                   key={item.id}
-                  className={`bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden ${
+                  className={`bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden ${
                     viewMode === 'list' ? 'flex' : ''
                   }`}
                 >
-                  {/* Image Section */}
-                  <div 
-                    className={`relative ${viewMode === 'list' ? 'w-48 h-48 flex-shrink-0' : 'aspect-video'} cursor-pointer`}
-                    onClick={() => setSelectedItem(item)}
+                  <Link 
+                    to={`/product/${item.id}`}
+                    className={`block relative ${
+                      viewMode === 'list' ? 'w-48 h-48 flex-shrink-0' : 'aspect-video'
+                    } group`}
+                    aria-label={`View details for ${item.title}`}
                   >
                     {item.photos && item.photos[0] ? (
                       <img
                         src={item.photos[0]}
                         alt={item.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors">
                         <Package className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(item.id);
-                      }}
-                      className={`absolute top-2 right-2 p-2 rounded-full ${
-                        favorites.includes(item.id)
-                          ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400'
-                          : 'bg-gray-100 text-gray-600 dark:bg-gray-700/50 dark:text-gray-400'
-                      }`}
-                    >
-                      <Heart className="w-5 h-5" />
-                    </button>
-                  </div>
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-200" />
+                  </Link>
 
-                  {/* Content Section */}
-                  <div className="p-6">
+                  <div className="p-6 flex-1">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <Link 
+                          to={`/product/${item.id}`}
+                          className="block text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        >
                           {item.title}
-                        </h3>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200">
+                        </Link>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 mt-2">
                           {item.category}
                         </span>
                       </div>
@@ -482,22 +465,30 @@ export default function Search() {
                     )}
 
                     <div className="mt-4 flex items-center justify-between">
-                      <button
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-                        onClick={() => setSelectedItem(item)}
+                      <Link
+                        to={`/product/${item.id}`}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                       >
                         View Details
-                      </button>
+                      </Link>
                       <div className="flex items-center space-x-2">
                         <button
+                          onClick={() => toggleFavorite(item.id)}
+                          className={`p-2 rounded-full ${
+                            favorites.includes(item.id)
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-gray-400 dark:text-gray-500'
+                          } hover:text-red-700 dark:hover:text-red-300 transition-colors`}
+                        >
+                          <Heart className="w-4 h-4" />
+                        </button>
+                        <button
                           className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                          onClick={() => {/* Share item */}}
                         >
                           <Share2 className="w-4 h-4" />
                         </button>
                         <button
                           className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                          onClick={() => {/* View history */}}
                         >
                           <Clock className="w-4 h-4" />
                         </button>
@@ -508,7 +499,6 @@ export default function Search() {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalResults > ITEMS_PER_PAGE && (
               <div className="flex justify-center mt-8 space-x-2">
                 <button
@@ -518,7 +508,7 @@ export default function Search() {
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2 text-sm font-medium text-gray-700 dark: text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
+                <span className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
                   Page {page} of {Math.ceil(totalResults / ITEMS_PER_PAGE)}
                 </span>
                 <button
@@ -539,7 +529,6 @@ export default function Search() {
           </div>
         )}
 
-        {/* Image Overlay */}
         {selectedItem && (
           <ImageOverlay
             item={selectedItem}
