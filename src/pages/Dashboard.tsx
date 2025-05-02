@@ -14,7 +14,8 @@ import {
   Calendar,
   AlertCircle,
   Edit,
-  Trash2
+  Trash2,
+  Package
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
@@ -27,6 +28,7 @@ interface DashboardItem {
   category: string;
   description: string;
   location: string;
+  photos: string[];
 }
 
 interface DashboardStats {
@@ -71,10 +73,7 @@ export default function Dashboard() {
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
-      if (announcementsError) {
-        console.error('Error fetching announcements:', announcementsError);
-        throw new Error('Failed to load your items. Please try again.');
-      }
+      if (announcementsError) throw announcementsError;
 
       // Calculate stats
       const stats = {
@@ -120,7 +119,7 @@ export default function Dashboard() {
         const photoUrls = itemToDelete.photos;
         const photoKeys = photoUrls.map(url => {
           const parts = url.split('/');
-          return parts[parts.length - 1];
+          return `${user?.id}/${parts[parts.length - 1]}`;
         });
 
         const { error: storageError } = await supabase.storage
@@ -129,7 +128,6 @@ export default function Dashboard() {
 
         if (storageError) {
           console.error('Error deleting photos:', storageError);
-          // Continue with item deletion even if photo deletion fails
         }
       }
 
@@ -137,11 +135,19 @@ export default function Dashboard() {
       const { error: deleteError } = await supabase
         .from('announcements')
         .delete()
-        .eq('id', itemId);
+        .eq('id', itemId)
+        .eq('user_id', user?.id); // Extra safety check
 
       if (deleteError) {
         throw deleteError;
       }
+
+      // Broadcast deletion event
+      await supabase.channel('custom-all-channel').send({
+        type: 'broadcast',
+        event: 'announcement_deleted',
+        payload: { id: itemId }
+      });
 
       // Update local state
       setItems(prevItems => prevItems.filter(item => item.id !== itemId));
@@ -165,6 +171,9 @@ export default function Dashboard() {
           ? `Failed to delete item: ${error.message}` 
           : 'Failed to delete item. Please try again.'
       );
+      
+      // Rollback UI changes on error
+      loadDashboardData();
     } finally {
       setDeletingItemId(null);
     }
@@ -312,84 +321,97 @@ export default function Dashboard() {
             ) : (
               items.map((item) => (
                 <div key={item.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className={`
-                        rounded-full p-2
-                        ${item.status === 'PENDING' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400' : ''}
-                        ${item.status === 'CLAIMED' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : ''}
-                        ${item.status === 'COMPLETED' ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400' : ''}
-                      `}>
-                        {item.status === 'PENDING' && <Clock className="w-5 h-5" />}
-                        {item.status === 'CLAIMED' && <BookmarkPlus className="w-5 h-5" />}
-                        {item.status === 'COMPLETED' && <CheckCircle className="w-5 h-5" />}
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-medium text-gray-900 dark:text-white">
-                          {item.title}
-                        </h4>
-                        <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {item.location}
-                          </span>
-                          <span className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </span>
+                  <div className="flex items-start space-x-4">
+                    {/* Item Image */}
+                    <div className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
+                      {item.photos && item.photos[0] ? (
+                        <img
+                          src={item.photos[0]}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Item Details */}
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <Link 
+                            to={`/product/${item.id}`}
+                            className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          >
+                            {item.title}
+                          </Link>
+                          <div className="mt-1 flex items-center space-x-2">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200">
+                              {item.category}
+                            </span>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              item.status === 'PENDING'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
+                                : item.status === 'CLAIMED'
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'
+                                : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                            }`}>
+                              {item.status}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <span className={`
-                      px-3 py-1 rounded-full text-sm font-medium
-                      ${item.status === 'PENDING' ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200' : ''}
-                      ${item.status === 'CLAIMED' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200' : ''}
-                      ${item.status === 'COMPLETED' ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200' : ''}
-                    `}>
-                      {item.status}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    {item.description}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Category: {item.category}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Link
-                        to={`/edit-item/${item.id}`}
-                        className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        disabled={deletingItemId === item.id}
-                        className={`
-                          inline-flex items-center px-3 py-1 text-sm font-medium
-                          ${deletingItemId === item.id
-                            ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                            : 'text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300'
-                          }
-                          transition-colors
-                        `}
-                      >
-                        {deletingItemId === item.id ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
-                            Deleting...
-                          </>
-                        ) : (
-                          <>
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete
-                          </>
-                        )}
-                      </button>
+
+                      <p className="mt-2 text-gray-600 dark:text-gray-300">
+                        {item.description}
+                      </p>
+
+                      <div className="mt-3 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center">
+                          <MapPin className="w-4 h-4 mr-1" />
+                          {item.location}
+                        </span>
+                        <span className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {new Date(item.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-end space-x-4">
+                        <Link
+                          to={`/edit-item/${item.id}`}
+                          className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          disabled={deletingItemId === item.id}
+                          className={`
+                            inline-flex items-center px-3 py-1 text-sm font-medium
+                            ${deletingItemId === item.id
+                              ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                              : 'text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300'
+                            }
+                            transition-colors
+                          `}
+                        >
+                          {deletingItemId === item.id ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
+                              Deleting...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

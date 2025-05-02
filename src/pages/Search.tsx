@@ -97,35 +97,19 @@ export default function Search() {
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
 
   useEffect(() => {
-    const subscription = supabase
-      .channel('announcements_changes')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'announcements' 
-        }, 
-        (payload) => {
-          if (payload.eventType === 'DELETE') {
-            setResults(prev => prev.filter(item => item.id !== payload.old.id));
-            setTotalResults(prev => prev - 1);
-          }
-          else if (payload.eventType === 'UPDATE') {
-            setResults(prev => prev.map(item => 
-              item.id === payload.new.id ? { ...item, ...payload.new } : item
-            ));
-          }
-          else if (payload.eventType === 'INSERT') {
-            performSearch();
-          }
-        }
-      )
+    const channel = supabase
+      .channel('custom-all-channel')
+      .on('broadcast', { event: 'announcement_deleted' }, (payload) => {
+        // Remove deleted item from results
+        setResults(prev => prev.filter(item => item.id !== payload.payload.id));
+        setTotalResults(prev => prev - 1);
+      })
       .subscribe();
 
     return () => {
-      supabase.removeChannel(subscription);
+      supabase.removeChannel(channel);
     };
-  }, [query, selectedCategory, selectedCondition, sortBy, page]);
+  }, []);
 
   const performSearch = async () => {
     setLoading(true);
