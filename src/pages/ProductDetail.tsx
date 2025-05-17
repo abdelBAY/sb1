@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
+import RequestForm from '../components/RequestForm';
 
 interface ProductDetails {
   id: string;
@@ -42,8 +43,8 @@ interface ProductDetails {
   };
   user: {
     id: string;
-    full_name: string;
-    avatar_url: string;
+    full_name: string | null;
+    avatar_url: string | null;
     rating: number;
     review_count: number;
   };
@@ -53,8 +54,8 @@ interface ProductDetails {
     comment: string;
     created_at: string;
     profiles: {
-      full_name: string;
-      avatar_url: string;
+      full_name: string | null;
+      avatar_url: string | null;
     };
   }[];
   related_items: {
@@ -74,6 +75,7 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showRequestForm, setShowRequestForm] = useState(false);
   const user = useStore((state) => state.user);
 
   useEffect(() => {
@@ -90,21 +92,30 @@ export default function ProductDetail() {
         .from('announcements')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (announcementError) throw announcementError;
+      if (!announcement) {
+        setError('Announcement not found');
+        return;
+      }
 
-      // Fetch user profile
-      const { data: userProfile, error: userError } = await supabase
+      // Fetch user profile with maybeSingle() to handle missing profiles
+      const { data: userProfile } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url')
         .eq('id', announcement.user_id)
-        .single();
+        .maybeSingle();
 
-      if (userError) throw userError;
+      // Create default profile if none exists
+      const profile = userProfile || {
+        id: announcement.user_id,
+        full_name: 'Anonymous User',
+        avatar_url: null
+      };
 
-      // Fetch user reviews with correct join
-      const { data: reviews, error: reviewsError } = await supabase
+      // Fetch user reviews
+      const { data: reviews = [], error: reviewsError } = await supabase
         .from('reviews')
         .select(`
           id,
@@ -120,13 +131,13 @@ export default function ProductDetail() {
 
       if (reviewsError) throw reviewsError;
 
-      // Calculate user rating
+      // Calculate user rating safely
       const userRating = reviews.length > 0
         ? reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length
         : 0;
 
       // Fetch related items
-      const { data: relatedItems, error: relatedError } = await supabase
+      const { data: relatedItems = [], error: relatedError } = await supabase
         .from('announcements')
         .select('id, title, photos, condition, status')
         .eq('category', announcement.category)
@@ -139,12 +150,12 @@ export default function ProductDetail() {
       const productData: ProductDetails = {
         ...announcement,
         user: {
-          ...userProfile,
+          ...profile,
           rating: userRating,
           review_count: reviews.length
         },
         reviews,
-        related_items: relatedItems || []
+        related_items: relatedItems
       };
 
       setProduct(productData);
@@ -156,7 +167,7 @@ export default function ProductDetail() {
           .select('id')
           .eq('user_id', user.id)
           .eq('announcement_id', id)
-          .single();
+          .maybeSingle();
 
         setIsFavorite(!!favorite);
       }
@@ -207,6 +218,12 @@ export default function ProductDetail() {
       month: 'long',
       day: 'numeric'
     }).format(new Date(dateString));
+  };
+
+  const handleRequestSubmit = async (formData: any) => {
+    // Here you would implement the logic to submit the request
+    console.log('Request submitted:', formData);
+    // You could save this to your database, send notifications, etc.
   };
 
   if (loading) {
@@ -420,7 +437,7 @@ export default function ProductDetail() {
                   {product.user.avatar_url ? (
                     <img
                       src={product.user.avatar_url}
-                      alt={product.user.full_name}
+                      alt={product.user.full_name || 'Anonymous User'}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   ) : (
@@ -430,7 +447,7 @@ export default function ProductDetail() {
                   )}
                   <div>
                     <h4 className="text-lg font-medium text-gray-900 dark:text-white">
-                      {product.user.full_name}
+                      {product.user.full_name || 'Anonymous User'}
                     </h4>
                     {product.user.rating > 0 && (
                       <div className="flex items-center mt-1">
@@ -452,6 +469,7 @@ export default function ProductDetail() {
               {/* Action Buttons */}
               <div className="flex items-center space-x-4 pt-6">
                 <button
+                  onClick={() => setShowRequestForm(true)}
                   className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
                 >
                   Request Item
@@ -481,7 +499,7 @@ export default function ProductDetail() {
                     {review.profiles.avatar_url ? (
                       <img
                         src={review.profiles.avatar_url}
-                        alt={review.profiles.full_name}
+                        alt={review.profiles.full_name || 'Anonymous User'}
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
@@ -493,7 +511,7 @@ export default function ProductDetail() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium text-gray-900 dark:text-white">
-                            {review.profiles.full_name}
+                            {review.profiles.full_name || 'Anonymous User'}
                           </h4>
                           <div className="flex items-center mt-1">
                             {[...Array(5)].map((_, i) => (
@@ -590,6 +608,16 @@ export default function ProductDetail() {
           )}
         </div>
       </div>
+
+      {/* Request Form Modal */}
+      {showRequestForm && (
+        <RequestForm
+          itemId={product.id}
+          itemName={product.title}
+          onClose={() => setShowRequestForm(false)}
+          onSubmit={handleRequestSubmit}
+        />
+      )}
     </div>
   );
 }

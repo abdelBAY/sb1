@@ -12,6 +12,7 @@ import CreateItem from './pages/CreateItem';
 import EditItem from './pages/EditItem';
 import Search from './pages/Search';
 import ProductDetail from './pages/ProductDetail';
+import Messages from './pages/Messages';
 import './lib/i18n';
 import './index.css';
 
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
       { path: 'edit-item/:id', element: <EditItem /> },
       { path: 'search', element: <Search /> },
       { path: 'product/:id', element: <ProductDetail /> },
+      { path: 'messages', element: <Messages /> },
     ],
   },
 ]);
