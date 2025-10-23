@@ -61,10 +61,6 @@ A web platform connecting donors, beneficiaries, and managers to facilitate item
 
 ### **Backend Setup**
 ```bash
-# Clone repo
-git clone https://github.com/yourusername/BridgeSphere.git
-cd BridgeSphere/backend
-
 # Install dependencies
 python -m venv venv
 source venv/bin/activate
