@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ChevronRight, 
   MapPin, 
@@ -67,6 +67,7 @@ interface ProductDetails {
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +77,7 @@ export default function ProductDetail() {
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestStatus, setRequestStatus] = useState<'none' | 'pending' | 'accepted' | 'declined' | 'completed'>('none');
   const user = useStore((state) => state.user);
+  const profile = useStore((state) => state.profile);
 
   useEffect(() => {
     loadProductDetails();
@@ -220,11 +222,40 @@ export default function ProductDetail() {
   };
 
   const handleSendRequest = async (message: string) => {
-    if (!user || !product) return;
+    if (!user || !product) {
+      console.error('Missing user or product:', { user: !!user, product: !!product });
+      throw new Error('User or product information is missing');
+    }
+
+    // Check if user is trying to send request to themselves
+    if (user.id === product.user.id) {
+      console.error('User trying to send request to themselves');
+      throw new Error('You cannot send a request to yourself');
+    }
 
     try {
+      console.log('Sending request:', {
+        sender_id: user.id,
+        receiver_id: product.user.id,
+        content: message,
+        announcement_id: product.id
+      });
+
+      // First, let's test if we can access the messages table
+      const { error: testError } = await supabase
+        .from('messages')
+        .select('id')
+        .limit(1);
+
+      if (testError) {
+        console.error('Cannot access messages table:', testError);
+        throw new Error(`Cannot access messages table: ${testError.message}`);
+      }
+
+      console.log('Messages table accessible, proceeding with insert...');
+
       // Create a message to the donor
-      const { error: messageError } = await supabase
+      const { data, error: messageError } = await supabase
         .from('messages')
         .insert([{
           sender_id: user.id,
@@ -232,17 +263,22 @@ export default function ProductDetail() {
           content: message,
           created_at: new Date().toISOString(),
           read: false,
-          announcement_id: product.id,
-          message_type: 'text'
-        }]);
+          announcement_id: product.id
+        }])
+        .select();
 
-      if (messageError) throw messageError;
+      if (messageError) {
+        console.error('Database error:', messageError);
+        throw new Error(`Database error: ${messageError.message}`);
+      }
+
+      console.log('Message sent successfully:', data);
 
       // Update request status
       setRequestStatus('pending');
       
       // Navigate to messages page
-      window.location.href = '/messages';
+      navigate('/messages');
     } catch (error) {
       console.error('Error sending request:', error);
       throw error;
@@ -250,7 +286,31 @@ export default function ProductDetail() {
   };
 
   const handleOpenChat = () => {
-    window.location.href = '/messages';
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    if (!profile) {
+      navigate('/register');
+      return;
+    }
+    
+    navigate('/messages');
+  };
+
+  const handleRequestClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
+    if (!profile) {
+      navigate('/register');
+      return;
+    }
+    
+    setShowRequestModal(true);
   };
 
   if (loading) {
@@ -505,7 +565,7 @@ export default function ProductDetail() {
               ) : (
                 <div className="flex items-center space-x-4 pt-6">
                   <button
-                    onClick={() => setShowRequestModal(true)}
+                    onClick={handleRequestClick}
                     className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
                   >
                     Request Item

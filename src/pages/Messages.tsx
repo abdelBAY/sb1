@@ -84,21 +84,33 @@ export default function Messages() {
   } | null>(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    // Only redirect if we're sure the user is not authenticated
+    // Give some time for auth to initialize
+    const timer = setTimeout(() => {
+      if (!user) {
+        navigate('/login');
+      }
+    }, 1000);
+
+    if (user) {
+      clearTimeout(timer);
+      loadChats();
     }
-    loadChats();
+
+    return () => clearTimeout(timer);
   }, [user, navigate]);
 
   useEffect(() => {
     if (selectedChat) {
+      console.log('Chat selected, loading messages for:', selectedChat.id);
+      console.log('Selected chat details:', selectedChat);
       loadMessages(selectedChat.id);
     }
   }, [selectedChat]);
 
   useEffect(() => {
     scrollToBottom();
+    console.log('Messages updated:', messages.length, messages);
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -108,6 +120,8 @@ export default function Messages() {
   const loadChats = async () => {
     try {
       setLoading(true);
+      
+      // First, get all messages for the user
       const { data: messages, error: messagesError } = await supabase
         .from('messages')
         .select(`
@@ -117,18 +131,35 @@ export default function Messages() {
           content,
           created_at,
           read,
-          announcement_id,
-          profiles!sender_id (
-            id,
-            full_name,
-            avatar_url,
-            last_seen
-          )
+          announcement_id
         `)
         .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
         .order('created_at', { ascending: false });
 
       if (messagesError) throw messagesError;
+
+      // Get unique user IDs from messages
+      const userIds = new Set<string>();
+      messages?.forEach((message: any) => {
+        if (message.sender_id !== user?.id) userIds.add(message.sender_id);
+        if (message.receiver_id !== user?.id) userIds.add(message.receiver_id);
+      });
+
+      // Fetch profiles for all users
+      let profiles: any[] = [];
+      if (userIds.size > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, last_seen')
+          .in('id', Array.from(userIds));
+
+        if (profilesError) {
+          console.error('Profiles query error:', profilesError);
+          // Continue without profiles - we'll use fallback data
+        } else {
+          profiles = profilesData || [];
+        }
+      }
 
       // Group messages by chat
       const chatMap = new Map<string, Chat>();
@@ -136,14 +167,17 @@ export default function Messages() {
         const otherUserId = message.sender_id === user?.id ? message.receiver_id : message.sender_id;
         const chatId = [user?.id, otherUserId].sort().join('-');
 
+        // Find profile for this user
+        const profile = profiles.find(p => p.id === otherUserId);
+
         if (!chatMap.has(chatId)) {
           chatMap.set(chatId, {
             id: chatId,
             user: {
               id: otherUserId,
-              full_name: message.profiles.full_name,
-              avatar_url: message.profiles.avatar_url,
-              last_seen: message.profiles.last_seen
+              full_name: profile?.full_name || 'Unknown User',
+              avatar_url: profile?.avatar_url || null,
+              last_seen: profile?.last_seen || null
             },
             last_message: {
               content: message.content,
@@ -176,24 +210,70 @@ export default function Messages() {
 
   const loadMessages = async (chatId: string) => {
     try {
-      // Extract user IDs from chatId (format: "user1-user2" sorted)
-      const [userId1, userId2] = chatId.split('-');
-      const { data: messages, error: messagesError } = await supabase
+      console.log('Loading messages for chatId:', chatId);
+      console.log('Current user ID:', user?.id);
+      
+      // Fix UUID parsing - UUIDs contain hyphens, so we need to split differently
+      // ChatId format: "uuid1-uuid2" where both are full UUIDs
+      // We need to find the middle point where one UUID ends and another begins
+      
+      // UUIDs are 36 characters long (8-4-4-4-12 format)
+      // So we split at position 36 (after first UUID)
+      if (chatId.length < 73) { // 36 + 1 + 36 = 73 characters minimum
+        console.error('Invalid chat ID format - too short:', chatId);
+        throw new Error('Invalid chat ID format');
+      }
+      
+      const userId1 = chatId.substring(0, 36); // First 36 characters
+      const userId2 = chatId.substring(37);    // From position 37 onwards
+      
+      console.log('Extracted user IDs:', { userId1, userId2 });
+
+      // Use two separate queries instead of complex OR
+      const { data: messages1, error: error1 } = await supabase
         .from('messages')
         .select('*')
-        .or(`sender_id.eq.${userId1},receiver_id.eq.${userId1},sender_id.eq.${userId2},receiver_id.eq.${userId2}`)
+        .eq('sender_id', userId1)
+        .eq('receiver_id', userId2)
         .order('created_at', { ascending: true });
 
-      if (messagesError) throw messagesError;
+      const { data: messages2, error: error2 } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('sender_id', userId2)
+        .eq('receiver_id', userId1)
+        .order('created_at', { ascending: true });
 
-      setMessages(messages || []);
+      if (error1) {
+        console.error('Error loading messages1:', error1);
+        throw error1;
+      }
+      if (error2) {
+        console.error('Error loading messages2:', error2);
+        throw error2;
+      }
+
+      console.log('Messages1 loaded:', messages1?.length || 0);
+      console.log('Messages2 loaded:', messages2?.length || 0);
+
+      // Combine and sort messages
+      const allMessages = [
+        ...(messages1 || []),
+        ...(messages2 || [])
+      ].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+      console.log('Total messages combined:', allMessages.length);
+      console.log('Messages:', allMessages);
+
+      setMessages(allMessages);
 
       // Mark messages as read
-      const unreadMessages = messages?.filter(
+      const unreadMessages = allMessages.filter(
         (m) => !m.read && m.receiver_id === user?.id
       );
 
       if (unreadMessages?.length) {
+        console.log('Marking messages as read:', unreadMessages.length);
         await supabase
           .from('messages')
           .update({ read: true })

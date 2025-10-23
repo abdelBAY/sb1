@@ -36,6 +36,7 @@ export default function RequestModal({
       await onSendRequest(message.trim());
       onClose();
     } catch (error) {
+      console.error('RequestModal error:', error);
       setError(error instanceof Error ? error.message : 'Failed to send request');
     } finally {
       setLoading(false);

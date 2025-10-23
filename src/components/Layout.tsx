@@ -56,6 +56,39 @@ export default function Layout() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setDarkMode]);
 
+  // Initialize authentication
+  React.useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        console.log('Initializing authentication...');
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error('Auth error:', error);
+        } else {
+          console.log('Current user:', user ? 'Authenticated' : 'Not authenticated');
+        }
+        
+        setUser(user);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setUser(null);
+      }
+    };
+
+    initializeAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session ? 'User authenticated' : 'User not authenticated');
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [setUser]);
+
   // Fetch profile data when user changes
   React.useEffect(() => {
     const fetchProfile = async () => {
