@@ -8,8 +8,10 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: 'fr',
     supportedLngs: ['en', 'ar', 'fr', 'ur'],
+    ns: ['common'],          // 👈 add this
+    defaultNS: 'common', 
     debug: import.meta.env.DEV,
     
     interpolation: {

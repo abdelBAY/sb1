@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   ChevronRight, 
@@ -8,12 +8,9 @@ import {
   Heart,
   Share2,
   MessageCircle,
-  Clock,
   Package,
   AlertCircle,
   ZoomIn,
-  ChevronLeft,
-  ChevronUp,
   Info,
   User,
   ThumbsUp,
@@ -21,7 +18,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
-import RequestForm from '../components/RequestForm';
+import RequestModal from '../components/RequestModal';
+import RequestStatus from '../components/RequestStatus';
 
 interface ProductDetails {
   id: string;
@@ -57,7 +55,7 @@ interface ProductDetails {
       full_name: string | null;
       avatar_url: string | null;
     };
-  }[];
+  }[] | null;
   related_items: {
     id: string;
     title: string;
@@ -75,7 +73,8 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<'none' | 'pending' | 'accepted' | 'declined' | 'completed'>('none');
   const user = useStore((state) => state.user);
 
   useEffect(() => {
@@ -132,7 +131,7 @@ export default function ProductDetail() {
       if (reviewsError) throw reviewsError;
 
       // Calculate user rating safely
-      const userRating = reviews.length > 0
+      const userRating = reviews && reviews.length > 0
         ? reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length
         : 0;
 
@@ -152,7 +151,7 @@ export default function ProductDetail() {
         user: {
           ...profile,
           rating: userRating,
-          review_count: reviews.length
+          review_count: reviews?.length || 0
         },
         reviews,
         related_items: relatedItems
@@ -220,10 +219,38 @@ export default function ProductDetail() {
     }).format(new Date(dateString));
   };
 
-  const handleRequestSubmit = async (formData: any) => {
-    // Here you would implement the logic to submit the request
-    console.log('Request submitted:', formData);
-    // You could save this to your database, send notifications, etc.
+  const handleSendRequest = async (message: string) => {
+    if (!user || !product) return;
+
+    try {
+      // Create a message to the donor
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert([{
+          sender_id: user.id,
+          receiver_id: product.user.id,
+          content: message,
+          created_at: new Date().toISOString(),
+          read: false,
+          announcement_id: product.id,
+          message_type: 'text'
+        }]);
+
+      if (messageError) throw messageError;
+
+      // Update request status
+      setRequestStatus('pending');
+      
+      // Navigate to messages page
+      window.location.href = '/messages';
+    } catch (error) {
+      console.error('Error sending request:', error);
+      throw error;
+    }
+  };
+
+  const handleOpenChat = () => {
+    window.location.href = '/messages';
   };
 
   if (loading) {
@@ -466,21 +493,32 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center space-x-4 pt-6">
-                <button
-                  onClick={() => setShowRequestForm(true)}
-                  className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
-                >
-                  Request Item
-                </button>
-                <button
-                  className="flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Message
-                </button>
-              </div>
+              {/* Request Status or Action Buttons */}
+              {requestStatus !== 'none' ? (
+                <div className="pt-6">
+                  <RequestStatus 
+                    status={requestStatus} 
+                    donorName={product.user.full_name || 'Anonymous User'}
+                    onOpenChat={handleOpenChat}
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4 pt-6">
+                  <button
+                    onClick={() => setShowRequestModal(true)}
+                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+                  >
+                    Request Item
+                  </button>
+                  <button
+                    onClick={handleOpenChat}
+                    className="flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <MessageCircle className="w-5 h-5 mr-2" />
+                    Message
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -609,13 +647,14 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Request Form Modal */}
-      {showRequestForm && (
-        <RequestForm
+      {/* Request Modal */}
+      {showRequestModal && product && (
+        <RequestModal
           itemId={product.id}
           itemName={product.title}
-          onClose={() => setShowRequestForm(false)}
-          onSubmit={handleRequestSubmit}
+          donorName={product.user.full_name || 'Anonymous User'}
+          onClose={() => setShowRequestModal(false)}
+          onSendRequest={handleSendRequest}
         />
       )}
     </div>

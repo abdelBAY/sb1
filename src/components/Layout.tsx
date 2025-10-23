@@ -7,12 +7,15 @@ import {
   HelpCircle, 
   Menu,
   X,
-  LayoutDashboard
+  LayoutDashboard,
+  User
 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Logo from './Logo';
+import LanguageSelector from './LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 export default function Layout() {
   const [isLanguageOpen, setIsLanguageOpen] = React.useState(false);
@@ -21,10 +24,13 @@ export default function Layout() {
   const [showResources, setShowResources] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const user = useStore((state) => state.user);
+  const profile = useStore((state) => state.profile);
   const setUser = useStore((state) => state.setUser);
+  const setProfile = useStore((state) => state.setProfile);
   const setDarkMode = useStore((state) => state.setDarkMode);
   const navigate = useNavigate();
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -50,6 +56,31 @@ export default function Layout() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setDarkMode]);
 
+  // Fetch profile data when user changes
+  React.useEffect(() => {
+    const fetchProfile = async () => {
+      if (user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          if (!error && data) {
+            setProfile(data);
+          }
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+        }
+      } else {
+        setProfile(null);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
+
   const handleSignOut = async () => {
     const confirmed = window.confirm('Are you sure you want to sign out?');
     if (confirmed) {
@@ -63,12 +94,6 @@ export default function Layout() {
     }
   };
 
-  const languages = [
-    { code: 'ar', name: 'العربية' },
-    { code: 'en', name: 'English' },
-    { code: 'fr', name: 'Français' },
-    { code: 'ur', name: 'اردو' }
-  ];
 
   const getInitials = (email: string) => {
     return email.split('@')[0].slice(0, 2).toUpperCase();
@@ -107,52 +132,71 @@ export default function Layout() {
 
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <div className="relative">
-                <button
-                  onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                  className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-colors duration-200"
-                >
-                  <span>Language</span>
-                </button>
-                {isLanguageOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-out scale-100 opacity-100 z-50">
-                    <div className="py-1" role="menu">
-                      {languages.map((lang) => (
-                        <button
-                          key={lang.code}
-                          className="block w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-                          role="menuitem"
-                          onClick={() => setIsLanguageOpen(false)}
-                        >
-                          {lang.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <LanguageSelector 
+                isOpen={isLanguageOpen}
+                onToggle={() => setIsLanguageOpen(!isLanguageOpen)}
+                onClose={() => setIsLanguageOpen(false)}
+              />
               {user ? (
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="w-10 h-10 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    {user.user_metadata?.avatar_url ? (
-                      <img
-                        src={user.user_metadata.avatar_url}
-                        alt="Profile"
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-sm font-medium">
-                        {getInitials(user.email || '')}
-                      </span>
-                    )}
-                  </button>
+                <>
+                  {/* Profile Display */}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                      {profile?.avatar_url ? (
+                        <img
+                          src={profile.avatar_url}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : user.user_metadata?.avatar_url ? (
+                        <img
+                          src={user.user_metadata.avatar_url}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {profile?.full_name || profile?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                    </span>
+                  </div>
+                  
+                  {/* Profile Dropdown */}
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className="w-10 h-10 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      {user.user_metadata?.avatar_url ? (
+                        <img
+                          src={user.user_metadata.avatar_url}
+                          alt="Profile"
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-medium">
+                          {getInitials(user.email || '')}
+                        </span>
+                      )}
+                    </button>
                   
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-out scale-100 opacity-100 z-50">
                       <div className="p-2">
+                        <Link
+                          to="/profile"
+                          className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            <span>{t('navigation.profile')}</span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </Link>
+
                         <Link
                           to="/dashboard"
                           className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -160,7 +204,7 @@ export default function Layout() {
                         >
                           <div className="flex items-center space-x-2">
                             <LayoutDashboard className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                            <span>Dashboard</span>
+                            <span>{t('navigation.dashboard')}</span>
                           </div>
                           <ChevronRight className="w-4 h-4 text-gray-400" />
                         </Link>
@@ -194,25 +238,26 @@ export default function Layout() {
                           className="w-full px-3 py-2 flex items-center space-x-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
                         >
                           <LogOut className="w-4 h-4" />
-                          <span>Sign Out</span>
+                          <span>{t('navigation.signOut')}</span>
                         </button>
                       </div>
                     </div>
                   )}
-                </div>
+                  </div>
+                </>
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link
                     to="/login"
                     className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                   >
-                    Sign In
+                    {t('navigation.signIn')}
                   </Link>
                   <Link
                     to="/register"
                     className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                   >
-                    Register
+                    {t('navigation.register')}
                   </Link>
                 </div>
               )}
@@ -223,46 +268,68 @@ export default function Layout() {
         {/* Mobile menu */}
         <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-800 shadow-lg">
-            <div className="px-3 py-2">
-              <button
-                onClick={() => setIsLanguageOpen(!isLanguageOpen)}
-                className="w-full text-left flex items-center justify-between text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                <span>Language</span>
-                <ChevronRight className={`w-4 h-4 transform transition-transform ${isLanguageOpen ? 'rotate-90' : ''}`} />
-              </button>
-              {isLanguageOpen && (
-                <div className="mt-2 space-y-1">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700"
-                      onClick={() => {
-                        setIsLanguageOpen(false);
-                        setIsMobileMenuOpen(false);
-                      }}
-                    >
-                      {lang.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <LanguageSelector 
+              isOpen={isLanguageOpen}
+              onToggle={() => setIsLanguageOpen(!isLanguageOpen)}
+              onClose={() => {
+                setIsLanguageOpen(false);
+                setIsMobileMenuOpen(false);
+              }}
+              isMobile={true}
+            />
 
             {user ? (
               <>
+                {/* Mobile Profile Display */}
+                <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                      {profile?.avatar_url ? (
+                        <img
+                          src={profile.avatar_url}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : user.user_metadata?.avatar_url ? (
+                        <img
+                          src={user.user_metadata.avatar_url}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {profile?.full_name || profile?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <Link
+                  to="/profile"
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t('navigation.profile')}
+                </Link>
                 <Link
                   to="/dashboard"
                   className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Dashboard
+                  {t('navigation.dashboard')}
                 </Link>
                 <button
                   onClick={handleSignOut}
                   className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
                 >
-                  Sign Out
+                  {t('navigation.signOut')}
                 </button>
               </>
             ) : (
@@ -272,14 +339,14 @@ export default function Layout() {
                   className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Sign In
+                  {t('navigation.signIn')}
                 </Link>
                 <Link
                   to="/register"
                   className="block w-full text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Register
+                  {t('navigation.register')}
                 </Link>
               </div>
             )}

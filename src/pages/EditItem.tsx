@@ -70,6 +70,14 @@ export default function EditItem() {
     tags: []
   });
 
+  // Check authentication
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+  }, [user, navigate]);
+
   useEffect(() => {
     loadItem();
   }, [id]);

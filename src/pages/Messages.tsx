@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search,
@@ -10,13 +10,21 @@ import {
   Phone,
   Video,
   User,
-  Clock,
   Check,
   CheckCheck,
-  Package
+  Package,
+  CheckCircle,
+  XCircle,
+  MessageCircle,
+  MapPin,
+  Calendar,
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
+import ConfirmationModal from '../components/ConfirmationModal';
+import FeedbackModal from '../components/FeedbackModal';
 
 interface Message {
   id: string;
@@ -26,6 +34,12 @@ interface Message {
   created_at: string;
   read: boolean;
   announcement_id?: string;
+  message_type?: 'text' | 'request_action' | 'meeting_confirmation';
+  metadata?: {
+    action?: 'accept' | 'decline' | 'ask_more_info';
+    meeting_date?: string;
+    meeting_place?: string;
+  };
 }
 
 interface Chat {
@@ -60,6 +74,14 @@ export default function Messages() {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState<{
+    itemName: string;
+    donorName: string;
+    suggestedDate?: string;
+    suggestedPlace?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -154,10 +176,12 @@ export default function Messages() {
 
   const loadMessages = async (chatId: string) => {
     try {
+      // Extract user IDs from chatId (format: "user1-user2" sorted)
+      const [userId1, userId2] = chatId.split('-');
       const { data: messages, error: messagesError } = await supabase
         .from('messages')
         .select('*')
-        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
+        .or(`sender_id.eq.${userId1},receiver_id.eq.${userId1},sender_id.eq.${userId2},receiver_id.eq.${userId2}`)
         .order('created_at', { ascending: true });
 
       if (messagesError) throw messagesError;
@@ -225,6 +249,133 @@ export default function Messages() {
     }
   };
 
+  const handleRequestAction = async (action: 'accept' | 'decline' | 'ask_more_info') => {
+    if (!selectedChat) return;
+
+    try {
+      let messageContent = '';
+      let metadata: any = { action };
+
+      switch (action) {
+        case 'accept':
+          messageContent = 'I accept your request! Let\'s arrange a meeting.';
+          // Set up confirmation modal
+          setPendingRequest({
+            itemName: selectedChat.announcement?.title || 'Item',
+            donorName: selectedChat.user.full_name,
+            suggestedDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Tomorrow
+            suggestedPlace: 'Please suggest a meeting place'
+          });
+          setShowConfirmationModal(true);
+          break;
+        case 'decline':
+          messageContent = 'Thank you for your interest, but I\'m unable to fulfill this request at this time.';
+          break;
+        case 'ask_more_info':
+          messageContent = 'I\'d like to know more about your request. Could you provide additional details?';
+          break;
+      }
+
+      const message = {
+        sender_id: user?.id,
+        receiver_id: selectedChat.user.id,
+        content: messageContent,
+        created_at: new Date().toISOString(),
+        read: false,
+        announcement_id: selectedChat.announcement?.id,
+        message_type: 'request_action',
+        metadata
+      };
+
+      const { error: sendError } = await supabase
+        .from('messages')
+        .insert([message]);
+
+      if (sendError) throw sendError;
+
+      loadMessages(selectedChat.id);
+    } catch (error) {
+      console.error('Error handling request action:', error);
+      setError('Failed to process request action');
+    }
+  };
+
+  const handleConfirmMeeting = async (date: string, place: string) => {
+    if (!selectedChat) return;
+
+    try {
+      const message = {
+        sender_id: user?.id,
+        receiver_id: selectedChat.user.id,
+        content: `Meeting confirmed for ${date} at ${place}. Please confirm pickup details.`,
+        created_at: new Date().toISOString(),
+        read: false,
+        announcement_id: selectedChat.announcement?.id,
+        message_type: 'meeting_confirmation',
+        metadata: {
+          meeting_date: date,
+          meeting_place: place
+        }
+      };
+
+      const { error: sendError } = await supabase
+        .from('messages')
+        .insert([message]);
+
+      if (sendError) throw sendError;
+
+      loadMessages(selectedChat.id);
+      setShowConfirmationModal(false);
+      setPendingRequest(null);
+    } catch (error) {
+      console.error('Error confirming meeting:', error);
+      setError('Failed to confirm meeting');
+    }
+  };
+
+  const handleCancelRequest = async () => {
+    if (!selectedChat) return;
+
+    try {
+      const message = {
+        sender_id: user?.id,
+        receiver_id: selectedChat.user.id,
+        content: 'I\'ve decided to cancel this request. Thank you for your time.',
+        created_at: new Date().toISOString(),
+        read: false,
+        announcement_id: selectedChat.announcement?.id,
+        message_type: 'text'
+      };
+
+      const { error: sendError } = await supabase
+        .from('messages')
+        .insert([message]);
+
+      if (sendError) throw sendError;
+
+      loadMessages(selectedChat.id);
+      setShowConfirmationModal(false);
+      setPendingRequest(null);
+    } catch (error) {
+      console.error('Error canceling request:', error);
+      setError('Failed to cancel request');
+    }
+  };
+
+  const handleSubmitFeedback = async (rating: 'positive' | 'neutral' | 'negative', comment: string) => {
+    if (!selectedChat) return;
+
+    try {
+      // Here you would save feedback to your database
+      console.log('Feedback submitted:', { rating, comment, chatId: selectedChat.id });
+      
+      setShowFeedbackModal(false);
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      setError('Failed to submit feedback');
+    }
+  };
+
   const filteredChats = chats.filter((chat) =>
     chat.user.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -232,6 +383,20 @@ export default function Messages() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400 flex items-center justify-between">
+            <div className="flex items-center">
+              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+              {error}
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="text-red-500 hover:text-red-700 dark:hover:text-red-300"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
             {/* Chat List */}
@@ -359,37 +524,105 @@ export default function Messages() {
                   {/* Messages */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${
-                          message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-                        }`}
-                      >
+                      <div key={message.id}>
+                        {/* Regular Message */}
                         <div
-                          className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                            message.sender_id === user?.id
-                              ? 'bg-blue-600 text-white dark:bg-blue-500'
-                              : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-white'
+                          className={`flex ${
+                            message.sender_id === user?.id ? 'justify-end' : 'justify-start'
                           }`}
                         >
-                          <p>{message.content}</p>
                           <div
-                            className={`flex items-center justify-end mt-1 space-x-1 text-xs ${
+                            className={`max-w-[70%] rounded-lg px-4 py-2 ${
                               message.sender_id === user?.id
-                                ? 'text-blue-200 dark:text-blue-300'
-                                : 'text-gray-500 dark:text-gray-400'
+                                ? 'bg-blue-600 text-white dark:bg-blue-500'
+                                : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-white'
                             }`}
                           >
-                            <span>{formatTime(message.created_at)}</span>
-                            {message.sender_id === user?.id && (
-                              message.read ? (
-                                <CheckCheck className="w-4 h-4" />
-                              ) : (
-                                <Check className="w-4 h-4" />
-                              )
-                            )}
+                            <p>{message.content}</p>
+                            <div
+                              className={`flex items-center justify-end mt-1 space-x-1 text-xs ${
+                                message.sender_id === user?.id
+                                  ? 'text-blue-200 dark:text-blue-300'
+                                  : 'text-gray-500 dark:text-gray-400'
+                              }`}
+                            >
+                              <span>{formatTime(message.created_at)}</span>
+                              {message.sender_id === user?.id && (
+                                message.read ? (
+                                  <CheckCheck className="w-4 h-4" />
+                                ) : (
+                                  <Check className="w-4 h-4" />
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
+
+                        {/* Action Buttons for Donors */}
+                        {message.message_type === 'request_action' && 
+                         message.sender_id !== user?.id && 
+                         selectedChat?.announcement && (
+                          <div className="flex justify-start mt-2">
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                                💬 Please confirm meeting time and place.
+                              </p>
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => handleRequestAction('accept')}
+                                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-1" />
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={() => handleRequestAction('ask_more_info')}
+                                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                                >
+                                  <MessageCircle className="w-4 h-4 mr-1" />
+                                  Ask More Info
+                                </button>
+                                <button
+                                  onClick={() => handleRequestAction('decline')}
+                                  className="flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                                >
+                                  <XCircle className="w-4 h-4 mr-1" />
+                                  Decline
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Meeting Confirmation Details */}
+                        {message.message_type === 'meeting_confirmation' && message.metadata && (
+                          <div className="flex justify-start mt-2">
+                            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                              <div className="flex items-center space-x-2 text-green-800 dark:text-green-200 mb-2">
+                                <Calendar className="w-4 h-4" />
+                                <span className="font-medium">Meeting Details</span>
+                              </div>
+                              <div className="space-y-1 text-sm text-green-700 dark:text-green-300">
+                                <div className="flex items-center space-x-2">
+                                  <Calendar className="w-3 h-3" />
+                                  <span>{message.metadata.meeting_date}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <MapPin className="w-3 h-3" />
+                                  <span>{message.metadata.meeting_place}</span>
+                                </div>
+                              </div>
+                              <div className="mt-3">
+                                <button
+                                  onClick={() => setShowFeedbackModal(true)}
+                                  className="text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 underline"
+                                >
+                                  📍 Remember to meet in a public area.
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                     <div ref={messagesEndRef} />
@@ -451,6 +684,32 @@ export default function Messages() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmationModal && pendingRequest && (
+        <ConfirmationModal
+          itemName={pendingRequest.itemName}
+          donorName={pendingRequest.donorName}
+          suggestedDate={pendingRequest.suggestedDate}
+          suggestedPlace={pendingRequest.suggestedPlace}
+          onClose={() => {
+            setShowConfirmationModal(false);
+            setPendingRequest(null);
+          }}
+          onConfirmMeeting={handleConfirmMeeting}
+          onCancelRequest={handleCancelRequest}
+        />
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && selectedChat && (
+        <FeedbackModal
+          itemName={selectedChat.announcement?.title || 'Item'}
+          donorName={selectedChat.user.full_name}
+          onClose={() => setShowFeedbackModal(false)}
+          onSubmitFeedback={handleSubmitFeedback}
+        />
+      )}
     </div>
   );
 }

@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Camera, 
-  Save, 
-  Trash2, 
-  Eye, 
-  EyeOff, 
-  Sparkles,
-  Moon,
-  Sun,
-  Settings,
-  HelpCircle,
-  LogOut,
-  Copy,
-  ChevronDown
+  Clock,
+  Megaphone,
+  ChevronRight,
+  User as UserIcon,
+  Camera
 } from 'lucide-react';
 
 interface Profile {
@@ -28,37 +21,54 @@ interface Profile {
   city: string;
   visibility: boolean;
   connect_id?: string;
+  first_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  gender?: string;
+  donation_count?: number;
+  adoption_count?: number;
 }
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const storeUser = useStore((state) => state.user);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const setStoreProfile = useStore((state) => state.setProfile);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [bioLength, setBioLength] = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showResources, setShowResources] = useState(false);
-  const isDarkMode = useStore((state) => state.isDarkMode);
-  const toggleDarkMode = useStore((state) => state.toggleDarkMode);
-  const setStoreUser = useStore((state) => state.setUser);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    date_of_birth: '',
+    gender: '',
+    email: ''
+  });
+
+  // Check store user authentication first
+  useEffect(() => {
+    if (!storeUser) {
+      navigate('/login');
+      return;
+    }
+  }, [storeUser, navigate]);
 
   useEffect(() => {
     getProfile();
   }, []);
 
-  useEffect(() => {
-    // Apply dark mode to body
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
   async function getProfile() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+
+      if (!user) {
+        // Redirect to login if user is not authenticated
+        navigate('/login');
+        return;
+      }
 
       if (user) {
         const { data, error } = await supabase
@@ -68,11 +78,28 @@ export default function Profile() {
           .single();
 
         if (error) throw error;
-        setProfile({
+        
+        const profileData = {
           ...data,
-          connect_id: user.id
+          connect_id: user.id,
+          // Use Gmail image if no custom avatar and user has Google provider
+          avatar_url: data.avatar_url || getGmailImageUrl(user) || data.avatar_url
+        };
+        
+        setProfile(profileData);
+        
+        // Update the store with profile data
+        setStoreProfile(profileData);
+        
+        // Populate form data
+        const nameParts = data?.full_name?.split(' ') || ['', ''];
+        setFormData({
+          first_name: nameParts[0] || '',
+          last_name: nameParts.slice(1).join(' ') || '',
+          date_of_birth: data?.date_of_birth || '',
+          gender: data?.gender || '',
+          email: user.email || ''
         });
-        setBioLength(data?.biography?.length || 0);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -81,22 +108,127 @@ export default function Profile() {
     }
   }
 
-  const handleCopyId = () => {
-    if (profile?.connect_id) {
-      navigator.clipboard.writeText(profile.connect_id);
-      // You could add a notification here
+  const handleSave = async () => {
+    if (!user || !profile) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: `${formData.first_name} ${formData.last_name}`.trim(),
+          date_of_birth: formData.date_of_birth,
+          gender: formData.gender
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+      
+      await getProfile(); // Refresh profile data
+      
+      // Update the store with the new profile data
+      const updatedProfile = {
+        ...profile,
+        full_name: `${formData.first_name} ${formData.last_name}`.trim(),
+        date_of_birth: formData.date_of_birth,
+        gender: formData.gender
+      };
+      setStoreProfile(updatedProfile);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleLogout = async () => {
-    const confirmed = window.confirm('Are you sure you want to sign out?');
-    if (confirmed) {
-      await supabase.auth.signOut();
-      setStoreUser(null);
-      window.location.href = '/';
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const getGmailImageUrl = (user: User) => {
+    // Check if user has Google provider data
+    const providerData = user.app_metadata?.providers || [];
+    if (providerData.includes('google') && user.user_metadata?.avatar_url) {
+      return user.user_metadata.avatar_url;
+    }
+    return null;
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // Create a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/profile.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL
+      const { data } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(fileName);
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Refresh profile data
+      await getProfile();
+      
+      // Update the store with the new avatar URL
+      if (profile) {
+        const updatedProfile = {
+          ...profile,
+          avatar_url: data.publicUrl
+        };
+        setStoreProfile(updatedProfile);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      console.error('Error details:', {
+        message: (error as any)?.message,
+        details: (error as any)?.details,
+        hint: (error as any)?.hint,
+        code: (error as any)?.code
+      });
+      alert(`Failed to upload image: ${(error as any)?.message || 'Please try again.'}`);
+    } finally {
+      setUploading(false);
     }
   };
 
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Show loading while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -105,123 +237,235 @@ export default function Profile() {
     );
   }
 
+  // Redirect if not authenticated (this will be handled by useEffect, but add safety check)
+  if (!storeUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Please sign in to access your profile
+          </h2>
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div className="p-6 space-y-6">
-            {/* Connect ID Section */}
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Your Connect ID
-              </h2>
-              <div className="flex items-center justify-center space-x-2">
-                <code className="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-sm font-mono text-gray-800 dark:text-gray-200">
-                  {profile?.connect_id}
-                </code>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex gap-8">
+          {/* Left Sidebar */}
+          <div className="w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="space-y-6">
+              {/* Membership Info */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
+                  <Clock className="w-5 h-5" />
+                  <span className="text-sm">Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : 'Unknown'}</span>
+                </div>
+                <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
+                  <Megaphone className="w-5 h-5" />
+                  <span className="text-sm">{profile?.donation_count || 0} donation, {profile?.adoption_count || 0} adoption</span>
+                </div>
+              </div>
+
+
+              {/* Reviews Section */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Reviews</h3>
+                <div className="text-sm text-gray-600 dark:text-gray-300">No reviews to display</div>
+                <div className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
+                  See all <ChevronRight className="inline w-4 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="max-w-md">
+              {/* Header */}
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Manage your personal information and preferences.
+                </p>
+              </div>
+
+              {/* Profile Picture */}
+              <div className="mb-8">
+                <div className="relative inline-block">
+                  <div 
+                    className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={handleImageClick}
+                  >
+                    {profile?.avatar_url ? (
+                      <img 
+                        src={profile.avatar_url} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : getGmailImageUrl(user!) ? (
+                      <img 
+                        src={getGmailImageUrl(user!)!} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UserIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                    )}
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
+                    {uploading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <Camera className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Click to change profile picture
+                </p>
+              </div>
+
+              {/* Profile Form */}
+              <div className="space-y-6">
+                {/* First Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    First name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.first_name}
+                    onChange={(e) => handleInputChange('first_name', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    placeholder="Enter first name"
+                  />
+                </div>
+
+                {/* Last Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.last_name}
+                    onChange={(e) => handleInputChange('last_name', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    placeholder="Enter last name"
+                  />
+                </div>
+
+                {/* Date of Birth */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Date of birth
+                  </label>
+                  <div className="flex space-x-2">
+                    <select
+                      value={formData.date_of_birth.split('/')[0] || ''}
+                      onChange={(e) => {
+                        const parts = formData.date_of_birth.split('/');
+                        handleInputChange('date_of_birth', `${e.target.value}/${parts[1] || ''}/${parts[2] || ''}`);
+                      }}
+                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    >
+                      <option value="">DD</option>
+                      {Array.from({ length: 31 }, (_, i) => (
+                        <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
+                          {String(i + 1).padStart(2, '0')}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={formData.date_of_birth.split('/')[1] || ''}
+                      onChange={(e) => {
+                        const parts = formData.date_of_birth.split('/');
+                        handleInputChange('date_of_birth', `${parts[0] || ''}/${e.target.value}/${parts[2] || ''}`);
+                      }}
+                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    >
+                      <option value="">MM</option>
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
+                          {String(i + 1).padStart(2, '0')}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={formData.date_of_birth.split('/')[2] || ''}
+                      onChange={(e) => {
+                        const parts = formData.date_of_birth.split('/');
+                        handleInputChange('date_of_birth', `${parts[0] || ''}/${parts[1] || ''}/${e.target.value}`);
+                      }}
+                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    >
+                      <option value="">YYYY</option>
+                      {Array.from({ length: 100 }, (_, i) => (
+                        <option key={2024 - i} value={2024 - i}>
+                          {2024 - i}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Gender */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Gender
+                  </label>
+                  <select
+                    value={formData.gender}
+                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                {/* Email Address */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email address
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    disabled
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
+                    placeholder="Email address"
+                  />
+                </div>
+
+                {/* Confirm Button */}
                 <button
-                  onClick={handleCopyId}
-                  className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                 >
-                  <Copy className="w-5 h-5" />
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                {user?.email}
-              </p>
             </div>
-
-            {/* Dark Mode Toggle */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <div className="flex items-center space-x-3">
-                {isDarkMode ? (
-                  <Moon className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                ) : (
-                  <Sun className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                )}
-                <span className="text-gray-700 dark:text-gray-200">Dark Mode</span>
-              </div>
-              <button
-                onClick={toggleDarkMode}
-                className="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 dark:bg-gray-600"
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition ${
-                    isDarkMode ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Settings Section */}
-            <div className="space-y-2">
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <Settings className="w-5 h-5" />
-                  <span>Settings</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 transform transition-transform ${showSettings ? 'rotate-180' : ''}`} />
-              </button>
-              {showSettings && (
-                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg ml-8">
-                  {/* Add your settings options here */}
-                  <div className="space-y-4">
-                    <button className="w-full text-left text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white">
-                      Account Settings
-                    </button>
-                    <button className="w-full text-left text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white">
-                      Privacy Settings
-                    </button>
-                    <button className="w-full text-left text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white">
-                      Notification Preferences
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Resources Section */}
-            <div className="space-y-2">
-              <button
-                onClick={() => setShowResources(!showResources)}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-              >
-                <div className="flex items-center space-x-3">
-                  <HelpCircle className="w-5 h-5" />
-                  <span>Resources</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 transform transition-transform ${showResources ? 'rotate-180' : ''}`} />
-              </button>
-              {showResources && (
-                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg ml-8">
-                  <div className="space-y-4">
-                    <button className="w-full text-left text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white">
-                      Help Center
-                    </button>
-                    <button className="w-full text-left text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white">
-                      Documentation
-                    </button>
-                    <button className="w-full text-left text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white">
-                      Contact Support
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-            >
-              <div className="flex items-center space-x-3">
-                <LogOut className="w-5 h-5" />
-                <span>Logout</span>
-              </div>
-            </button>
           </div>
         </div>
       </div>

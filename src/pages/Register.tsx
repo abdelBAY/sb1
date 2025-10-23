@@ -60,7 +60,7 @@ export default function Register() {
       }
 
       setUser(authData.user);
-      navigate('/dashboard');
+      navigate('/search');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred during registration');
     } finally {
