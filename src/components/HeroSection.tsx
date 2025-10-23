@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const HeroSection = () => {
+const HeroSection: React.FC = () => {
   return (
     <section className="relative flex flex-col items-center justify-center text-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white overflow-hidden">
       {/* Animated gradient overlay */}
@@ -24,7 +24,7 @@ const HeroSection = () => {
         </p>
 
         <motion.a
-          href="/donate"
+          href="/register"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="inline-block bg-white text-indigo-600 font-semibold px-8 py-3 rounded-full shadow-lg hover:bg-indigo-100 transition-all duration-300"
@@ -33,7 +33,6 @@ const HeroSection = () => {
         </motion.a>
       </motion.div>
 
-      {/* Subtle gradient animation background */}
       <style>{`
         @keyframes gradient-x {
           0%, 100% { background-position: 0% 50%; }
