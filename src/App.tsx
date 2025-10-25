@@ -3,7 +3,7 @@ import { Gift, MessageCircle, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from './lib/store';
 import { useTranslation } from 'react-i18next';
-import HeroSection from "./components/HeroSection";
+import HeroSection from "./components/HeroSection.tsx";
 
 console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
 console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY);
@@ -18,7 +18,7 @@ function App() {
     setDarkMode(prefersDark);
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => setDarkMode(e.matches);
+    const handleChange = (e: MediaQueryListEvent) => setDarkMode(e.matches);
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setDarkMode]);
