@@ -39,7 +39,7 @@ const HeroSection: React.FC = () => {
           >
             {t("home.hero.startDonating")}
           </motion.a>
-
+          
           <motion.a
             href="/search"
             whileHover={{ scale: 1.05 }}
