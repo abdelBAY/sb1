@@ -9,6 +9,7 @@ import Footer from "./components/Footer.tsx"; // 👈 Import Footer
 console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
 console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY);
 
+
 function App() {
   const navigate = useNavigate();
   const setDarkMode = useStore((state) => state.setDarkMode);

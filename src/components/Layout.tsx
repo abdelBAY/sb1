@@ -145,7 +145,7 @@ export default function Layout() {
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
                 <Logo size="md" />
-                <span className="text-xl font-bold text-gray-900 dark:text-white">Givea</span>
+                <span className="text-xl font-bold text-orange-600 dark:text-orange">Givea</span>
               </Link>
             </div>
 

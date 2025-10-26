@@ -22,9 +22,10 @@ const HeroSection: React.FC = () => {
         transition={{ duration: 1 }}
       >
         <h1 className="text-5xl md:text-6xl font-extrabold mb-4 leading-tight tracking-tight">
-          {t("home.hero.title")}
+          Connect, Share,{" "}
+          <span className="text-orange-400">Make a Difference</span>
         </h1>
-
+        
         <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-10">
           {t("home.hero.subtitle")}
         </p>
