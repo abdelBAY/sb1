@@ -15,6 +15,9 @@ import ProductDetail from './pages/ProductDetail';
 import Messages from './pages/Messages';
 import './lib/i18n';
 import './index.css';
+import About from './pages/About';
+import ContactUs from './pages/ContactUs';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +43,9 @@ const router = createBrowserRouter([
       { path: 'search', element: <Search /> },
       { path: 'product/:id', element: <ProductDetail /> },
       { path: 'messages', element: <Messages /> },
+      { path: 'privacy', element: <PrivacyPolicy /> },
+      { path: 'contact', element: <ContactUs /> },
+      { path: 'about', element: <About /> },
     ],
   },
 ]);

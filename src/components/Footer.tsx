@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer: React.FC = () => {
   return (
@@ -6,14 +7,22 @@ const Footer: React.FC = () => {
       className="py-8 text-center text-white"
       style={{ backgroundColor: "#141313" }}
     >
-      <p className="font-medium">© {new Date().getFullYear()} Givea. All rights reserved.</p>
+      <p className="font-medium">
+        © {new Date().getFullYear()} Givea. All rights reserved.
+      </p>
 
       <p className="text-sm mt-2">
-        <a href="#privacy" className="hover:underline">Privacy Policy</a>
+        <Link to="/privacy" className="hover:underline">
+          Privacy Policy
+        </Link>
         <span className="mx-2">|</span>
-        <a href="#contact" className="hover:underline">Contact Us</a>
+        <Link to="/contact" className="hover:underline">
+          Contact Us
+        </Link>
         <span className="mx-2">|</span>
-        <a href="#about" className="hover:underline">About</a>
+        <Link to="/about" className="hover:underline">
+          About
+        </Link>
       </p>
 
       <p className="text-xs mt-3 text-white">

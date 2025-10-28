@@ -12,14 +12,14 @@ import {
   User,
   Check,
   CheckCheck,
-  Package,
   CheckCircle,
   XCircle,
   MessageCircle,
   MapPin,
   Calendar,
   AlertCircle,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
@@ -66,6 +66,7 @@ interface Chat {
 export default function Messages() {
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
+  const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -161,16 +162,52 @@ export default function Messages() {
         }
       }
 
+      // Get unique announcement IDs from messages
+      const announcementIds = new Set<string>();
+      messages?.forEach((message: any) => {
+        if (message.announcement_id) {
+          announcementIds.add(message.announcement_id);
+        }
+      });
+
+      // Fetch announcement details for all chats
+      let announcements: any[] = [];
+      if (announcementIds.size > 0) {
+        const { data: announcementsData, error: announcementsError } = await supabase
+          .from('announcements')
+          .select('id, title, photos')
+          .in('id', Array.from(announcementIds));
+
+        if (announcementsError) {
+          console.error('Announcements query error:', announcementsError);
+        } else {
+          announcements = announcementsData || [];
+        }
+      }
+
       // Group messages by chat
       const chatMap = new Map<string, Chat>();
       messages?.forEach((message: any) => {
         const otherUserId = message.sender_id === user?.id ? message.receiver_id : message.sender_id;
-        const chatId = [user?.id, otherUserId].sort().join('-');
+        
+        // Create chat ID based on users AND announcement_id to separate chats by item
+        let chatId;
+        if (message.announcement_id) {
+          // Include announcement_id to keep separate chats for each item
+          const sortedUserIds = [user?.id, otherUserId].sort().join('-');
+          chatId = `${sortedUserIds}-${message.announcement_id}`;
+        } else {
+          // No announcement, group by user only
+          chatId = [user?.id, otherUserId].sort().join('-');
+        }
 
         // Find profile for this user
         const profile = profiles.find(p => p.id === otherUserId);
 
         if (!chatMap.has(chatId)) {
+          // Find announcement for this message
+          const announcement = announcements.find(a => a.id === message.announcement_id);
+          
           chatMap.set(chatId, {
             id: chatId,
             user: {
@@ -187,8 +224,8 @@ export default function Messages() {
             unread_count: message.read ? 0 : 1,
             announcement: message.announcement_id ? {
               id: message.announcement_id,
-              title: '', // We'll fetch this separately
-              photos: []
+              title: announcement?.title || 'Item',
+              photos: announcement?.photos || []
             } : undefined
           });
         } else {
@@ -213,36 +250,52 @@ export default function Messages() {
       console.log('Loading messages for chatId:', chatId);
       console.log('Current user ID:', user?.id);
       
-      // Fix UUID parsing - UUIDs contain hyphens, so we need to split differently
-      // ChatId format: "uuid1-uuid2" where both are full UUIDs
-      // We need to find the middle point where one UUID ends and another begins
+      // Parse chatId which can be:
+      // 1. "uuid1-uuid2" (chats without announcement_id) - 73 chars (36 + 1 + 36)
+      // 2. "uuid1-uuid2-announcementId" (chats with announcement_id) - 110 chars (36 + 1 + 36 + 1 + 36)
       
-      // UUIDs are 36 characters long (8-4-4-4-12 format)
-      // So we split at position 36 (after first UUID)
-      if (chatId.length < 73) { // 36 + 1 + 36 = 73 characters minimum
-        console.error('Invalid chat ID format - too short:', chatId);
-        throw new Error('Invalid chat ID format');
+      // UUIDs are 36 characters long
+      const userId1 = chatId.substring(0, 36);
+      
+      let userId2: string;
+      let announcementId: string | undefined;
+      
+      if (chatId.length >= 110) {
+        // Has announcement_id: format is "uuid1-uuid2-announcementId"
+        userId2 = chatId.substring(37, 73); // Positions 37-73 (skip hyphen at 36)
+        announcementId = chatId.substring(74); // Everything after position 74
+      } else {
+        // No announcement_id, just two UUIDs
+        userId2 = chatId.substring(37); // Everything after position 37
       }
       
-      const userId1 = chatId.substring(0, 36); // First 36 characters
-      const userId2 = chatId.substring(37);    // From position 37 onwards
-      
-      console.log('Extracted user IDs:', { userId1, userId2 });
+      console.log('Extracted IDs:', { userId1, userId2, announcementId });
 
-      // Use two separate queries instead of complex OR
-      const { data: messages1, error: error1 } = await supabase
+      // Build the query based on whether there's an announcement_id
+      let messages1Query = supabase
         .from('messages')
         .select('*')
         .eq('sender_id', userId1)
-        .eq('receiver_id', userId2)
-        .order('created_at', { ascending: true });
-
-      const { data: messages2, error: error2 } = await supabase
+        .eq('receiver_id', userId2);
+      
+      let messages2Query = supabase
         .from('messages')
         .select('*')
         .eq('sender_id', userId2)
-        .eq('receiver_id', userId1)
-        .order('created_at', { ascending: true });
+        .eq('receiver_id', userId1);
+      
+      // Filter by announcement_id if it exists
+      if (announcementId) {
+        messages1Query = messages1Query.eq('announcement_id', announcementId);
+        messages2Query = messages2Query.eq('announcement_id', announcementId);
+      }
+      
+      // Order by created_at
+      messages1Query = messages1Query.order('created_at', { ascending: true });
+      messages2Query = messages2Query.order('created_at', { ascending: true });
+
+      const { data: messages1, error: error1 } = await messages1Query;
+      const { data: messages2, error: error2 } = await messages2Query;
 
       if (error1) {
         console.error('Error loading messages1:', error1);
@@ -278,6 +331,17 @@ export default function Messages() {
           .from('messages')
           .update({ read: true })
           .in('id', unreadMessages.map((m) => m.id));
+        
+        // Update global unread count
+        const { data: unreadData } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('receiver_id', user?.id)
+          .eq('read', false);
+        
+        if (unreadData) {
+          setUnreadMessagesCount(unreadData.length);
+        }
       }
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -326,6 +390,86 @@ export default function Messages() {
       return date.toLocaleDateString([], { weekday: 'long' });
     } else {
       return date.toLocaleDateString();
+    }
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!selectedChat || !user) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete this conversation with ${selectedChat.user.full_name}? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      console.log('Deleting conversation:', selectedChat.id);
+      
+      // Parse chatId to extract user IDs and announcement ID
+      const chatId = selectedChat.id;
+      const userId1 = chatId.substring(0, 36);
+      let userId2: string;
+      let announcementId: string | undefined;
+      
+      if (chatId.length >= 110) {
+        // Has announcement_id
+        userId2 = chatId.substring(37, 73);
+        announcementId = chatId.substring(74);
+      } else {
+        // Just two user IDs
+        userId2 = chatId.substring(37);
+      }
+
+      console.log('Deleting messages for:', { userId1, userId2, announcementId, currentUser: user.id });
+
+      // Build queries to delete messages for both directions
+      let query1 = supabase
+        .from('messages')
+        .delete()
+        .eq('sender_id', user.id)
+        .in('receiver_id', [userId1, userId2]);
+
+      let query2 = supabase
+        .from('messages')
+        .delete()
+        .eq('receiver_id', user.id)
+        .in('sender_id', [userId1, userId2]);
+
+      // Filter by announcement_id if it exists
+      if (announcementId) {
+        query1 = query1.eq('announcement_id', announcementId);
+        query2 = query2.eq('announcement_id', announcementId);
+      }
+
+      // Execute both deletes
+      const { error: error1 } = await query1;
+      const { error: error2 } = await query2;
+
+      if (error1 || error2) {
+        console.error('Delete errors:', { error1, error2 });
+        throw error1 || error2;
+      }
+
+      console.log('Conversation deleted successfully');
+
+      // Clear selected chat and reload chat list
+      setSelectedChat(null);
+      setMessages([]);
+      loadChats();
+      
+      // Update unread count
+      const { data: unreadData } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('receiver_id', user.id)
+        .eq('read', false);
+      
+      if (unreadData) {
+        setUnreadMessagesCount(unreadData.length);
+      }
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      setError(`Failed to delete conversation: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
     }
   };
 
@@ -510,38 +654,44 @@ export default function Messages() {
                           : ''
                       }`}
                     >
-                      {chat.user.avatar_url ? (
+                      {/* Show item thumbnail if available, otherwise show user avatar */}
+                      {chat.announcement?.photos?.[0] ? (
+                        <img
+                          src={chat.announcement.photos[0]}
+                          alt={chat.announcement.title}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                        />
+                      ) : chat.user.avatar_url ? (
                         <img
                           src={chat.user.avatar_url}
                           alt={chat.user.full_name}
-                          className="w-12 h-12 rounded-full object-cover"
+                          className="w-16 h-16 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                          <User className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                        <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                          <User className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {chat.user.full_name}
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                            {chat.announcement?.title || chat.user.full_name}
                           </h3>
                           {chat.last_message && (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
                               {formatTime(chat.last_message.created_at)}
                             </span>
                           )}
                         </div>
+                        {chat.user.full_name && chat.announcement && (
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 truncate">
+                            {chat.user.full_name}
+                          </p>
+                        )}
                         {chat.last_message && (
                           <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                             {chat.last_message.content}
                           </p>
-                        )}
-                        {chat.announcement && (
-                          <div className="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                            <Package className="w-4 h-4 mr-1" />
-                            {chat.announcement.title}
-                          </div>
                         )}
                         {chat.unread_count > 0 && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200 mt-1">
@@ -595,11 +745,42 @@ export default function Messages() {
                       <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                         <Video className="w-5 h-5" />
                       </button>
+                      <button
+                        onClick={handleDeleteConversation}
+                        className="p-2 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        title="Delete conversation"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                       <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                         <MoreVertical className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
+
+                  {/* Item Display Section */}
+                  {selectedChat.announcement && (
+                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                      <div className="flex items-center space-x-3">
+                        {selectedChat.announcement.photos?.[0] && (
+                          <img
+                            src={selectedChat.announcement.photos[0]}
+                            alt={selectedChat.announcement.title}
+                            className="w-16 h-16 rounded-lg object-cover"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {selectedChat.announcement.title}
+                          </h3>
+                          <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            <User className="w-3 h-3 mr-1" />
+                            <span>{selectedChat.user.full_name}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Messages */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-4">

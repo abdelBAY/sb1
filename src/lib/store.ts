@@ -33,6 +33,8 @@ interface AppState {
   removeNotification: (id: string) => void;
   isDarkMode: boolean;
   setDarkMode: (isDark: boolean) => void;
+  unreadMessagesCount: number;
+  setUnreadMessagesCount: (count: number) => void;
 }
 
 interface Notification {
@@ -66,6 +68,8 @@ export const useStore = create<AppState>()(
           document.documentElement.classList.toggle('dark', isDark);
           return { isDarkMode: isDark };
         }),
+      unreadMessagesCount: 0,
+      setUnreadMessagesCount: (count) => set({ unreadMessagesCount: count }),
     }),
     {
       name: 'app-storage',

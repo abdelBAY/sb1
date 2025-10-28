@@ -8,7 +8,8 @@ import {
   Menu,
   X,
   LayoutDashboard,
-  User
+  User,
+  Bell
 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { Link } from 'react-router-dom';
@@ -28,6 +29,8 @@ export default function Layout() {
   const setUser = useStore((state) => state.setUser);
   const setProfile = useStore((state) => state.setProfile);
   const setDarkMode = useStore((state) => state.setDarkMode);
+  const unreadMessagesCount = useStore((state) => state.unreadMessagesCount);
+  const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
   const navigate = useNavigate();
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -114,6 +117,54 @@ export default function Layout() {
     fetchProfile();
   }, [user]);
 
+  // Fetch unread messages count when user changes
+  React.useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('messages')
+            .select('id')
+            .eq('receiver_id', user.id)
+            .eq('read', false);
+          
+          if (!error && data) {
+            setUnreadMessagesCount(data.length);
+          }
+        } catch (error) {
+          console.error('Error fetching unread count:', error);
+        }
+      } else {
+        setUnreadMessagesCount(0);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Set up real-time subscription for unread messages
+    if (user?.id) {
+      const subscription = supabase
+        .channel('unread-messages')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `receiver_id=eq.${user.id}`,
+          },
+          () => {
+            fetchUnreadCount();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [user, setUnreadMessagesCount]);
+
   const handleSignOut = async () => {
     const confirmed = window.confirm('Are you sure you want to sign out?');
     if (confirmed) {
@@ -194,6 +245,21 @@ export default function Layout() {
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {profile?.full_name || profile?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
                     </span>
+                    
+                    {/* Message Notification Icon */}
+                    <div className="relative">
+                      <button
+                        onClick={() => navigate('/messages')}
+                        className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                      >
+                        <Bell className="w-5 h-5" />
+                        {unreadMessagesCount > 0 && (
+                          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
+                            {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                          </span>
+                        )}
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Profile Dropdown */}
@@ -240,6 +306,25 @@ export default function Layout() {
                             <span>{t('navigation.dashboard')}</span>
                           </div>
                           <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </Link>
+
+                        <Link
+                          to="/messages"
+                          className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Bell className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            <span>Messages</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            {unreadMessagesCount > 0 && (
+                              <span className="flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
+                                {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                              </span>
+                            )}
+                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                          </div>
                         </Link>
 
                         <button
@@ -357,6 +442,18 @@ export default function Layout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {t('navigation.dashboard')}
+                </Link>
+                <Link
+                  to="/messages"
+                  className="flex items-center justify-between px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>Messages</span>
+                  {unreadMessagesCount > 0 && (
+                    <span className="flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full">
+                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    </span>
+                  )}
                 </Link>
                 <button
                   onClick={handleSignOut}
