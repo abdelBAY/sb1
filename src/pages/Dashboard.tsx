@@ -132,14 +132,21 @@ export default function Dashboard() {
       }
 
       // Delete the announcement
-      const { error: deleteError } = await supabase
+      const { data, error: deleteError } = await supabase
         .from('announcements')
         .delete()
         .eq('id', itemId)
-        .eq('user_id', user?.id); // Extra safety check
+        .eq('user_id', user?.id) // Extra safety check
+        .select(); // Return deleted rows to verify deletion
 
       if (deleteError) {
-        throw deleteError;
+        console.error('Supabase delete error:', deleteError);
+        throw new Error(deleteError.message || 'Failed to delete item. You may not have permission to delete this item.');
+      }
+
+      // Verify deletion succeeded
+      if (!data || data.length === 0) {
+        throw new Error('No item was deleted. The item may not exist or you may not have permission to delete it.');
       }
 
       // Broadcast deletion event

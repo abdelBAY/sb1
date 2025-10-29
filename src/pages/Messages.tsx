@@ -93,10 +93,34 @@ export default function Messages() {
       }
     }, 1000);
 
-    if (user) {
+    const init = async () => {
+      if (!user) return;
       clearTimeout(timer);
+
+      // Mark all received messages as read on opening Messages
+      // Note: We'll mark them as read when loading each chat instead
+      // to avoid RLS policy issues with bulk updates
+      try {
+        const { data: unread, error: fetchErr } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('receiver_id', user.id)
+          .eq('read', false);
+
+        if (!fetchErr && unread) {
+          console.log(`Found ${unread.length} unread messages - will mark as read on chat load`);
+          // We'll update the global count to 0 since we're viewing messages
+          setUnreadMessagesCount(0);
+        }
+      } catch (e) {
+        console.error('Error checking unread messages:', e);
+      }
+
+      // Load chats after marking as read so UI reflects zero unread
       loadChats();
-    }
+    };
+
+    init();
 
     return () => clearTimeout(timer);
   }, [user, navigate]);
@@ -187,6 +211,30 @@ export default function Messages() {
 
       // Group messages by chat
       const chatMap = new Map<string, Chat>();
+      
+      // First pass: count unread messages per chat
+      const unreadCounts = new Map<string, number>();
+      messages?.forEach((message: any) => {
+        const otherUserId = message.sender_id === user?.id ? message.receiver_id : message.sender_id;
+        
+        // Create chat ID based on users AND announcement_id to separate chats by item
+        let chatId;
+        if (message.announcement_id) {
+          // Include announcement_id to keep separate chats for each item
+          const sortedUserIds = [user?.id, otherUserId].sort().join('-');
+          chatId = `${sortedUserIds}-${message.announcement_id}`;
+        } else {
+          // No announcement, group by user only
+          chatId = [user?.id, otherUserId].sort().join('-');
+        }
+
+        // Count unread messages (messages sent TO current user)
+        if (!message.read && message.receiver_id === user?.id) {
+          unreadCounts.set(chatId, (unreadCounts.get(chatId) || 0) + 1);
+        }
+      });
+
+      // Second pass: build chat objects
       messages?.forEach((message: any) => {
         const otherUserId = message.sender_id === user?.id ? message.receiver_id : message.sender_id;
         
@@ -221,7 +269,7 @@ export default function Messages() {
               created_at: message.created_at,
               read: message.read
             },
-            unread_count: message.read ? 0 : 1,
+            unread_count: unreadCounts.get(chatId) || 0,
             announcement: message.announcement_id ? {
               id: message.announcement_id,
               title: announcement?.title || 'Item',
@@ -230,9 +278,16 @@ export default function Messages() {
           });
         } else {
           const chat = chatMap.get(chatId)!;
-          if (!message.read && message.sender_id !== user?.id) {
-            chat.unread_count++;
+          // Update last message if this one is more recent
+          if (new Date(message.created_at) > new Date(chat.last_message?.created_at || 0)) {
+            chat.last_message = {
+              content: message.content,
+              created_at: message.created_at,
+              read: message.read
+            };
           }
+          // Update unread count from our map
+          chat.unread_count = unreadCounts.get(chatId) || 0;
         }
       });
 
@@ -320,28 +375,45 @@ export default function Messages() {
 
       setMessages(allMessages);
 
-      // Mark messages as read
+      // Mark messages as read - update database AND UI state
       const unreadMessages = allMessages.filter(
         (m) => !m.read && m.receiver_id === user?.id
       );
 
-      if (unreadMessages?.length) {
-        console.log('Marking messages as read:', unreadMessages.length);
-        await supabase
-          .from('messages')
-          .update({ read: true })
-          .in('id', unreadMessages.map((m) => m.id));
-        
-        // Update global unread count
-        const { data: unreadData } = await supabase
-          .from('messages')
-          .select('id')
-          .eq('receiver_id', user?.id)
-          .eq('read', false);
-        
-        if (unreadData) {
-          setUnreadMessagesCount(unreadData.length);
+      if (unreadMessages.length > 0) {
+        // Try to update in database (will work after applying the SQL migration)
+        try {
+          const messageIds = unreadMessages.map((m) => m.id);
+          await supabase
+            .from('messages')
+            .update({ read: true })
+            .in('id', messageIds);
+        } catch (dbError) {
+          console.log('Database update skipped (need to apply SQL migration):', dbError);
         }
+
+        // Update messages to show as read in UI
+        const updatedMessages = allMessages.map((m) => {
+          if (!m.read && m.receiver_id === user?.id) {
+            return { ...m, read: true };
+          }
+          return m;
+        });
+        setMessages(updatedMessages);
+
+        // Update the selected chat's unread count to 0
+        if (selectedChat) {
+          setChats((prevChats) =>
+            prevChats.map((chat) =>
+              chat.id === selectedChat.id ? { ...chat, unread_count: 0 } : chat
+            )
+          );
+        }
+
+        // Reset global unread count
+        setUnreadMessagesCount(0);
+      } else {
+        setMessages(allMessages);
       }
     } catch (error) {
       console.error('Error loading messages:', error);

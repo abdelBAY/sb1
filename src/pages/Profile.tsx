@@ -40,8 +40,7 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
+    full_name: '',
     date_of_birth: '',
     gender: '',
     email: ''
@@ -92,10 +91,8 @@ export default function Profile() {
         setStoreProfile(profileData);
         
         // Populate form data
-        const nameParts = data?.full_name?.split(' ') || ['', ''];
         setFormData({
-          first_name: nameParts[0] || '',
-          last_name: nameParts.slice(1).join(' ') || '',
+          full_name: data?.full_name || '',
           date_of_birth: data?.date_of_birth || '',
           gender: data?.gender || '',
           email: user.email || ''
@@ -116,7 +113,7 @@ export default function Profile() {
       const { error } = await supabase
         .from('profiles')
         .update({
-          full_name: `${formData.first_name} ${formData.last_name}`.trim(),
+          full_name: formData.full_name.trim(),
           date_of_birth: formData.date_of_birth,
           gender: formData.gender
         })
@@ -129,7 +126,7 @@ export default function Profile() {
       // Update the store with the new profile data
       const updatedProfile = {
         ...profile,
-        full_name: `${formData.first_name} ${formData.last_name}`.trim(),
+        full_name: formData.full_name.trim(),
         date_of_birth: formData.date_of_birth,
         gender: formData.gender
       };
@@ -343,31 +340,17 @@ export default function Profile() {
 
               {/* Profile Form */}
               <div className="space-y-6">
-                {/* First Name */}
+                {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    First name
+                    Full name
                   </label>
                   <input
                     type="text"
-                    value={formData.first_name}
-                    onChange={(e) => handleInputChange('first_name', e.target.value)}
+                    value={formData.full_name ?? ''}
+                    onChange={(e) => handleInputChange('full_name', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
-                    placeholder="Enter first name"
-                  />
-                </div>
-
-                {/* Last Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Last name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.last_name}
-                    onChange={(e) => handleInputChange('last_name', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
-                    placeholder="Enter last name"
+                    placeholder="Enter full name"
                   />
                 </div>
 
@@ -378,7 +361,7 @@ export default function Profile() {
                   </label>
                   <div className="flex space-x-2">
                     <select
-                      value={formData.date_of_birth.split('/')[0] || ''}
+                      value={(formData.date_of_birth || '').split('/')[0] || ''}
                       onChange={(e) => {
                         const parts = formData.date_of_birth.split('/');
                         handleInputChange('date_of_birth', `${e.target.value}/${parts[1] || ''}/${parts[2] || ''}`);
@@ -393,7 +376,7 @@ export default function Profile() {
                       ))}
                     </select>
                     <select
-                      value={formData.date_of_birth.split('/')[1] || ''}
+                      value={(formData.date_of_birth || '').split('/')[1] || ''}
                       onChange={(e) => {
                         const parts = formData.date_of_birth.split('/');
                         handleInputChange('date_of_birth', `${parts[0] || ''}/${e.target.value}/${parts[2] || ''}`);
@@ -408,7 +391,7 @@ export default function Profile() {
                       ))}
                     </select>
                     <select
-                      value={formData.date_of_birth.split('/')[2] || ''}
+                      value={(formData.date_of_birth || '').split('/')[2] || ''}
                       onChange={(e) => {
                         const parts = formData.date_of_birth.split('/');
                         handleInputChange('date_of_birth', `${parts[0] || ''}/${parts[1] || ''}/${e.target.value}`);
@@ -417,7 +400,7 @@ export default function Profile() {
                     >
                       <option value="">YYYY</option>
                       {Array.from({ length: 100 }, (_, i) => (
-                        <option key={2024 - i} value={2024 - i}>
+                        <option key={2024 - i} value={String(2024 - i)}>
                           {2024 - i}
                         </option>
                       ))}
@@ -431,7 +414,7 @@ export default function Profile() {
                     Gender
                   </label>
                   <select
-                    value={formData.gender}
+                    value={formData.gender ?? ''}
                     onChange={(e) => handleInputChange('gender', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   >
@@ -449,7 +432,7 @@ export default function Profile() {
                   </label>
                   <input
                     type="email"
-                    value={formData.email}
+                    value={formData.email ?? ''}
                     disabled
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
                     placeholder="Email address"

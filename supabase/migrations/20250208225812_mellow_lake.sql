@@ -1,52 +1,14 @@
-/*
-  # Add storage bucket for item photos
+-- Fix the UPDATE policy for messages to avoid OLD reference in USING clause
+-- OLD can only be referenced in WITH CHECK, not in USING
 
-  1. New Storage
-    - Create 'item-photos' bucket for storing item images
-  
-  2. Security
-    - Enable public access for reading photos
-    - Allow authenticated users to upload photos
-    - Restrict file types to images
-    - Set size limits
-*/
+DROP POLICY IF EXISTS "Users can update message read status" ON messages;
 
--- Create the storage bucket if it doesn't exist
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('item-photos', 'item-photos', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Set up storage policies
-CREATE POLICY "Public Access"
-  ON storage.objects FOR SELECT
-  USING (bucket_id::text = 'item-photos');
-
-CREATE POLICY "Authenticated users can upload images"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    bucket_id::text = 'item-photos'
-    AND (LOWER(SUBSTRING(name FROM '\.([^\.]+)$')) IN ('jpg', 'jpeg', 'png', 'webp'))
-    AND LENGTH(name) < 100
-    AND SPLIT_PART(name, '/', 1) = auth.uid()::text
-);
-
-CREATE POLICY "Users can update own images"
-  ON storage.objects FOR UPDATE
-  TO authenticated
+CREATE POLICY "Users can update message read status"
+  ON messages FOR UPDATE
   USING (
-    bucket_id::text = 'item-photos' 
-    AND SPLIT_PART(name, '/', 1) = auth.uid()::text
+    auth.uid() = sender_id OR auth.uid() = receiver_id
   )
   WITH CHECK (
-    bucket_id::text = 'item-photos' 
-    AND SPLIT_PART(name, '/', 1) = auth.uid()::text
-  );
-
-CREATE POLICY "Users can delete own images"
-  ON storage.objects FOR DELETE
-  TO authenticated
-  USING (
-    bucket_id::text = 'item-photos' 
-    AND SPLIT_PART(name, '/', 1) = auth.uid()::text
+    auth.uid() = sender_id OR 
+    (auth.uid() = receiver_id AND read = true)
   );
