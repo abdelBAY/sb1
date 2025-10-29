@@ -10,6 +10,8 @@
   "home": {
     "hero": {
       "title": "Connectez, Partagez, Faites la différence",
+      "titlePart1": "Connectez, Partagez,",
+      "titlePart2": "Faites la différence",
       "subtitle": "Rejoignez notre communauté où le don rencontre le besoin. Créez un impact positif en partageant ce dont vous n'avez plus besoin avec ceux qui en ont le plus besoin.",
       "startDonating": "Commencer à donner",
       "browseItems": "Parcourir les articles"

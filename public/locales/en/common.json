@@ -10,6 +10,8 @@
   "home": {
     "hero": {
       "title": "Connect, Share, Make a Difference",
+      "titlePart1": "Connect, Share,",
+      "titlePart2": "Make a Difference",
       "subtitle": "Join our community where giving meets receiving. Make a positive impact by sharing what you no longer need with those who need it most.",
       "startDonating": "Start Donating",
       "browseItems": "Browse Items"

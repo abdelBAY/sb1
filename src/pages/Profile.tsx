@@ -254,21 +254,21 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 px-4 sm:px-6 lg:px-8 sm:py-12">
       <div className="max-w-7xl mx-auto">
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Left Sidebar */}
-          <div className="w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div className="w-full lg:w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
             <div className="space-y-6">
               {/* Membership Info */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
-                  <Clock className="w-5 h-5" />
-                  <span className="text-sm">Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : 'Unknown'}</span>
+                  <Clock className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm break-words">Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : 'Unknown'}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
-                  <Megaphone className="w-5 h-5" />
-                  <span className="text-sm">{profile?.donation_count || 0} donation, {profile?.adoption_count || 0} adoption</span>
+                  <Megaphone className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm break-words">{profile?.donation_count || 0} donation, {profile?.adoption_count || 0} adoption</span>
                 </div>
               </div>
 
@@ -285,18 +285,18 @@ export default function Profile() {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="max-w-md">
+          <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+            <div className="w-full max-w-md mx-auto lg:mx-0">
               {/* Header */}
-              <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
+              <div className="mb-6 sm:mb-8">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Manage your personal information and preferences.
                 </p>
               </div>
 
               {/* Profile Picture */}
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <div className="relative inline-block">
                   <div 
                     className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
@@ -339,7 +339,7 @@ export default function Profile() {
               </div>
 
               {/* Profile Form */}
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -349,7 +349,7 @@ export default function Profile() {
                     type="text"
                     value={formData.full_name ?? ''}
                     onChange={(e) => handleInputChange('full_name', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     placeholder="Enter full name"
                   />
                 </div>
@@ -363,10 +363,10 @@ export default function Profile() {
                     <select
                       value={(formData.date_of_birth || '').split('/')[0] || ''}
                       onChange={(e) => {
-                        const parts = formData.date_of_birth.split('/');
+                        const parts = (formData.date_of_birth || '').split('/');
                         handleInputChange('date_of_birth', `${e.target.value}/${parts[1] || ''}/${parts[2] || ''}`);
                       }}
-                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                      className="flex-1 px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     >
                       <option value="">DD</option>
                       {Array.from({ length: 31 }, (_, i) => (
@@ -378,10 +378,10 @@ export default function Profile() {
                     <select
                       value={(formData.date_of_birth || '').split('/')[1] || ''}
                       onChange={(e) => {
-                        const parts = formData.date_of_birth.split('/');
+                        const parts = (formData.date_of_birth || '').split('/');
                         handleInputChange('date_of_birth', `${parts[0] || ''}/${e.target.value}/${parts[2] || ''}`);
                       }}
-                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                      className="flex-1 px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     >
                       <option value="">MM</option>
                       {Array.from({ length: 12 }, (_, i) => (
@@ -393,10 +393,10 @@ export default function Profile() {
                     <select
                       value={(formData.date_of_birth || '').split('/')[2] || ''}
                       onChange={(e) => {
-                        const parts = formData.date_of_birth.split('/');
+                        const parts = (formData.date_of_birth || '').split('/');
                         handleInputChange('date_of_birth', `${parts[0] || ''}/${parts[1] || ''}/${e.target.value}`);
                       }}
-                      className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                      className="flex-1 px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     >
                       <option value="">YYYY</option>
                       {Array.from({ length: 100 }, (_, i) => (
@@ -416,7 +416,7 @@ export default function Profile() {
                   <select
                     value={formData.gender ?? ''}
                     onChange={(e) => handleInputChange('gender', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -434,7 +434,7 @@ export default function Profile() {
                     type="email"
                     value={formData.email ?? ''}
                     disabled
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
                     placeholder="Email address"
                   />
                 </div>
@@ -443,7 +443,7 @@ export default function Profile() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+                  className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>

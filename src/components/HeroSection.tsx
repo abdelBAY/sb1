@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 const HeroSection: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   return (
     <section
@@ -22,12 +22,12 @@ const HeroSection: React.FC = () => {
         transition={{ duration: 1 }}
       >
         <h1 className="text-5xl md:text-6xl font-extrabold mb-4 leading-tight tracking-tight">
-          Connect, Share,{" "}
-          <span className="text-orange-400">Make a Difference</span>
+          {t('home.hero.titlePart1', 'Connect, Share,')}{" "}
+          <span className="text-orange-400">{t('home.hero.titlePart2', 'Make a Difference')}</span>
         </h1>
         
         <p className="text-lg md:text-xl text-blue-100 dark:text-blue-200 mb-10">
-          {t("home.hero.subtitle")}
+          {t('home.hero.subtitle', 'Join our community where giving meets receiving. Make a positive impact by sharing what you no longer need with those who need it most.')}
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center gap-4">
