@@ -3,12 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
 import { UserPlus } from 'lucide-react';
+import Turnstile from 'react-turnstile'; // ✅ NEW
 
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<'DONOR' | 'BENEFICIARY'>('DONOR');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null); // ✅ NEW
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -20,22 +22,24 @@ export default function Register() {
     setError(null);
 
     try {
-      // 1. Sign up the user
+      if (!captchaToken) {
+        throw new Error('رجاءً أكمل التحقق (CAPTCHA) قبل إنشاء الحساب.');
+      }
+
+      // 1️⃣ تسجيل المستخدم
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-            role: role
-          }
-        }
+          data: { full_name: fullName, role: role },
+          captchaToken, // ✅ نضيف التوكين هنا
+        },
       });
 
       if (authError) throw authError;
       if (!authData.user) throw new Error('Registration failed. Please try again.');
 
-      // 2. Create the profile record
+      // 2️⃣ إنشاء سجل الملف الشخصي
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([
@@ -47,14 +51,13 @@ export default function Register() {
             biography: '',
             city: '',
             visibility: true,
-            avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`
-          }
+            avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
+          },
         ])
         .select()
         .single();
 
       if (profileError) {
-        // If profile creation fails, delete the auth user to maintain consistency
         await supabase.auth.admin.deleteUser(authData.user.id);
         throw profileError;
       }
@@ -80,8 +83,8 @@ export default function Register() {
           </h1>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
             >
               Sign in
@@ -176,6 +179,15 @@ export default function Register() {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* ✅ CAPTCHA */}
+          <div className="flex justify-center">
+            <Turnstile
+              sitekey="0x4AAAAAAB92OMKRH-HWakZ7"
+              onVerify={(token) => setCaptchaToken(token)}
+              theme="light"
+            />
           </div>
 
           <div>
