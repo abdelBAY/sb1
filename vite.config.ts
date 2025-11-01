@@ -7,4 +7,6 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  // Service worker is automatically copied from public/ to dist/ during build
+  // The service worker registration happens in main.tsx for production builds
 });

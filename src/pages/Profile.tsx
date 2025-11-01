@@ -32,6 +32,7 @@ interface Profile {
 export default function Profile() {
   const navigate = useNavigate();
   const storeUser = useStore((state) => state.user);
+  const isLoading = useStore((state) => state.isLoading);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const setStoreProfile = useStore((state) => state.setProfile);
@@ -46,13 +47,18 @@ export default function Profile() {
     email: ''
   });
 
-  // Check store user authentication first
+  // Check store user authentication first (wait for auth initialization)
   useEffect(() => {
+    // Don't redirect while auth is still initializing
+    if (isLoading) {
+      return;
+    }
+    
     if (!storeUser) {
       navigate('/login');
       return;
     }
-  }, [storeUser, navigate]);
+  }, [storeUser, isLoading, navigate]);
 
   useEffect(() => {
     getProfile();
@@ -225,8 +231,8 @@ export default function Profile() {
     fileInputRef.current?.click();
   };
 
-  // Show loading while checking authentication
-  if (loading) {
+  // Show loading while checking authentication or while auth is initializing
+  if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

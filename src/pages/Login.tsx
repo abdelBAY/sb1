@@ -14,12 +14,23 @@ export default function Login() {
   const navigate = useNavigate();
   const setUser = useStore((state) => state.setUser);
 
+  // 🧠 Detect if we are running locally
+  const isLocal = window.location.hostname === 'localhost';
+
+  // 🧩 Use test sitekey locally, real one in production
+  const siteKey = isLocal
+    ? '1x00000000000000000000AA' // ✅ Cloudflare always-pass test key
+    : '0x4AAAAAAB92OMKRH-HWakZ7'; // your real site key
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    if (!captchaToken) {
+    // ⚙️ Skip CAPTCHA locally (simulate token)
+    const tokenToUse = isLocal ? 'test_token_local_skip' : captchaToken;
+
+    if (!tokenToUse) {
       setError('Please complete the CAPTCHA before signing in.');
       setLoading(false);
       return;
@@ -30,7 +41,7 @@ export default function Login() {
         email,
         password,
         options: {
-          captchaToken, // ← add this line
+          captchaToken: tokenToUse, // 🧩 send the token (real or fake)
         },
       });
 
@@ -39,7 +50,11 @@ export default function Login() {
       setUser(data.user);
       navigate('/search');
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred during sign in');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'An error occurred during sign in'
+      );
     } finally {
       setLoading(false);
     }
@@ -109,19 +124,21 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Cloudflare Turnstile widget */}
-          <div className="mt-4 flex justify-center">
-            <Turnstile
-              sitekey="0x4AAAAAAB92OMKRH-HWakZ7"
-              onVerify={(token) => setCaptchaToken(token)}
-              onExpire={() => setCaptchaToken(null)}
-            />
-          </div>
+          {/* 🧠 Hide Turnstile widget when local */}
+          {!isLocal && (
+            <div className="mt-4 flex justify-center">
+              <Turnstile
+                sitekey={siteKey}
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
+              />
+            </div>
+          )}
 
           <div>
             <button
               type="submit"
-              disabled={loading || !captchaToken}
+              disabled={loading || (!captchaToken && !isLocal)}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 ease-in-out transform hover:-translate-y-0.5"
             >
               {loading ? (

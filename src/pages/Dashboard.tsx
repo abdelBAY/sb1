@@ -52,14 +52,20 @@ export default function Dashboard() {
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
+  const isLoading = useStore((state) => state.isLoading);
 
   useEffect(() => {
+    // Don't redirect while auth is still initializing
+    if (isLoading) {
+      return;
+    }
+    
     if (!user) {
       navigate('/login');
       return;
     }
     loadDashboardData();
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   async function loadDashboardData() {
     try {

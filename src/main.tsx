@@ -18,6 +18,7 @@ import './index.css';
 import About from './pages/About';
 import ContactUs from './pages/ContactUs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import { registerServiceWorker } from './utils/serviceWorker';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,3 +58,8 @@ createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </StrictMode>
 );
+
+// Register service worker for offline support
+if (import.meta.env.PROD) {
+  registerServiceWorker();
+}

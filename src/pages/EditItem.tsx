@@ -50,6 +50,7 @@ export default function EditItem() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
+  const isLoading = useStore((state) => state.isLoading);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,13 +71,18 @@ export default function EditItem() {
     tags: []
   });
 
-  // Check authentication
+  // Check authentication (wait for auth initialization)
   useEffect(() => {
+    // Don't redirect while auth is still initializing
+    if (isLoading) {
+      return;
+    }
+    
     if (!user) {
       navigate('/login');
       return;
     }
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   useEffect(() => {
     loadItem();

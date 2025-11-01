@@ -29,6 +29,7 @@ export default function Layout() {
   const setUser = useStore((state) => state.setUser);
   const setProfile = useStore((state) => state.setProfile);
   const setDarkMode = useStore((state) => state.setDarkMode);
+  const setIsLoading = useStore((state) => state.setIsLoading);
   const unreadMessagesCount = useStore((state) => state.unreadMessagesCount);
   const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
   const navigate = useNavigate();
@@ -64,18 +65,24 @@ export default function Layout() {
     const initializeAuth = async () => {
       try {
         console.log('Initializing authentication...');
+        // Set loading to true initially
+        setIsLoading(true);
+        
         const { data: { user }, error } = await supabase.auth.getUser();
         
         if (error) {
           console.error('Auth error:', error);
+          setUser(null);
         } else {
           console.log('Current user:', user ? 'Authenticated' : 'Not authenticated');
+          setUser(user);
         }
-        
-        setUser(user);
       } catch (error) {
         console.error('Error initializing auth:', error);
         setUser(null);
+      } finally {
+        // Set loading to false after auth initialization completes
+        setIsLoading(false);
       }
     };
 
@@ -86,11 +93,13 @@ export default function Layout() {
       async (event, session) => {
         console.log('Auth state changed:', event, session ? 'User authenticated' : 'User not authenticated');
         setUser(session?.user ?? null);
+        // Ensure loading is set to false when auth state changes after initial load
+        setIsLoading(false);
       }
     );
 
     return () => subscription.unsubscribe();
-  }, [setUser]);
+  }, [setUser, setIsLoading]);
 
   // Fetch profile data when user changes
   React.useEffect(() => {

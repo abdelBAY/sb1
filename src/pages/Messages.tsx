@@ -66,6 +66,7 @@ interface Chat {
 export default function Messages() {
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
+  const isLoading = useStore((state) => state.isLoading);
   const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -85,17 +86,18 @@ export default function Messages() {
   } | null>(null);
 
   useEffect(() => {
-    // Only redirect if we're sure the user is not authenticated
-    // Give some time for auth to initialize
-    const timer = setTimeout(() => {
-      if (!user) {
-        navigate('/login');
-      }
-    }, 1000);
+    // Don't redirect while auth is still initializing
+    if (isLoading) {
+      return;
+    }
+    
+    if (!user) {
+      navigate('/login');
+      return;
+    }
 
     const init = async () => {
       if (!user) return;
-      clearTimeout(timer);
 
       // Mark all received messages as read on opening Messages
       // Note: We'll mark them as read when loading each chat instead
@@ -121,9 +123,7 @@ export default function Messages() {
     };
 
     init();
-
-    return () => clearTimeout(timer);
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   useEffect(() => {
     if (selectedChat) {
