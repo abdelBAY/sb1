@@ -5,7 +5,6 @@ import {
   CheckCircle, 
   BookmarkPlus, 
   Activity, 
-  PlusCircle,
   Gift,
   Users,
   MessageCircle,
@@ -15,7 +14,8 @@ import {
   AlertCircle,
   Edit,
   Trash2,
-  Package
+  Package,
+  ChevronRight
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../lib/store';
@@ -233,10 +233,12 @@ export default function Dashboard() {
           </div>
           <Link
             to="/create-item"
-            className="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
+            className="mt-4 md:mt-0 inline-flex items-center justify-center gap-3 px-6 py-3 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
           >
-            <PlusCircle className="w-5 h-5 mr-2" />
-            Create New Item
+            <span>CREATE NEW ITEM</span>
+            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm">
+              <ChevronRight className="w-5 h-5" />
+            </div>
           </Link>
         </div>
 
@@ -325,10 +327,12 @@ export default function Dashboard() {
                 <div className="text-gray-500 dark:text-gray-400 mb-4">No items yet.</div>
                 <Link
                   to="/create-item"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200"
+                  className="inline-flex items-center justify-center gap-3 px-6 py-3 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
                 >
-                  <PlusCircle className="w-5 h-5 mr-2" />
-                  Create Your First Item
+                  <span>CREATE YOUR FIRST ITEM</span>
+                  <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm">
+                    <ChevronRight className="w-5 h-5" />
+                  </div>
                 </Link>
               </div>
             ) : (

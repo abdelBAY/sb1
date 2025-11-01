@@ -232,62 +232,61 @@ export default function Layout() {
               />
               {user ? (
                 <>
-                  {/* Profile Display */}
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                      {profile?.avatar_url ? (
-                        <img
-                          src={profile.avatar_url}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : user.user_metadata?.avatar_url ? (
-                        <img
-                          src={user.user_metadata.avatar_url}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                  {/* Donate Now Button */}
+                  <Link
+                    to="/create-item"
+                    className="inline-flex items-center justify-center gap-3 px-5 py-2.5 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
+                  >
+                    <span>DONATE NOW</span>
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm">
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  </Link>
+                  
+                  {/* Message Notification Icon */}
+                  <div className="relative">
+                    <button
+                      onClick={() => navigate('/messages')}
+                      className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                    >
+                      <Bell className="w-5 h-5" />
+                      {unreadMessagesCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
+                          {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                        </span>
                       )}
-                    </div>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {profile?.full_name || profile?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
-                    </span>
-                    
-                    {/* Message Notification Icon */}
-                    <div className="relative">
-                      <button
-                        onClick={() => navigate('/messages')}
-                        className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
-                      >
-                        <Bell className="w-5 h-5" />
-                        {unreadMessagesCount > 0 && (
-                          <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
-                            {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-                          </span>
-                        )}
-                      </button>
-                    </div>
+                    </button>
                   </div>
                   
                   {/* Profile Dropdown */}
                   <div className="relative" ref={dropdownRef}>
                     <button
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="w-10 h-10 rounded-full bg-blue-100 dark:bg-gray-700 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border border-gray-200 dark:border-gray-600"
                     >
-                      {user.user_metadata?.avatar_url ? (
-                        <img
-                          src={user.user_metadata.avatar_url}
-                          alt="Profile"
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-sm font-medium">
-                          {getInitials(user.email || '')}
-                        </span>
-                      )}
+                      <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-600">
+                        {profile?.avatar_url ? (
+                          <img
+                            src={profile.avatar_url}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : user.user_metadata?.avatar_url ? (
+                          <img
+                            src={user.user_metadata.avatar_url}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <User className="w-5 h-5 text-gray-400 dark:text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[140px] truncate">
+                        {profile?.full_name || profile?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </button>
                   
                   {isProfileOpen && (
@@ -407,6 +406,20 @@ export default function Layout() {
 
             {user ? (
               <>
+                {/* Donate Now Button for Mobile */}
+                <div className="px-3 py-2">
+                  <Link
+                    to="/create-item"
+                    className="inline-flex items-center justify-center gap-3 w-full px-5 py-3 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>DONATE NOW</span>
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm">
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  </Link>
+                </div>
+                
                 {/* Mobile Profile Display */}
                 <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center space-x-3">
