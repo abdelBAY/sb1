@@ -32,7 +32,7 @@ interface SearchResult {
   tags: string[];
   created_at: string;
   condition: 'LIKE_NEW' | 'GOOD' | 'WORN' | 'BROKEN';
-  status: 'PENDING' | 'CLAIMED' | 'COMPLETED';
+  status: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   dimensions?: {
     length: number;
     width: number;
@@ -95,6 +95,7 @@ export default function Search() {
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
+  const [pendingOnly, setPendingOnly] = useState<boolean>(false);
 
   useEffect(() => {
     const channel = supabase
@@ -127,6 +128,10 @@ export default function Search() {
         queryBuilder = queryBuilder.eq('condition', selectedCondition);
       }
 
+      if (pendingOnly) {
+        queryBuilder = queryBuilder.eq('status', 'PENDING');
+      }
+
       if (typeof query === 'string' && query.trim()) {
         queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
       }
@@ -151,7 +156,7 @@ export default function Search() {
     const debouncedSearch = debounce(performSearch, 300);
     debouncedSearch();
     return () => debouncedSearch.cancel();
-  }, [query, selectedCategory, selectedCondition, sortBy, page]);
+  }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly]);
 
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems(prev => 
@@ -195,7 +200,8 @@ export default function Search() {
     const colors = {
       'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
       'CLAIMED': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-      'COMPLETED': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+      'COMPLETED': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+      'GIVEN_AWAY': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
     };
     return colors[status] || '';
   };
@@ -209,6 +215,15 @@ export default function Search() {
               Find Available Items
             </h1>
             <div className="flex items-center space-x-4">
+              <label className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={pendingOnly}
+                  onChange={(e) => setPendingOnly(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 dark:text-blue-400 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                />
+                <span>Pending Only</span>
+              </label>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -416,7 +431,7 @@ export default function Search() {
                           {item.condition}
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                          {item.status}
+                          {item.status === 'GIVEN_AWAY' ? 'Given Away' : item.status}
                         </span>
                       </div>
                       {item.rating && (

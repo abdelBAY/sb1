@@ -1,14 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { 
-  Clock, 
   CheckCircle, 
-  BookmarkPlus, 
   Activity, 
   Gift,
   Users,
-  MessageCircle,
-  TrendingUp,
   MapPin,
   Calendar,
   AlertCircle,
@@ -23,7 +19,7 @@ import { useStore } from '../lib/store';
 interface DashboardItem {
   id: string;
   title: string;
-  status: 'PENDING' | 'CLAIMED' | 'COMPLETED';
+  status: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   created_at: string;
   category: string;
   description: string;
@@ -50,6 +46,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+  const [markingAsGivenAwayId, setMarkingAsGivenAwayId] = useState<string | null>(null);
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
@@ -85,7 +82,7 @@ export default function Dashboard() {
       const stats = {
         totalDonations: announcements?.length || 0,
         activeDonations: announcements?.filter(a => a.status === 'PENDING').length || 0,
-        completedDonations: announcements?.filter(a => a.status === 'COMPLETED').length || 0,
+        completedDonations: announcements?.filter(a => a.status === 'COMPLETED' || a.status === 'GIVEN_AWAY').length || 0,
         totalBeneficiaries: new Set(announcements?.map(a => a.claimed_by)).size || 0
       };
 
@@ -189,6 +186,71 @@ export default function Dashboard() {
       loadDashboardData();
     } finally {
       setDeletingItemId(null);
+    }
+  };
+
+  const handleMarkAsGivenAway = async (itemId: string) => {
+    try {
+      setMarkingAsGivenAwayId(itemId);
+
+      const confirmed = window.confirm(
+        'Are you sure you want to mark this item as "Given Away"? This will prevent others from contacting you about it.'
+      );
+
+      if (!confirmed) {
+        setMarkingAsGivenAwayId(null);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('announcements')
+        .update({ status: 'GIVEN_AWAY', updated_at: new Date().toISOString() })
+        .eq('id', itemId)
+        .eq('user_id', user?.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Find the item to get its previous status
+      const itemToUpdate = items.find(item => item.id === itemId);
+      const previousStatus = itemToUpdate?.status;
+
+      // Update local state
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item.id === itemId ? { ...item, status: 'GIVEN_AWAY' } : item
+        )
+      );
+
+      // Update stats based on previous status
+      setStats(prevStats => {
+        const newStats = { ...prevStats };
+        
+        // If it was PENDING, decrease active donations
+        if (previousStatus === 'PENDING') {
+          newStats.activeDonations = Math.max(0, prevStats.activeDonations - 1);
+        }
+        
+        // If it wasn't already COMPLETED or GIVEN_AWAY, increase completed donations
+        if (previousStatus !== 'COMPLETED' && previousStatus !== 'GIVEN_AWAY') {
+          newStats.completedDonations = prevStats.completedDonations + 1;
+        }
+        
+        return newStats;
+      });
+
+      // Reload dashboard data to ensure consistency
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Error marking item as given away:', error);
+      alert(
+        error instanceof Error
+          ? `Failed to mark item as given away: ${error.message}`
+          : 'Failed to mark item as given away. Please try again.'
+      );
+    } finally {
+      setMarkingAsGivenAwayId(null);
     }
   };
 
@@ -373,9 +435,11 @@ export default function Dashboard() {
                                 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                                 : item.status === 'CLAIMED'
                                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'
-                                : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                                : item.status === 'COMPLETED'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                             }`}>
-                              {item.status}
+                              {item.status === 'GIVEN_AWAY' ? 'Given Away' : item.status}
                             </span>
                           </div>
                         </div>
@@ -397,6 +461,32 @@ export default function Dashboard() {
                       </div>
 
                       <div className="mt-4 flex items-center justify-end space-x-4">
+                        {item.status !== 'GIVEN_AWAY' && (
+                          <button
+                            onClick={() => handleMarkAsGivenAway(item.id)}
+                            disabled={markingAsGivenAwayId === item.id}
+                            className={`
+                              inline-flex items-center px-3 py-1 text-sm font-medium
+                              ${markingAsGivenAwayId === item.id
+                                ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                                : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300'
+                              }
+                              transition-colors
+                            `}
+                          >
+                            {markingAsGivenAwayId === item.id ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
+                                Marking...
+                              </>
+                            ) : (
+                              <>
+                                <Gift className="w-4 h-4 mr-1" />
+                                Mark as Given Away
+                              </>
+                            )}
+                          </button>
+                        )}
                         <Link
                           to={`/edit-item/${item.id}`}
                           className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"

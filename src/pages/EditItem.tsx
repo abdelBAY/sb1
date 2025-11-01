@@ -22,7 +22,7 @@ interface EditItemForm {
   photos: string[];
   newPhotos: File[];
   location: string;
-  availability: 'PENDING' | 'CLAIMED' | 'COMPLETED';
+  availability: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   pickupInstructions: string;
   tags: string[];
 }

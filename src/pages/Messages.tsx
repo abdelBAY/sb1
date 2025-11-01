@@ -99,9 +99,7 @@ export default function Messages() {
     const init = async () => {
       if (!user) return;
 
-      // Mark all received messages as read on opening Messages
-      // Note: We'll mark them as read when loading each chat instead
-      // to avoid RLS policy issues with bulk updates
+      // Mark all received messages as read when opening Messages page
       try {
         const { data: unread, error: fetchErr } = await supabase
           .from('messages')
@@ -109,9 +107,27 @@ export default function Messages() {
           .eq('receiver_id', user.id)
           .eq('read', false);
 
-        if (!fetchErr && unread) {
-          console.log(`Found ${unread.length} unread messages - will mark as read on chat load`);
-          // We'll update the global count to 0 since we're viewing messages
+        if (!fetchErr && unread && unread.length > 0) {
+          console.log(`Found ${unread.length} unread messages - marking as read`);
+          
+          // Update each message individually to ensure RLS policy works
+          const updatePromises = unread.map(async (msg: any) => {
+            const { error: updateError } = await supabase
+              .from('messages')
+              .update({ read: true })
+              .eq('id', msg.id)
+              .eq('receiver_id', user.id)
+              .eq('read', false);
+            
+            if (updateError) {
+              console.error(`Error updating message ${msg.id}:`, updateError);
+            }
+            return updateError === null;
+          });
+
+          await Promise.all(updatePromises);
+          
+          // Update the global count to 0 since we're viewing messages
           setUnreadMessagesCount(0);
         }
       } catch (e) {
@@ -381,15 +397,29 @@ export default function Messages() {
       );
 
       if (unreadMessages.length > 0) {
-        // Try to update in database (will work after applying the SQL migration)
-        try {
-          const messageIds = unreadMessages.map((m) => m.id);
-          await supabase
+        // Update in database - mark messages as read
+        const messageIds = unreadMessages.map((m) => m.id);
+        
+        // Update each message individually to ensure RLS policy works correctly
+        const updatePromises = messageIds.map(async (messageId) => {
+          const { error: updateError } = await supabase
             .from('messages')
             .update({ read: true })
-            .in('id', messageIds);
-        } catch (dbError) {
-          console.log('Database update skipped (need to apply SQL migration):', dbError);
+            .eq('id', messageId)
+            .eq('receiver_id', user?.id)
+            .eq('read', false); // Only update if currently unread
+            
+          if (updateError) {
+            console.error(`Error updating message ${messageId}:`, updateError);
+          }
+          return updateError === null;
+        });
+
+        const updateResults = await Promise.all(updatePromises);
+        const successCount = updateResults.filter(Boolean).length;
+        
+        if (successCount > 0) {
+          console.log(`Successfully marked ${successCount} message(s) as read`);
         }
 
         // Update messages to show as read in UI
@@ -410,8 +440,18 @@ export default function Messages() {
           );
         }
 
-        // Reset global unread count
+        // Reset global unread count and refresh it
         setUnreadMessagesCount(0);
+        
+        // Force refresh unread count in Layout component
+        // This ensures the count is updated even after page reload
+        const { data: unreadData } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('receiver_id', user?.id)
+          .eq('read', false);
+        
+        setUnreadMessagesCount(unreadData?.length || 0);
       } else {
         setMessages(allMessages);
       }

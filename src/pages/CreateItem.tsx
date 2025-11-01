@@ -18,7 +18,7 @@ interface CreateItemForm {
   condition: 'LIKE_NEW' | 'GOOD' | 'WORN' | 'BROKEN';
   photos: File[];
   location: string;
-  availability: 'PENDING' | 'CLAIMED' | 'COMPLETED';
+  availability: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   pickupInstructions: string;
   tags: string[];
 }

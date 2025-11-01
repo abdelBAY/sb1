@@ -31,7 +31,7 @@ interface ProductDetails {
   photos: string[];
   tags: string[];
   created_at: string;
-  status: 'PENDING' | 'CLAIMED' | 'COMPLETED';
+  status: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   pickup_instructions?: string;
   dimensions?: {
     length: number;
@@ -296,6 +296,12 @@ export default function ProductDetail() {
       return;
     }
     
+    // Prevent chat if item is given away
+    if (product?.status === 'GIVEN_AWAY') {
+      alert('This item has already been given away. The donor is no longer accepting requests.');
+      return;
+    }
+    
     navigate('/messages');
   };
 
@@ -307,6 +313,12 @@ export default function ProductDetail() {
     
     if (!profile) {
       navigate('/register');
+      return;
+    }
+    
+    // Prevent requests if item is given away
+    if (product?.status === 'GIVEN_AWAY') {
+      alert('This item has already been given away. The donor is no longer accepting requests.');
       return;
     }
     
@@ -455,9 +467,11 @@ export default function ProductDetail() {
                         ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                         : product.status === 'CLAIMED'
                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'
-                        : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                        : product.status === 'COMPLETED'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                     }`}>
-                      {product.status}
+                      {product.status === 'GIVEN_AWAY' ? 'Given Away' : product.status}
                     </span>
                   </div>
                 </div>
@@ -554,7 +568,18 @@ export default function ProductDetail() {
               </div>
 
               {/* Request Status or Action Buttons */}
-              {requestStatus !== 'none' ? (
+              {product.status === 'GIVEN_AWAY' ? (
+                <div className="pt-6">
+                  <div className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-4 text-center">
+                    <p className="text-gray-700 dark:text-gray-300 font-medium">
+                      This item has already been given away
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      The donor is no longer accepting requests for this item.
+                    </p>
+                  </div>
+                </div>
+              ) : requestStatus !== 'none' ? (
                 <div className="pt-6">
                   <RequestStatus 
                     status={requestStatus} 
@@ -694,9 +719,11 @@ export default function ProductDetail() {
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                           : item.status === 'CLAIMED'
                           ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                          : item.status === 'COMPLETED'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
-                        {item.status}
+                        {item.status === 'GIVEN_AWAY' ? 'Given Away' : item.status}
                       </span>
                     </div>
                   </Link>
