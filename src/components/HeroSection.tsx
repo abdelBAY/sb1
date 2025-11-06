@@ -1,4 +1,5 @@
 import React from "react";
+import heroImg from "../assets/givea-image2.png";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
@@ -50,6 +51,27 @@ const HeroSection: React.FC = () => {
           >
             {t("home.hero.browseItems")}
           </motion.a>
+        </div>
+      </motion.div>
+
+      {/* Hero Image */}
+      <motion.div
+        className="relative z-10 px-6 w-full max-w-6xl mx-auto mt-10"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        <div className="overflow-hidden rounded-3xl shadow-2xl ring-1 ring-white/10 backdrop-blur-sm">
+          <img
+            src={heroImg}
+            alt="Room preview captured on phone"
+            className="w-full h-full object-cover aspect-[16/9] md:aspect-[21/9]"
+            loading="eager"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.src = "/logo1.png"; // fallback so the section never appears empty
+            }}
+          />
         </div>
       </motion.div>
 
