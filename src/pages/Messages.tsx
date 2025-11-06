@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Search,
   Send,
@@ -7,8 +8,6 @@ import {
   Paperclip,
   Smile,
   MoreVertical,
-  Phone,
-  Video,
   User,
   Check,
   CheckCheck,
@@ -64,6 +63,7 @@ interface Chat {
 }
 
 export default function Messages() {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
@@ -851,16 +851,10 @@ export default function Messages() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <Phone className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <Video className="w-5 h-5" />
-                      </button>
                       <button
                         onClick={handleDeleteConversation}
                         className="p-2 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                        title="Delete conversation"
+                        title={t('messages.deleteConversation')}
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>

@@ -19,6 +19,7 @@ import About from './pages/About';
 import ContactUs from './pages/ContactUs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import { registerServiceWorker } from './utils/serviceWorker';
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <NotFound />,
     children: [
       { index: true, element: <App /> },
       { path: 'profile', element: <Profile /> },
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
       { path: 'privacy', element: <PrivacyPolicy /> },
       { path: 'contact', element: <ContactUs /> },
       { path: 'about', element: <About /> },
+      { path: "*", element: <NotFound /> },
     ],
   },
 ]);
