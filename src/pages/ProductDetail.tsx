@@ -20,6 +20,7 @@ import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
 import RequestModal from '../components/RequestModal';
 import RequestStatus from '../components/RequestStatus';
+import LocationMap from '../components/LocationMap';
 
 interface ProductDetails {
   id: string;
@@ -501,9 +502,12 @@ export default function ProductDetail() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center text-gray-500 dark:text-gray-400">
-                  <MapPin className="w-5 h-5 mr-2" />
-                  {product.location}
+                <div>
+                  <div className="flex items-center text-gray-500 dark:text-gray-400 mb-2">
+                    <MapPin className="w-5 h-5 mr-2" />
+                    <span className="font-medium">{product.location}</span>
+                  </div>
+                  <LocationMap location={product.location} height="250px" />
                 </div>
                 <div className="flex items-center text-gray-500 dark:text-gray-400">
                   <Calendar className="w-5 h-5 mr-2" />
@@ -539,7 +543,7 @@ export default function ProductDetail() {
                     <img
                       src={product.user.avatar_url}
                       alt={product.user.full_name || 'Anonymous User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-12 h-12 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -623,7 +627,7 @@ export default function ProductDetail() {
                       <img
                         src={review.profiles.avatar_url}
                         alt={review.profiles.full_name || 'Anonymous User'}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                       />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

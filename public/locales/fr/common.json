@@ -35,5 +35,11 @@
       "subtitle": "Rejoignez des milliers d'autres personnes qui ont déjà un impact dans leurs communautés.",
       "button": "Commencer"
     }
+  },
+  "logout": {
+    "title": "Déconnexion",
+    "message": "Vous serez déconnecté de votre compte : {{account}}",
+    "cancel": "Annuler",
+    "confirm": "OK"
   }
 }

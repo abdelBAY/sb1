@@ -16,6 +16,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Logo from './Logo';
 import LanguageSelector from './LanguageSelector';
+import LogoutModal from './LogoutModal';
 import { useTranslation } from 'react-i18next';
 
 export default function Layout() {
@@ -24,6 +25,7 @@ export default function Layout() {
   const [showSettings, setShowSettings] = React.useState(false);
   const [showResources, setShowResources] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
   const user = useStore((state) => state.user);
   const profile = useStore((state) => state.profile);
   const setUser = useStore((state) => state.setUser);
@@ -34,7 +36,7 @@ export default function Layout() {
   const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
   const navigate = useNavigate();
   const dropdownRef = React.useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
+  const { t } = useTranslation('common');
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -174,17 +176,29 @@ export default function Layout() {
     }
   }, [user, setUnreadMessagesCount]);
 
-  const handleSignOut = async () => {
-    const confirmed = window.confirm('Are you sure you want to sign out?');
-    if (confirmed) {
-      try {
-        await supabase.auth.signOut();
-        setUser(null);
-        navigate('/');
-      } catch (error) {
-        console.error('Error signing out:', error);
-      }
+  const handleSignOut = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setShowLogoutModal(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
+  };
+
+  const getAccountType = () => {
+    if (!user) return 'account';
+    const providers = user.app_metadata?.providers || [];
+    if (providers.includes('google')) return 'Google';
+    if (providers.includes('github')) return 'GitHub';
+    if (providers.includes('facebook')) return 'Facebook';
+    if (user.email) return 'email';
+    return 'account';
   };
 
 
@@ -264,7 +278,7 @@ export default function Layout() {
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
                       className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 border border-gray-200 dark:border-gray-600"
                     >
-                      <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-600">
+                      <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-600 ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]">
                         {profile?.avatar_url ? (
                           <img
                             src={profile.avatar_url}
@@ -423,7 +437,7 @@ export default function Layout() {
                 {/* Mobile Profile Display */}
                 <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]">
                       {profile?.avatar_url ? (
                         <img
                           src={profile.avatar_url}
@@ -509,6 +523,14 @@ export default function Layout() {
       <main className="relative z-0">
         <Outlet />
       </main>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmLogout}
+        accountType={getAccountType()}
+      />
     </div>
   );
 }

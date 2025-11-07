@@ -35,5 +35,49 @@
       "subtitle": "Join thousands of others who are already making an impact in their communities.",
       "button": "Get Started"
     }
+  },
+  "messages": {
+    "errors": {
+      "loadChats": "Failed to load chats",
+      "loadMessages": "Failed to load messages",
+      "send": "Failed to send message",
+      "delete": "Failed to delete conversation",
+      "requestAction": "Failed to process request action",
+      "confirmMeeting": "Failed to confirm meeting",
+      "cancelRequest": "Failed to cancel request"
+    },
+    "confirmDelete": "Are you sure you want to delete this conversation with {{name}}? This action cannot be undone.",
+    "actions": {
+      "accepted": "I accept your request! Let's arrange a meeting.",
+      "declined": "Thank you for your interest, but I'm unable to fulfill this request at this time.",
+      "askMore": "I'd like to know more about your request. Could you provide additional details?",
+      "canceled": "I've decided to cancel this request. Thank you for your time."
+    },
+    "meetingConfirmed": "Meeting confirmed for {{date}} at {{place}}. Please confirm pickup details.",
+    "item": "Item",
+    "suggestPlace": "Please suggest a meeting place",
+    "searchPlaceholder": "Search messages...",
+    "new": "new",
+    "empty": "No messages found",
+    "lastSeen": "Last seen",
+    "deleteConversation": "Delete conversation",
+    "confirmPrompt": "Please confirm meeting time and place.",
+    "accept": "Accept",
+    "askMore": "Ask More Info",
+    "decline": "Decline",
+    "meetingDetails": "Meeting Details",
+    "rememberPublic": "Remember to meet in a public area.",
+    "inputPlaceholder": "Type a message...",
+    "selectChatTitle": "Select a chat to start messaging",
+    "selectChatSubtitle": "Choose from your existing conversations or start a new one",
+    "startConversation": "Start Conversation!",
+    "startConversationDesc": "Connect with fellow users, donors, or the Give community. Select an existing chats on the left or click 'New Message' to begin.",
+    "newMessage": "NEW MESSAGE"
+  },
+  "logout": {
+    "title": "Logout",
+    "message": "You will be logged out of your account: {{account}}",
+    "cancel": "Cancel",
+    "confirm": "OK"
   }
 }

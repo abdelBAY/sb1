@@ -18,7 +18,9 @@ import {
   Calendar,
   AlertCircle,
   X,
-  Trash2
+  Trash2,
+  Filter,
+  Plus
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
@@ -738,15 +740,20 @@ export default function Messages() {
             {/* Chat List */}
             <div className="border-r border-gray-200 dark:border-gray-700">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search messages..."
-                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                  />
-                  <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <div className="relative flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t('messages.searchPlaceholder')}
+                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    />
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  </div>
+                  <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <Filter className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
 
@@ -777,7 +784,7 @@ export default function Messages() {
                         <img
                           src={chat.user.avatar_url}
                           alt={chat.user.full_name}
-                          className="w-16 h-16 rounded-full object-cover"
+                          className="w-16 h-16 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                         />
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -832,7 +839,7 @@ export default function Messages() {
                         <img
                           src={selectedChat.user.avatar_url}
                           alt={selectedChat.user.full_name}
-                          className="w-10 h-10 rounded-full object-cover"
+                          className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -1035,15 +1042,31 @@ export default function Messages() {
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center">
-                    <MessageCircle className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                      Select a chat to start messaging
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      Choose from your existing conversations or start a new one
+                <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                  <div className="text-center max-w-md px-6">
+                    {/* Two overlapping speech bubbles icon */}
+                    <div className="relative mx-auto mb-6 w-24 h-24 flex items-center justify-center">
+                      <MessageCircle className="w-16 h-16 text-gray-300 dark:text-gray-600 absolute" />
+                      <MessageCircle className="w-12 h-12 text-orange-500 dark:text-orange-400 absolute -top-2 -right-2" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
+                        <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full mx-1"></div>
+                        <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
+                      </div>
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                      {t('messages.startConversation')} 👋
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
+                      {t('messages.startConversationDesc')}
                     </p>
+                    <button
+                      onClick={() => navigate('/search')}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                    >
+                      <Plus className="w-5 h-5" />
+                      {t('messages.newMessage')}
+                    </button>
                   </div>
                 </div>
               )}
