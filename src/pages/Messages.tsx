@@ -61,6 +61,7 @@ interface Chat {
     id: string;
     title: string;
     photos: string[];
+    status?: string;
   };
 }
 
@@ -217,7 +218,7 @@ export default function Messages() {
       if (announcementIds.size > 0) {
         const { data: announcementsData, error: announcementsError } = await supabase
           .from('announcements')
-          .select('id, title, photos')
+          .select('id, title, photos, status')
           .in('id', Array.from(announcementIds));
 
         if (announcementsError) {
@@ -278,7 +279,7 @@ export default function Messages() {
             id: chatId,
             user: {
               id: otherUserId,
-              full_name: profile?.full_name || 'Unknown User',
+              full_name: profile?.full_name || t('messages.unknownUser'),
               avatar_url: profile?.avatar_url || null,
               last_seen: profile?.last_seen || null
             },
@@ -290,8 +291,9 @@ export default function Messages() {
             unread_count: unreadCounts.get(chatId) || 0,
             announcement: message.announcement_id ? {
               id: message.announcement_id,
-              title: announcement?.title || 'Item',
-              photos: announcement?.photos || []
+              title: announcement?.title || t('messages.item'),
+              photos: announcement?.photos || [],
+              status: announcement?.status
             } : undefined
           });
         } else {
@@ -312,7 +314,7 @@ export default function Messages() {
       setChats(Array.from(chatMap.values()));
     } catch (error) {
       console.error('Error loading chats:', error);
-      setError('Failed to load chats');
+      setError(t('messages.errors.loadChats'));
     } finally {
       setLoading(false);
     }
@@ -459,7 +461,7 @@ export default function Messages() {
       }
     } catch (error) {
       console.error('Error loading messages:', error);
-      setError('Failed to load messages');
+      setError(t('messages.errors.loadMessages'));
     }
   };
 
@@ -486,7 +488,7 @@ export default function Messages() {
       loadMessages(selectedChat.id);
     } catch (error) {
       console.error('Error sending message:', error);
-      setError('Failed to send message');
+      setError(t('messages.errors.send'));
     }
   };
 
@@ -499,7 +501,7 @@ export default function Messages() {
     if (days === 0) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else if (days === 1) {
-      return 'Yesterday';
+      return t('messages.yesterday');
     } else if (days < 7) {
       return date.toLocaleDateString([], { weekday: 'long' });
     } else {
@@ -511,7 +513,7 @@ export default function Messages() {
     if (!selectedChat || !user) return;
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete this conversation with ${selectedChat.user.full_name}? This action cannot be undone.`
+      t('messages.confirmDelete', { name: selectedChat.user.full_name })
     );
 
     if (!confirmed) return;
@@ -583,7 +585,7 @@ export default function Messages() {
       }
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      setError(`Failed to delete conversation: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
+      setError(t('messages.errors.delete'));
     }
   };
 
@@ -596,21 +598,21 @@ export default function Messages() {
 
       switch (action) {
         case 'accept':
-          messageContent = 'I accept your request! Let\'s arrange a meeting.';
+          messageContent = t('messages.actions.accepted');
           // Set up confirmation modal
           setPendingRequest({
-            itemName: selectedChat.announcement?.title || 'Item',
+            itemName: selectedChat.announcement?.title || t('messages.item'),
             donorName: selectedChat.user.full_name,
             suggestedDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Tomorrow
-            suggestedPlace: 'Please suggest a meeting place'
+            suggestedPlace: t('messages.suggestPlace')
           });
           setShowConfirmationModal(true);
           break;
         case 'decline':
-          messageContent = 'Thank you for your interest, but I\'m unable to fulfill this request at this time.';
+          messageContent = t('messages.actions.declined');
           break;
         case 'ask_more_info':
-          messageContent = 'I\'d like to know more about your request. Could you provide additional details?';
+          messageContent = t('messages.actions.askMore');
           break;
       }
 
@@ -634,7 +636,7 @@ export default function Messages() {
       loadMessages(selectedChat.id);
     } catch (error) {
       console.error('Error handling request action:', error);
-      setError('Failed to process request action');
+      setError(t('messages.errors.requestAction'));
     }
   };
 
@@ -645,7 +647,7 @@ export default function Messages() {
       const message = {
         sender_id: user?.id,
         receiver_id: selectedChat.user.id,
-        content: `Meeting confirmed for ${date} at ${place}. Please confirm pickup details.`,
+        content: t('messages.meetingConfirmed', { date, place }),
         created_at: new Date().toISOString(),
         read: false,
         announcement_id: selectedChat.announcement?.id,
@@ -667,7 +669,7 @@ export default function Messages() {
       setPendingRequest(null);
     } catch (error) {
       console.error('Error confirming meeting:', error);
-      setError('Failed to confirm meeting');
+      setError(t('messages.errors.confirmMeeting'));
     }
   };
 
@@ -678,7 +680,7 @@ export default function Messages() {
       const message = {
         sender_id: user?.id,
         receiver_id: selectedChat.user.id,
-        content: 'I\'ve decided to cancel this request. Thank you for your time.',
+        content: t('messages.actions.canceled'),
         created_at: new Date().toISOString(),
         read: false,
         announcement_id: selectedChat.announcement?.id,
@@ -696,7 +698,7 @@ export default function Messages() {
       setPendingRequest(null);
     } catch (error) {
       console.error('Error canceling request:', error);
-      setError('Failed to cancel request');
+      setError(t('messages.errors.cancelRequest'));
     }
   };
 
@@ -710,7 +712,7 @@ export default function Messages() {
       setShowFeedbackModal(false);
     } catch (error) {
       console.error('Error submitting feedback:', error);
-      setError('Failed to submit feedback');
+      setError(t('messages.errors.submitFeedback'));
     }
   };
 
@@ -778,7 +780,9 @@ export default function Messages() {
                         <img
                           src={chat.announcement.photos[0]}
                           alt={chat.announcement.title}
-                          className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                          className={`w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 ${
+                            chat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                          }`}
                         />
                       ) : chat.user.avatar_url ? (
                         <img
@@ -814,7 +818,7 @@ export default function Messages() {
                         )}
                         {chat.unread_count > 0 && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200 mt-1">
-                            {chat.unread_count} new
+                            {chat.unread_count} {t('messages.new')}
                           </span>
                         )}
                       </div>
@@ -822,7 +826,7 @@ export default function Messages() {
                   ))
                 ) : (
                   <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                    No messages found
+                    {t('messages.empty')}
                   </div>
                 )}
               </div>
@@ -852,7 +856,7 @@ export default function Messages() {
                         </h2>
                         {selectedChat.user.last_seen && (
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Last seen {formatTime(selectedChat.user.last_seen)}
+                            {t('messages.lastSeen')} {formatTime(selectedChat.user.last_seen)}
                           </p>
                         )}
                       </div>
@@ -879,7 +883,9 @@ export default function Messages() {
                           <img
                             src={selectedChat.announcement.photos[0]}
                             alt={selectedChat.announcement.title}
-                            className="w-16 h-16 rounded-lg object-cover"
+                            className={`w-16 h-16 rounded-lg object-cover ${
+                              selectedChat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                            }`}
                           />
                         )}
                         <div className="flex-1">
@@ -939,7 +945,7 @@ export default function Messages() {
                           <div className="flex justify-start mt-2">
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
                               <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                                💬 Please confirm meeting time and place.
+                                💬 {t('messages.confirmPrompt')}
                               </p>
                               <div className="flex space-x-2">
                                 <button
@@ -947,21 +953,21 @@ export default function Messages() {
                                   className="flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
                                 >
                                   <CheckCircle className="w-4 h-4 mr-1" />
-                                  Accept
+                                  {t('messages.accept')}
                                 </button>
                                 <button
                                   onClick={() => handleRequestAction('ask_more_info')}
                                   className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                                 >
                                   <MessageCircle className="w-4 h-4 mr-1" />
-                                  Ask More Info
+                                  {t('messages.askMore')}
                                 </button>
                                 <button
                                   onClick={() => handleRequestAction('decline')}
                                   className="flex items-center px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                                 >
                                   <XCircle className="w-4 h-4 mr-1" />
-                                  Decline
+                                  {t('messages.decline')}
                                 </button>
                               </div>
                             </div>
@@ -974,7 +980,7 @@ export default function Messages() {
                             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
                               <div className="flex items-center space-x-2 text-green-800 dark:text-green-200 mb-2">
                                 <Calendar className="w-4 h-4" />
-                                <span className="font-medium">Meeting Details</span>
+                                <span className="font-medium">{t('messages.meetingDetails')}</span>
                               </div>
                               <div className="space-y-1 text-sm text-green-700 dark:text-green-300">
                                 <div className="flex items-center space-x-2">
@@ -991,7 +997,7 @@ export default function Messages() {
                                   onClick={() => setShowFeedbackModal(true)}
                                   className="text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 underline"
                                 >
-                                  📍 Remember to meet in a public area.
+                                  📍 {t('messages.rememberPublic')}
                                 </button>
                               </div>
                             </div>
@@ -1015,7 +1021,7 @@ export default function Messages() {
                               sendMessage();
                             }
                           }}
-                          placeholder="Type a message..."
+                          placeholder={t('messages.inputPlaceholder')}
                           className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 p-3 resize-none"
                           rows={1}
                         />
@@ -1094,7 +1100,7 @@ export default function Messages() {
       {/* Feedback Modal */}
       {showFeedbackModal && selectedChat && (
         <FeedbackModal
-          itemName={selectedChat.announcement?.title || 'Item'}
+          itemName={selectedChat.announcement?.title || t('messages.item')}
           donorName={selectedChat.user.full_name}
           onClose={() => setShowFeedbackModal(false)}
           onSubmitFeedback={handleSubmitFeedback}

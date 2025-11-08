@@ -72,7 +72,9 @@ export default function ImageOverlay({ item, onClose }: ImageOverlayProps) {
               <img
                 src={item.photos[0]}
                 alt={item.title}
-                className="w-full h-full object-contain"
+                className={`w-full h-full object-contain ${
+                  item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                }`}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">

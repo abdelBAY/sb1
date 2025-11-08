@@ -14,6 +14,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../lib/store';
 
 interface DashboardItem {
@@ -35,6 +36,7 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation('common');
   const [items, setItems] = useState<DashboardItem[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalDonations: 0,
@@ -90,7 +92,7 @@ export default function Dashboard() {
       setStats(stats);
     } catch (error) {
       console.error('Error loading dashboard:', error);
-      setError(error instanceof Error ? error.message : 'Failed to load dashboard data');
+      setError(error instanceof Error ? error.message : t('dashboard.errors.loadData'));
     } finally {
       setLoading(false);
     }
@@ -104,12 +106,12 @@ export default function Dashboard() {
       // Find the item to be deleted
       const itemToDelete = items.find(item => item.id === itemId);
       if (!itemToDelete) {
-        throw new Error('Item not found');
+        throw new Error(t('dashboard.errors.itemNotFound'));
       }
 
       // Show confirmation dialog with item details
       const confirmed = window.confirm(
-        `Are you sure you want to delete "${itemToDelete.title}"? This action cannot be undone.`
+        t('dashboard.confirmDelete', { title: itemToDelete.title })
       );
 
       if (!confirmed) {
@@ -144,12 +146,12 @@ export default function Dashboard() {
 
       if (deleteError) {
         console.error('Supabase delete error:', deleteError);
-        throw new Error(deleteError.message || 'Failed to delete item. You may not have permission to delete this item.');
+        throw new Error(deleteError.message || t('dashboard.errors.deleteItem'));
       }
 
       // Verify deletion succeeded
       if (!data || data.length === 0) {
-        throw new Error('No item was deleted. The item may not exist or you may not have permission to delete it.');
+        throw new Error(t('dashboard.errors.deleteFailed'));
       }
 
       // Broadcast deletion event
@@ -178,8 +180,8 @@ export default function Dashboard() {
       console.error('Error deleting item:', error);
       setDeleteError(
         error instanceof Error 
-          ? `Failed to delete item: ${error.message}` 
-          : 'Failed to delete item. Please try again.'
+          ? `${t('dashboard.errors.deleteItem')}: ${error.message}` 
+          : t('dashboard.errors.deleteItem')
       );
       
       // Rollback UI changes on error
@@ -194,7 +196,7 @@ export default function Dashboard() {
       setMarkingAsGivenAwayId(itemId);
 
       const confirmed = window.confirm(
-        'Are you sure you want to mark this item as "Given Away"? This will prevent others from contacting you about it.'
+        t('dashboard.confirmMarkGivenAway')
       );
 
       if (!confirmed) {
@@ -246,8 +248,8 @@ export default function Dashboard() {
       console.error('Error marking item as given away:', error);
       alert(
         error instanceof Error
-          ? `Failed to mark item as given away: ${error.message}`
-          : 'Failed to mark item as given away. Please try again.'
+          ? `${t('dashboard.errors.markGivenAway')}: ${error.message}`
+          : t('dashboard.errors.markGivenAway')
       );
     } finally {
       setMarkingAsGivenAwayId(null);
@@ -268,14 +270,14 @@ export default function Dashboard() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
           <div className="flex items-center space-x-3 text-red-600 dark:text-red-400 mb-4">
             <AlertCircle className="w-6 h-6" />
-            <h2 className="text-xl font-semibold">Error Loading Dashboard</h2>
+            <h2 className="text-xl font-semibold">{t('dashboard.errors.title')}</h2>
           </div>
           <p className="text-gray-600 dark:text-gray-300">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
           >
-            Retry
+            {t('dashboard.retry')}
           </button>
         </div>
       </div>
@@ -288,16 +290,16 @@ export default function Dashboard() {
         {/* Header */}
         <div className="md:flex md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Welcome back! Here's an overview of your donations and impact.
+              {t('dashboard.subtitle')}
             </p>
           </div>
           <Link
             to="/create-item"
             className="mt-4 md:mt-0 inline-flex items-center justify-center gap-3 px-6 py-3 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
           >
-            <span>CREATE NEW ITEM</span>
+            <span>{t('dashboard.createNewItem')}</span>
             <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm">
               <ChevronRight className="w-5 h-5" />
             </div>
@@ -317,28 +319,28 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {[
             {
-              title: 'Total Donations',
+              title: t('dashboard.stats.totalDonations'),
               value: stats.totalDonations,
               icon: Gift,
               color: 'text-blue-600 dark:text-blue-400',
               bg: 'bg-blue-100 dark:bg-blue-900/20'
             },
             {
-              title: 'Active Donations',
+              title: t('dashboard.stats.activeDonations'),
               value: stats.activeDonations,
               icon: Activity,
               color: 'text-green-600 dark:text-green-400',
               bg: 'bg-green-100 dark:bg-green-900/20'
             },
             {
-              title: 'Completed Donations',
+              title: t('dashboard.stats.completedDonations'),
               value: stats.completedDonations,
               icon: CheckCircle,
               color: 'text-purple-600 dark:text-purple-400',
               bg: 'bg-purple-100 dark:bg-purple-900/20'
             },
             {
-              title: 'Total Beneficiaries',
+              title: t('dashboard.stats.totalBeneficiaries'),
               value: stats.totalBeneficiaries,
               icon: Users,
               color: 'text-orange-600 dark:text-orange-400',
@@ -376,22 +378,22 @@ export default function Dashboard() {
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-              Recent Items
+              {t('dashboard.recentItems')}
             </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              A list of your recent donations and their current status.
+              {t('dashboard.recentItemsDescription')}
             </p>
           </div>
 
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {items.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="text-gray-500 dark:text-gray-400 mb-4">No items yet.</div>
+                <div className="text-gray-500 dark:text-gray-400 mb-4">{t('dashboard.noItems')}</div>
                 <Link
                   to="/create-item"
                   className="inline-flex items-center justify-center gap-3 px-6 py-3 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
                 >
-                  <span>CREATE YOUR FIRST ITEM</span>
+                  <span>{t('dashboard.createFirstItem')}</span>
                   <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm">
                     <ChevronRight className="w-5 h-5" />
                   </div>
@@ -407,7 +409,9 @@ export default function Dashboard() {
                         <img
                           src={item.photos[0]}
                           alt={item.title}
-                          className="w-full h-full object-cover"
+                          className={`w-full h-full object-cover ${
+                            item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                          }`}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -439,7 +443,7 @@ export default function Dashboard() {
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                             }`}>
-                              {item.status === 'GIVEN_AWAY' ? 'Given Away' : item.status}
+                              {item.status === 'GIVEN_AWAY' ? t('dashboard.givenAway') : t(`dashboard.status.${item.status.toLowerCase()}`)}
                             </span>
                           </div>
                         </div>
@@ -460,13 +464,13 @@ export default function Dashboard() {
                         </span>
                       </div>
 
-                      <div className="mt-4 flex items-center justify-end space-x-4">
+                      <div className="mt-4 flex flex-wrap items-center justify-end gap-2 sm:gap-4">
                         {item.status !== 'GIVEN_AWAY' && (
                           <button
                             onClick={() => handleMarkAsGivenAway(item.id)}
                             disabled={markingAsGivenAwayId === item.id}
                             className={`
-                              inline-flex items-center px-3 py-1 text-sm font-medium
+                              inline-flex items-center px-2 py-1.5 sm:px-3 sm:py-1 text-xs sm:text-sm font-medium whitespace-nowrap
                               ${markingAsGivenAwayId === item.id
                                 ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                                 : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300'
@@ -476,29 +480,31 @@ export default function Dashboard() {
                           >
                             {markingAsGivenAwayId === item.id ? (
                               <>
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
-                                Marking...
+                                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
+                                <span className="hidden sm:inline">{t('dashboard.marking')}</span>
+                                <span className="sm:hidden">...</span>
                               </>
                             ) : (
                               <>
-                                <Gift className="w-4 h-4 mr-1" />
-                                Mark as Given Away
+                                <Gift className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                                <span className="hidden sm:inline">{t('dashboard.markAsGivenAway')}</span>
+                                <span className="sm:hidden">{t('dashboard.givenAway')}</span>
                               </>
                             )}
                           </button>
                         )}
                         <Link
                           to={`/edit-item/${item.id}`}
-                          className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                          className="inline-flex items-center px-2 py-1.5 sm:px-3 sm:py-1 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors whitespace-nowrap"
                         >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Edit
+                          <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                          <span>{t('dashboard.edit')}</span>
                         </Link>
                         <button
                           onClick={() => handleDelete(item.id)}
                           disabled={deletingItemId === item.id}
                           className={`
-                            inline-flex items-center px-3 py-1 text-sm font-medium
+                            inline-flex items-center px-2 py-1.5 sm:px-3 sm:py-1 text-xs sm:text-sm font-medium whitespace-nowrap
                             ${deletingItemId === item.id
                               ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                               : 'text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300'
@@ -508,13 +514,14 @@ export default function Dashboard() {
                         >
                           {deletingItemId === item.id ? (
                             <>
-                              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
-                              Deleting...
+                              <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
+                              <span className="hidden sm:inline">{t('dashboard.deleting')}</span>
+                              <span className="sm:hidden">...</span>
                             </>
                           ) : (
                             <>
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Delete
+                              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                              <span>{t('dashboard.delete')}</span>
                             </>
                           )}
                         </button>

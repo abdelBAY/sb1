@@ -36,10 +36,177 @@
       "button": "شروع کریں"
     }
   },
+  "messages": {
+    "errors": {
+      "loadChats": "بات چیت لوڈ کرنے میں ناکام",
+      "loadMessages": "پیغامات لوڈ کرنے میں ناکام",
+      "send": "پیغام بھیجنے میں ناکام",
+      "delete": "بات چیت حذف کرنے میں ناکام",
+      "requestAction": "درخواست کی کارروائی پر عمل کرنے میں ناکام",
+      "confirmMeeting": "میٹنگ کی تصدیق کرنے میں ناکام",
+      "cancelRequest": "درخواست منسوخ کرنے میں ناکام",
+      "submitFeedback": "تبصرہ جمع کرانے میں ناکام"
+    },
+    "yesterday": "کل",
+    "unknownUser": "نامعلوم صارف",
+    "confirmDelete": "کیا آپ واقعی {{name}} کے ساتھ یہ بات چیت حذف کرنا چاہتے ہیں؟ یہ کارروائی واپس نہیں ہو سکتی۔",
+    "actions": {
+      "accepted": "میں آپ کی درخواست قبول کرتا ہوں! آئیے ایک میٹنگ کا بندوبست کریں۔",
+      "declined": "آپ کی دلچسپی کا شکریہ، لیکن میں اس وقت اس درخواست کو پورا کرنے سے قاصر ہوں۔",
+      "askMore": "میں آپ کی درخواست کے بارے میں مزید جاننا چاہوں گا۔ کیا آپ اضافی تفصیلات فراہم کر سکتے ہیں؟",
+      "canceled": "میں نے اس درخواست کو منسوخ کرنے کا فیصلہ کیا ہے۔ آپ کے وقت کا شکریہ۔"
+    },
+    "meetingConfirmed": "{{date}} کو {{place}} پر میٹنگ کی تصدیق ہو گئی۔ براہ کرم وصولی کی تفصیلات کی تصدیق کریں۔",
+    "item": "شے",
+    "suggestPlace": "براہ کرم میٹنگ کی جگہ تجویز کریں",
+    "searchPlaceholder": "پیغامات تلاش کریں...",
+    "new": "نیا",
+    "empty": "کوئی پیغام نہیں ملا",
+    "lastSeen": "آخری بار دیکھا گیا",
+    "deleteConversation": "بات چیت حذف کریں",
+    "confirmPrompt": "براہ کرم میٹنگ کا وقت اور جگہ کی تصدیق کریں۔",
+    "accept": "قبول کریں",
+    "askMore": "مزید معلومات پوچھیں",
+    "decline": "مسترد کریں",
+    "meetingDetails": "میٹنگ کی تفصیلات",
+    "rememberPublic": "یاد رکھیں کہ عوامی جگہ پر ملاقات کریں۔",
+    "inputPlaceholder": "پیغام ٹائپ کریں...",
+    "selectChatTitle": "میسجنگ شروع کرنے کے لیے ایک چیٹ منتخب کریں",
+    "selectChatSubtitle": "اپنی موجودہ بات چیتوں میں سے انتخاب کریں یا ایک نیا شروع کریں",
+    "startConversation": "بات چیت شروع کریں!",
+    "startConversationDesc": "دیگر صارفین، عطیہ دہندگان، یا Give کمیونٹی کے ساتھ جڑیں۔ بائیں طرف موجودہ چیٹس میں سے ایک منتخب کریں یا شروع کرنے کے لیے 'نیا پیغام' پر کلک کریں۔",
+    "newMessage": "نیا پیغام"
+  },
   "logout": {
     "title": "لاگ آؤٹ",
     "message": "آپ کو اپنے اکاؤنٹ سے لاگ آؤٹ کر دیا جائے گا: {{account}}",
     "cancel": "منسوخ کریں",
     "confirm": "ٹھیک ہے"
+  },
+  "search": {
+    "title": "دستیاب اشیاء تلاش کریں",
+    "pendingOnly": "صرف زیر التواء",
+    "filters": "فلٹرز",
+    "searchPlaceholder": "اشیاء تلاش کریں...",
+    "allCategories": "تمام زمرے",
+    "condition": "حالت",
+    "anyCondition": "کوئی بھی حالت",
+    "itemsSelected": "{{count}} اشیاء منتخب",
+    "compareSelected": "منتخب کردہ کا موازنہ کریں",
+    "clearSelection": "منتخب کردہ صاف کریں",
+    "noResults": "کوئی نتیجہ نہیں ملا",
+    "startTyping": "اشیاء تلاش کرنے کے لیے ٹائپ کرنا شروع کریں",
+    "viewDetails": "تفصیلات دیکھیں",
+    "givenAway": "دے دیا گیا",
+    "previous": "پچھلا",
+    "next": "اگلا",
+    "page": "صفحہ {{current}} از {{total}}",
+    "sortOptions": {
+      "newestFirst": "سب سے نیا پہلے",
+      "oldestFirst": "سب سے پرانا پہلے",
+      "nameAZ": "نام ا-ز",
+      "nameZA": "نام ز-ا",
+      "ratingHighLow": "ریٹنگ زیادہ-کم",
+      "ratingLowHigh": "ریٹنگ کم-زیادہ"
+    },
+    "categories": {
+      "all": "تمام زمرے",
+      "furniture": "فرنیچر",
+      "electronics": "الیکٹرانکس",
+      "clothing": "کپڑے",
+      "books": "کتابیں",
+      "kitchen": "باورچی خانہ",
+      "sports": "کھیل",
+      "toys": "کھلونے",
+      "tools": "اوزار",
+      "other": "دیگر"
+    },
+    "conditions": {
+      "likeNew": "جیسا نیا",
+      "good": "اچھا",
+      "worn": "پہنا ہوا",
+      "broken": "مرمت کی ضرورت"
+    },
+    "status": {
+      "pending": "زیر التواء",
+      "claimed": "دعویٰ کیا گیا",
+      "completed": "مکمل",
+      "givenAway": "دے دیا گیا"
+    }
+  },
+  "dashboard": {
+    "title": "ڈیش بورڈ",
+    "subtitle": "خوش آمدید! یہاں آپ کے عطیات اور اثر کا جائزہ ہے۔",
+    "createNewItem": "نیا آئٹم بنائیں",
+    "createFirstItem": "اپنا پہلا آئٹم بنائیں",
+    "retry": "دوبارہ کوشش کریں",
+    "noItems": "ابھی تک کوئی آئٹم نہیں۔",
+    "recentItems": "حالیہ آئٹمز",
+    "recentItemsDescription": "آپ کے حالیہ عطیات اور ان کی موجودہ حالت کی فہرست۔",
+    "givenAway": "دے دیا گیا",
+    "markAsGivenAway": "دے دیا گیا کے طور پر نشان زد کریں",
+    "marking": "نشان زد کر رہے ہیں...",
+    "edit": "ترمیم",
+    "delete": "حذف کریں",
+    "deleting": "حذف ہو رہا ہے...",
+    "confirmDelete": "کیا آپ واقعی \"{{title}}\" کو حذف کرنا چاہتے ہیں؟ یہ کارروائی واپس نہیں ہو سکتی۔",
+    "confirmMarkGivenAway": "کیا آپ واقعی اس آئٹم کو \"دے دیا گیا\" کے طور پر نشان زد کرنا چاہتے ہیں؟ یہ دوسروں کو اس کے بارے میں آپ سے رابطہ کرنے سے روکے گا۔",
+    "stats": {
+      "totalDonations": "کل عطیات",
+      "activeDonations": "فعال عطیات",
+      "completedDonations": "مکمل عطیات",
+      "totalBeneficiaries": "کل مستفید ہونے والے"
+    },
+    "status": {
+      "pending": "زیر التواء",
+      "claimed": "دعویٰ کیا گیا",
+      "completed": "مکمل",
+      "given_away": "دے دیا گیا"
+    },
+    "errors": {
+      "title": "ڈیش بورڈ لوڈ کرنے میں خرابی",
+      "loadData": "ڈیش بورڈ ڈیٹا لوڈ کرنے میں ناکام",
+      "itemNotFound": "آئٹم نہیں ملا",
+      "deleteItem": "آئٹم حذف کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔",
+      "deleteFailed": "کوئی آئٹم حذف نہیں ہوا۔ آئٹم موجود نہیں ہو سکتا یا آپ کے پاس اسے حذف کرنے کی اجازت نہیں ہو سکتی۔",
+      "markGivenAway": "آئٹم کو دے دیا گیا کے طور پر نشان زد کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔"
+    }
+  },
+  "profile": {
+    "title": "پروفائل کی ترتیبات",
+    "subtitle": "اپنی ذاتی معلومات اور ترجیحات کا انتظام کریں۔",
+    "signInRequired": "براہ کرم اپنے پروفائل تک رسائی کے لیے سائن ان کریں",
+    "goToLogin": "لاگ ان پر جائیں",
+    "memberSince": "رکن از",
+    "unknown": "نامعلوم",
+    "donationCount": "{{count}} عطیہ",
+    "donationCount_plural": "{{count}} عطیات",
+    "adoptionCount": "{{count}} اپنانا",
+    "adoptionCount_plural": "{{count}} اپنانے",
+    "reviews": "جائزے",
+    "noReviews": "کوئی جائزہ دکھانے کے لیے نہیں",
+    "seeAll": "سب دیکھیں",
+    "profilePicture": "پروفائل",
+    "clickToChangePicture": "پروفائل تصویر تبدیل کرنے کے لیے کلک کریں",
+    "fullName": "پورا نام",
+    "enterFullName": "پورا نام درج کریں",
+    "dateOfBirth": "تاریخ پیدائش",
+    "day": "دن",
+    "month": "مہینہ",
+    "year": "سال",
+    "gender": "جنس",
+    "selectGender": "جنس منتخب کریں",
+    "genderMale": "مرد",
+    "genderFemale": "عورت",
+    "genderOther": "دیگر",
+    "emailAddress": "ای میل پتہ",
+    "saving": "محفوظ ہو رہا ہے...",
+    "saveChanges": "تبدیلیاں محفوظ کریں",
+    "errors": {
+      "invalidFileType": "براہ کرم ایک تصویری فائل منتخب کریں",
+      "fileSizeTooLarge": "فائل کا سائز 5 میگا بائٹ سے کم ہونا چاہیے",
+      "uploadFailed": "تصویر اپ لوڈ کرنے میں ناکام",
+      "tryAgain": "براہ کرم دوبارہ کوشش کریں۔"
+    }
   }
 }

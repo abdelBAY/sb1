@@ -3,6 +3,7 @@ import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Clock,
   Megaphone,
@@ -30,6 +31,7 @@ interface Profile {
 }
 
 export default function Profile() {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const storeUser = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
@@ -163,13 +165,13 @@ export default function Profile() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      alert(t('profile.errors.invalidFileType'));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
+      alert(t('profile.errors.fileSizeTooLarge'));
       return;
     }
 
@@ -221,7 +223,7 @@ export default function Profile() {
         hint: (error as any)?.hint,
         code: (error as any)?.code
       });
-      alert(`Failed to upload image: ${(error as any)?.message || 'Please try again.'}`);
+      alert(`${t('profile.errors.uploadFailed')}: ${(error as any)?.message || t('profile.errors.tryAgain')}`);
     } finally {
       setUploading(false);
     }
@@ -246,13 +248,13 @@ export default function Profile() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Please sign in to access your profile
+            {t('profile.signInRequired')}
           </h2>
           <button
             onClick={() => navigate('/login')}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Go to Login
+            {t('profile.goToLogin')}
           </button>
         </div>
       </div>
@@ -270,21 +272,21 @@ export default function Profile() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
                   <Clock className="w-5 h-5 flex-shrink-0" />
-                  <span className="text-sm break-words">Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : 'Unknown'}</span>
+                  <span className="text-sm break-words">{t('profile.memberSince')} {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : t('profile.unknown')}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
                   <Megaphone className="w-5 h-5 flex-shrink-0" />
-                  <span className="text-sm break-words">{profile?.donation_count || 0} donation, {profile?.adoption_count || 0} adoption</span>
+                  <span className="text-sm break-words">{t('profile.donationCount', { count: profile?.donation_count || 0 })}, {t('profile.adoptionCount', { count: profile?.adoption_count || 0 })}</span>
                 </div>
               </div>
 
 
               {/* Reviews Section */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Reviews</h3>
-                <div className="text-sm text-gray-600 dark:text-gray-300">No reviews to display</div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('profile.reviews')}</h3>
+                <div className="text-sm text-gray-600 dark:text-gray-300">{t('profile.noReviews')}</div>
                 <div className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
-                  See all <ChevronRight className="inline w-4 h-4" />
+                  {t('profile.seeAll')} <ChevronRight className="inline w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -295,9 +297,9 @@ export default function Profile() {
             <div className="w-full max-w-md mx-auto lg:mx-0">
               {/* Header */}
               <div className="mb-6 sm:mb-8">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Profile Settings</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('profile.title')}</h1>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Manage your personal information and preferences.
+                  {t('profile.subtitle')}
                 </p>
               </div>
 
@@ -311,13 +313,13 @@ export default function Profile() {
                     {profile?.avatar_url ? (
                       <img 
                         src={profile.avatar_url} 
-                        alt="Profile" 
+                        alt={t('profile.profilePicture')} 
                         className="w-full h-full object-cover"
                       />
                     ) : getGmailImageUrl(user!) ? (
                       <img 
                         src={getGmailImageUrl(user!)!} 
-                        alt="Profile" 
+                        alt={t('profile.profilePicture')} 
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -340,7 +342,7 @@ export default function Profile() {
                   className="hidden"
                 />
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Click to change profile picture
+                  {t('profile.clickToChangePicture')}
                 </p>
               </div>
 
@@ -349,21 +351,21 @@ export default function Profile() {
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Full name
+                    {t('profile.fullName')}
                   </label>
                   <input
                     type="text"
                     value={formData.full_name ?? ''}
                     onChange={(e) => handleInputChange('full_name', e.target.value)}
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
-                    placeholder="Enter full name"
+                    placeholder={t('profile.enterFullName')}
                   />
                 </div>
 
                 {/* Date of Birth */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Date of birth
+                    {t('profile.dateOfBirth')}
                   </label>
                   <div className="flex space-x-2">
                     <select
@@ -374,7 +376,7 @@ export default function Profile() {
                       }}
                       className="flex-1 px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     >
-                      <option value="">DD</option>
+                      <option value="">{t('profile.day')}</option>
                       {Array.from({ length: 31 }, (_, i) => (
                         <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
                           {String(i + 1).padStart(2, '0')}
@@ -389,7 +391,7 @@ export default function Profile() {
                       }}
                       className="flex-1 px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     >
-                      <option value="">MM</option>
+                      <option value="">{t('profile.month')}</option>
                       {Array.from({ length: 12 }, (_, i) => (
                         <option key={i + 1} value={String(i + 1).padStart(2, '0')}>
                           {String(i + 1).padStart(2, '0')}
@@ -404,7 +406,7 @@ export default function Profile() {
                       }}
                       className="flex-1 px-2 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                     >
-                      <option value="">YYYY</option>
+                      <option value="">{t('profile.year')}</option>
                       {Array.from({ length: 100 }, (_, i) => (
                         <option key={2024 - i} value={String(2024 - i)}>
                           {2024 - i}
@@ -417,31 +419,31 @@ export default function Profile() {
                 {/* Gender */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Gender
+                    {t('profile.gender')}
                   </label>
                   <select
                     value={formData.gender ?? ''}
                     onChange={(e) => handleInputChange('gender', e.target.value)}
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="">{t('profile.selectGender')}</option>
+                    <option value="male">{t('profile.genderMale')}</option>
+                    <option value="female">{t('profile.genderFemale')}</option>
+                    <option value="other">{t('profile.genderOther')}</option>
                   </select>
                 </div>
 
                 {/* Email Address */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email address
+                    {t('profile.emailAddress')}
                   </label>
                   <input
                     type="email"
                     value={formData.email ?? ''}
                     disabled
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
-                    placeholder="Email address"
+                    placeholder={t('profile.emailAddress')}
                   />
                 </div>
 
@@ -451,7 +453,7 @@ export default function Profile() {
                   disabled={saving}
                   className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 shadow-md hover:shadow-lg"
                 >
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? t('profile.saving') : t('profile.saveChanges')}
                 </button>
               </div>
             </div>

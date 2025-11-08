@@ -401,7 +401,7 @@ export default function ProductDetail() {
                     alt={`${product.title} - Image ${selectedImage + 1}`}
                     className={`w-full h-full object-cover transition-transform duration-200 ${
                       isZoomed ? 'scale-150' : ''
-                    }`}
+                    } ${product.status === 'GIVEN_AWAY' ? 'blur-md' : ''}`}
                     onClick={() => setIsZoomed(!isZoomed)}
                   />
                 ) : (
@@ -433,7 +433,9 @@ export default function ProductDetail() {
                       <img
                         src={photo}
                         alt={`${product.title} - Thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover ${
+                          product.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                        }`}
                       />
                     </button>
                   ))}
@@ -695,7 +697,9 @@ export default function ProductDetail() {
                         <img
                           src={item.photos[0]}
                           alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 ${
+                            item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                          }`}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

@@ -20,6 +20,7 @@ import {
   BarChart2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ImageOverlay from '../components/ImageOverlay';
 
 interface SearchResult {
@@ -51,36 +52,8 @@ interface SortOption {
 
 const ITEMS_PER_PAGE = 12;
 
-const sortOptions: SortOption[] = [
-  { label: 'Newest First', value: 'created_at-desc' },
-  { label: 'Oldest First', value: 'created_at-asc' },
-  { label: 'Name A-Z', value: 'title-asc' },
-  { label: 'Name Z-A', value: 'title-desc' },
-  { label: 'Rating High-Low', value: 'rating-desc' },
-  { label: 'Rating Low-High', value: 'rating-asc' }
-];
-
-const categories = [
-  'All Categories',
-  'Furniture',
-  'Electronics',
-  'Clothing',
-  'Books',
-  'Kitchen',
-  'Sports',
-  'Toys',
-  'Tools',
-  'Other'
-];
-
-const conditions = [
-  { value: 'LIKE_NEW', label: 'Like New' },
-  { value: 'GOOD', label: 'Good' },
-  { value: 'WORN', label: 'Worn' },
-  { value: 'BROKEN', label: 'Needs Repair' }
-];
-
 export default function Search() {
+  const { t } = useTranslation('common');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -96,6 +69,53 @@ export default function Search() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
   const [pendingOnly, setPendingOnly] = useState<boolean>(false);
+
+  // Category mapping: English database values to translation keys
+  const categoryMap: { [key: string]: string } = {
+    'All Categories': 'all',
+    'Furniture': 'furniture',
+    'Electronics': 'electronics',
+    'Clothing': 'clothing',
+    'Books': 'books',
+    'Kitchen': 'kitchen',
+    'Sports': 'sports',
+    'Toys': 'toys',
+    'Tools': 'tools',
+    'Other': 'other'
+  };
+
+  // Get translated options
+  const sortOptions: SortOption[] = [
+    { label: t('search.sortOptions.newestFirst'), value: 'created_at-desc' },
+    { label: t('search.sortOptions.oldestFirst'), value: 'created_at-asc' },
+    { label: t('search.sortOptions.nameAZ'), value: 'title-asc' },
+    { label: t('search.sortOptions.nameZA'), value: 'title-desc' },
+    { label: t('search.sortOptions.ratingHighLow'), value: 'rating-desc' },
+    { label: t('search.sortOptions.ratingLowHigh'), value: 'rating-asc' }
+  ];
+
+  const categories = [
+    t('search.categories.all'),
+    t('search.categories.furniture'),
+    t('search.categories.electronics'),
+    t('search.categories.clothing'),
+    t('search.categories.books'),
+    t('search.categories.kitchen'),
+    t('search.categories.sports'),
+    t('search.categories.toys'),
+    t('search.categories.tools'),
+    t('search.categories.other')
+  ];
+
+  // English category names for database queries
+  const categoryValues = ['All Categories', 'Furniture', 'Electronics', 'Clothing', 'Books', 'Kitchen', 'Sports', 'Toys', 'Tools', 'Other'];
+
+  const conditions = [
+    { value: 'LIKE_NEW', label: t('search.conditions.likeNew') },
+    { value: 'GOOD', label: t('search.conditions.good') },
+    { value: 'WORN', label: t('search.conditions.worn') },
+    { value: 'BROKEN', label: t('search.conditions.broken') }
+  ];
 
   useEffect(() => {
     const channel = supabase
@@ -120,8 +140,10 @@ export default function Search() {
         .select('*', { count: 'exact' })
         .range((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE - 1);
 
-      if (selectedCategory && selectedCategory !== 'All Categories') {
-        queryBuilder = queryBuilder.eq('category', selectedCategory);
+      // Find the English category value from the translated selected category
+      const categoryIndex = categories.indexOf(selectedCategory);
+      if (categoryIndex > 0 && categoryIndex < categoryValues.length) {
+        queryBuilder = queryBuilder.eq('category', categoryValues[categoryIndex]);
       }
 
       if (selectedCondition) {
@@ -212,7 +234,7 @@ export default function Search() {
         <div className="mb-8 space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Find Available Items
+              {t('search.title')}
             </h1>
             <div className="flex items-center space-x-4">
               <label className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
@@ -222,13 +244,13 @@ export default function Search() {
                   onChange={(e) => setPendingOnly(e.target.checked)}
                   className="h-4 w-4 text-blue-600 dark:text-blue-400 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                 />
-                <span>Pending Only</span>
+                <span>{t('search.pendingOnly')}</span>
               </label>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Filters
+                {t('search.filters')}
               </button>
               <button
                 onClick={handlePrint}
@@ -245,7 +267,7 @@ export default function Search() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search for items..."
+                placeholder={t('search.searchPlaceholder')}
                 className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               />
               <SearchIcon className="absolute left-4 top-3.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -256,8 +278,8 @@ export default function Search() {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             >
-              {categories.map((category) => (
-                <option key={category} value={category}>
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
                   {category}
                 </option>
               ))}
@@ -304,14 +326,14 @@ export default function Search() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Condition
+                    {t('search.condition')}
                   </label>
                   <select
                     value={selectedCondition}
                     onChange={(e) => setSelectedCondition(e.target.value)}
                     className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
-                    <option value="">Any Condition</option>
+                    <option value="">{t('search.anyCondition')}</option>
                     {conditions.map((condition) => (
                       <option key={condition.value} value={condition.value}>
                         {condition.label}
@@ -328,7 +350,7 @@ export default function Search() {
           <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex items-center justify-between">
             <div className="flex items-center">
               <span className="text-gray-700 dark:text-gray-300">
-                {selectedItems.length} items selected
+                {t('search.itemsSelected', { count: selectedItems.length })}
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -336,13 +358,13 @@ export default function Search() {
                 onClick={() => setShowCompareModal(true)}
                 className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
               >
-                Compare Selected
+                {t('search.compareSelected')}
               </button>
               <button
                 onClick={() => setSelectedItems([])}
                 className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
               >
-                Clear Selection
+                {t('search.clearSelection')}
               </button>
             </div>
           </div>
@@ -373,7 +395,9 @@ export default function Search() {
                       <img
                         src={item.photos[0]}
                         alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                        className={`w-full h-full object-cover transition-transform duration-200 group-hover:scale-105 ${
+                          item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                        }`}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors">
@@ -393,7 +417,7 @@ export default function Search() {
                           {item.title}
                         </Link>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 mt-2">
-                          {item.category}
+                          {item.category && categoryMap[item.category] ? t(`search.categories.${categoryMap[item.category]}`) : item.category}
                         </span>
                       </div>
                       <input
@@ -428,10 +452,10 @@ export default function Search() {
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getConditionColor(item.condition)}`}>
-                          {item.condition}
+                          {conditions.find(c => c.value === item.condition)?.label || item.condition}
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                          {item.status === 'GIVEN_AWAY' ? 'Given Away' : item.status}
+                          {item.status === 'GIVEN_AWAY' ? t('search.givenAway') : t(`search.status.${item.status.toLowerCase()}`)}
                         </span>
                       </div>
                       {item.rating && (
@@ -468,7 +492,7 @@ export default function Search() {
                         to={`/product/${item.id}`}
                         className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                       >
-                        View Details
+                        {t('search.viewDetails')}
                       </Link>
                       <div className="flex items-center space-x-2">
                         <button
@@ -505,17 +529,17 @@ export default function Search() {
                   disabled={page === 1}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  Previous
+                  {t('search.previous')}
                 </button>
                 <span className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">
-                  Page {page} of {Math.ceil(totalResults / ITEMS_PER_PAGE)}
+                  {t('search.page', { current: page, total: Math.ceil(totalResults / ITEMS_PER_PAGE) })}
                 </span>
                 <button
                   onClick={() => setPage(page + 1)}
                   disabled={page * ITEMS_PER_PAGE >= totalResults}
                   className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
-                  Next
+                  {t('search.next')}
                 </button>
               </div>
             )}
@@ -523,7 +547,7 @@ export default function Search() {
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
-              {query || selectedCategory ? 'No results found' : 'Start typing to search for items'}
+              {query || selectedCategory ? t('search.noResults') : t('search.startTyping')}
             </p>
           </div>
         )}

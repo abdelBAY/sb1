@@ -43,15 +43,22 @@ export default function LocationMap({ location, height = '300px' }: LocationMapP
         setLoading(true);
         setError(null);
 
-        // Use Nominatim (OpenStreetMap's geocoding service)
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`,
-          {
-            headers: {
-              'User-Agent': 'Givea App'
-            }
-          }
-        );
+        // Use proxy in development to avoid CORS issues, direct API in production
+        const isDevelopment = import.meta.env.DEV;
+        const apiUrl = isDevelopment
+          ? `/api/nominatim/search?format=json&q=${encodeURIComponent(location)}&limit=1`
+          : `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
+
+        // Headers for Nominatim API (required for production)
+        const headers: HeadersInit = isDevelopment
+          ? {} // Proxy handles headers in development
+          : {
+              'User-Agent': 'Givea-Donation-App/1.0 (https://givea.app)',
+              'Accept': 'application/json',
+              'Accept-Language': 'en-US,en;q=0.9',
+            };
+
+        const response = await fetch(apiUrl, { headers });
 
         if (!response.ok) {
           throw new Error('Geocoding failed');
@@ -68,7 +75,12 @@ export default function LocationMap({ location, height = '300px' }: LocationMapP
         }
       } catch (err) {
         console.error('Error geocoding location:', err);
-        setError('Failed to load map');
+        // Provide more helpful error message
+        if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+          setError('Unable to connect to map service. Please check your connection.');
+        } else {
+          setError('Failed to load map. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }

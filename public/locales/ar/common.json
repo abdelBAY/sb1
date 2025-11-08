@@ -36,10 +36,177 @@
       "button": "ابدأ الآن"
     }
   },
+  "messages": {
+    "errors": {
+      "loadChats": "فشل تحميل المحادثات",
+      "loadMessages": "فشل تحميل الرسائل",
+      "send": "فشل إرسال الرسالة",
+      "delete": "فشل حذف المحادثة",
+      "requestAction": "فشل معالجة إجراء الطلب",
+      "confirmMeeting": "فشل تأكيد الاجتماع",
+      "cancelRequest": "فشل إلغاء الطلب",
+      "submitFeedback": "فشل إرسال التعليقات"
+    },
+    "yesterday": "أمس",
+    "unknownUser": "مستخدم غير معروف",
+    "confirmDelete": "هل أنت متأكد من حذف هذه المحادثة مع {{name}}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "actions": {
+      "accepted": "أقبل طلبك! دعنا نرتب اجتماعاً.",
+      "declined": "شكراً لاهتمامك، لكنني غير قادر على تلبية هذا الطلب في الوقت الحالي.",
+      "askMore": "أود معرفة المزيد عن طلبك. هل يمكنك تقديم تفاصيل إضافية؟",
+      "canceled": "قررت إلغاء هذا الطلب. شكراً لوقتك."
+    },
+    "meetingConfirmed": "تم تأكيد الاجتماع في {{date}} في {{place}}. يرجى تأكيد تفاصيل الاستلام.",
+    "item": "عنصر",
+    "suggestPlace": "يرجى اقتراح مكان للاجتماع",
+    "searchPlaceholder": "البحث في الرسائل...",
+    "new": "جديد",
+    "empty": "لم يتم العثور على رسائل",
+    "lastSeen": "آخر ظهور",
+    "deleteConversation": "حذف المحادثة",
+    "confirmPrompt": "يرجى تأكيد وقت ومكان الاجتماع.",
+    "accept": "قبول",
+    "askMore": "طلب المزيد من المعلومات",
+    "decline": "رفض",
+    "meetingDetails": "تفاصيل الاجتماع",
+    "rememberPublic": "تذكر أن تلتقي في مكان عام.",
+    "inputPlaceholder": "اكتب رسالة...",
+    "selectChatTitle": "اختر محادثة لبدء المراسلة",
+    "selectChatSubtitle": "اختر من محادثاتك الموجودة أو ابدأ محادثة جديدة",
+    "startConversation": "ابدأ المحادثة!",
+    "startConversationDesc": "تواصل مع المستخدمين الآخرين أو المتبرعين أو مجتمع Give. اختر محادثة موجودة على اليسار أو انقر على 'رسالة جديدة' للبدء.",
+    "newMessage": "رسالة جديدة"
+  },
   "logout": {
     "title": "تسجيل الخروج",
     "message": "سيتم تسجيل خروجك من حسابك: {{account}}",
     "cancel": "إلغاء",
     "confirm": "موافق"
+  },
+  "search": {
+    "title": "العثور على العناصر المتاحة",
+    "pendingOnly": "في الانتظار فقط",
+    "filters": "المرشحات",
+    "searchPlaceholder": "البحث عن العناصر...",
+    "allCategories": "جميع الفئات",
+    "condition": "الحالة",
+    "anyCondition": "أي حالة",
+    "itemsSelected": "تم تحديد {{count}} عنصر",
+    "compareSelected": "مقارنة المحدد",
+    "clearSelection": "مسح التحديد",
+    "noResults": "لم يتم العثور على نتائج",
+    "startTyping": "ابدأ الكتابة للبحث عن العناصر",
+    "viewDetails": "عرض التفاصيل",
+    "givenAway": "تم التبرع به",
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "الصفحة {{current}} من {{total}}",
+    "sortOptions": {
+      "newestFirst": "الأحدث أولاً",
+      "oldestFirst": "الأقدم أولاً",
+      "nameAZ": "الاسم أ-ي",
+      "nameZA": "الاسم ي-أ",
+      "ratingHighLow": "التقييم عالي-منخفض",
+      "ratingLowHigh": "التقييم منخفض-عالي"
+    },
+    "categories": {
+      "all": "جميع الفئات",
+      "furniture": "الأثاث",
+      "electronics": "الإلكترونيات",
+      "clothing": "الملابس",
+      "books": "الكتب",
+      "kitchen": "المطبخ",
+      "sports": "الرياضة",
+      "toys": "الألعاب",
+      "tools": "الأدوات",
+      "other": "أخرى"
+    },
+    "conditions": {
+      "likeNew": "كالجديد",
+      "good": "جيد",
+      "worn": "مستعمل",
+      "broken": "يحتاج إصلاح"
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "claimed": "مطالب به",
+      "completed": "مكتمل",
+      "givenAway": "تم التبرع به"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "مرحباً بعودتك! إليك نظرة عامة على تبرعاتك وتأثيرك.",
+    "createNewItem": "إنشاء عنصر جديد",
+    "createFirstItem": "إنشاء عنصرك الأول",
+    "retry": "إعادة المحاولة",
+    "noItems": "لا توجد عناصر حتى الآن.",
+    "recentItems": "العناصر الأخيرة",
+    "recentItemsDescription": "قائمة بتبرعاتك الأخيرة وحالتها الحالية.",
+    "givenAway": "تم التبرع به",
+    "markAsGivenAway": "وضع علامة تم التبرع به",
+    "marking": "جارٍ التحديد...",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "deleting": "جارٍ الحذف...",
+    "confirmDelete": "هل أنت متأكد من حذف \"{{title}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirmMarkGivenAway": "هل أنت متأكد من وضع علامة \"تم التبرع به\" على هذا العنصر؟ سيؤدي ذلك إلى منع الآخرين من الاتصال بك بخصوصه.",
+    "stats": {
+      "totalDonations": "إجمالي التبرعات",
+      "activeDonations": "التبرعات النشطة",
+      "completedDonations": "التبرعات المكتملة",
+      "totalBeneficiaries": "إجمالي المستفيدين"
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "claimed": "مطالب به",
+      "completed": "مكتمل",
+      "given_away": "تم التبرع به"
+    },
+    "errors": {
+      "title": "خطأ في تحميل لوحة التحكم",
+      "loadData": "فشل تحميل بيانات لوحة التحكم",
+      "itemNotFound": "العنصر غير موجود",
+      "deleteItem": "فشل حذف العنصر. يرجى المحاولة مرة أخرى.",
+      "deleteFailed": "لم يتم حذف أي عنصر. قد لا يكون العنصر موجوداً أو قد لا يكون لديك إذن لحذفه.",
+      "markGivenAway": "فشل وضع علامة تم التبرع به على العنصر. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "profile": {
+    "title": "إعدادات الملف الشخصي",
+    "subtitle": "إدارة معلوماتك الشخصية وتفضيلاتك.",
+    "signInRequired": "يرجى تسجيل الدخول للوصول إلى ملفك الشخصي",
+    "goToLogin": "الانتقال إلى تسجيل الدخول",
+    "memberSince": "عضو منذ",
+    "unknown": "غير معروف",
+    "donationCount": "{{count}} تبرع",
+    "donationCount_plural": "{{count}} تبرعات",
+    "adoptionCount": "{{count}} تبني",
+    "adoptionCount_plural": "{{count}} تبنيات",
+    "reviews": "المراجعات",
+    "noReviews": "لا توجد مراجعات للعرض",
+    "seeAll": "عرض الكل",
+    "profilePicture": "الملف الشخصي",
+    "clickToChangePicture": "انقر لتغيير صورة الملف الشخصي",
+    "fullName": "الاسم الكامل",
+    "enterFullName": "أدخل الاسم الكامل",
+    "dateOfBirth": "تاريخ الميلاد",
+    "day": "يوم",
+    "month": "شهر",
+    "year": "سنة",
+    "gender": "الجنس",
+    "selectGender": "اختر الجنس",
+    "genderMale": "ذكر",
+    "genderFemale": "أنثى",
+    "genderOther": "آخر",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "saving": "جارٍ الحفظ...",
+    "saveChanges": "حفظ التغييرات",
+    "errors": {
+      "invalidFileType": "يرجى اختيار ملف صورة",
+      "fileSizeTooLarge": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+      "uploadFailed": "فشل تحميل الصورة",
+      "tryAgain": "يرجى المحاولة مرة أخرى."
+    }
   }
 }

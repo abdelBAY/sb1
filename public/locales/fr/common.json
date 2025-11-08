@@ -36,10 +36,177 @@
       "button": "Commencer"
     }
   },
+  "messages": {
+    "errors": {
+      "loadChats": "Échec du chargement des conversations",
+      "loadMessages": "Échec du chargement des messages",
+      "send": "Échec de l'envoi du message",
+      "delete": "Échec de la suppression de la conversation",
+      "requestAction": "Échec du traitement de l'action de demande",
+      "confirmMeeting": "Échec de la confirmation de la réunion",
+      "cancelRequest": "Échec de l'annulation de la demande",
+      "submitFeedback": "Échec de l'envoi des commentaires"
+    },
+    "yesterday": "Hier",
+    "unknownUser": "Utilisateur inconnu",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette conversation avec {{name}} ? Cette action ne peut pas être annulée.",
+    "actions": {
+      "accepted": "J'accepte votre demande ! Organisons une réunion.",
+      "declined": "Merci pour votre intérêt, mais je ne peux pas satisfaire cette demande pour le moment.",
+      "askMore": "J'aimerais en savoir plus sur votre demande. Pourriez-vous fournir des détails supplémentaires ?",
+      "canceled": "J'ai décidé d'annuler cette demande. Merci pour votre temps."
+    },
+    "meetingConfirmed": "Réunion confirmée pour le {{date}} à {{place}}. Veuillez confirmer les détails de récupération.",
+    "item": "Article",
+    "suggestPlace": "Veuillez suggérer un lieu de rencontre",
+    "searchPlaceholder": "Rechercher des messages...",
+    "new": "nouveau",
+    "empty": "Aucun message trouvé",
+    "lastSeen": "Vu pour la dernière fois",
+    "deleteConversation": "Supprimer la conversation",
+    "confirmPrompt": "Veuillez confirmer l'heure et le lieu de la réunion.",
+    "accept": "Accepter",
+    "askMore": "Demander plus d'infos",
+    "decline": "Refuser",
+    "meetingDetails": "Détails de la réunion",
+    "rememberPublic": "N'oubliez pas de vous rencontrer dans un lieu public.",
+    "inputPlaceholder": "Tapez un message...",
+    "selectChatTitle": "Sélectionnez une conversation pour commencer à envoyer des messages",
+    "selectChatSubtitle": "Choisissez parmi vos conversations existantes ou créez-en une nouvelle",
+    "startConversation": "Commencer une conversation !",
+    "startConversationDesc": "Connectez-vous avec d'autres utilisateurs, donateurs ou la communauté Give. Sélectionnez une conversation existante à gauche ou cliquez sur 'Nouveau message' pour commencer.",
+    "newMessage": "NOUVEAU MESSAGE"
+  },
   "logout": {
     "title": "Déconnexion",
     "message": "Vous serez déconnecté de votre compte : {{account}}",
     "cancel": "Annuler",
     "confirm": "OK"
+  },
+  "search": {
+    "title": "Trouver des articles disponibles",
+    "pendingOnly": "En attente uniquement",
+    "filters": "Filtres",
+    "searchPlaceholder": "Rechercher des articles...",
+    "allCategories": "Toutes les catégories",
+    "condition": "État",
+    "anyCondition": "N'importe quel état",
+    "itemsSelected": "{{count}} articles sélectionnés",
+    "compareSelected": "Comparer la sélection",
+    "clearSelection": "Effacer la sélection",
+    "noResults": "Aucun résultat trouvé",
+    "startTyping": "Commencez à taper pour rechercher des articles",
+    "viewDetails": "Voir les détails",
+    "givenAway": "Donné",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {{current}} sur {{total}}",
+    "sortOptions": {
+      "newestFirst": "Plus récent d'abord",
+      "oldestFirst": "Plus ancien d'abord",
+      "nameAZ": "Nom A-Z",
+      "nameZA": "Nom Z-A",
+      "ratingHighLow": "Note élevée-basse",
+      "ratingLowHigh": "Note basse-élevée"
+    },
+    "categories": {
+      "all": "Toutes les catégories",
+      "furniture": "Mobilier",
+      "electronics": "Électronique",
+      "clothing": "Vêtements",
+      "books": "Livres",
+      "kitchen": "Cuisine",
+      "sports": "Sports",
+      "toys": "Jouets",
+      "tools": "Outils",
+      "other": "Autre"
+    },
+    "conditions": {
+      "likeNew": "Comme neuf",
+      "good": "Bon",
+      "worn": "Usé",
+      "broken": "Nécessite une réparation"
+    },
+    "status": {
+      "pending": "EN ATTENTE",
+      "claimed": "RÉCLAMÉ",
+      "completed": "TERMINÉ",
+      "givenAway": "Donné"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Bon retour ! Voici un aperçu de vos dons et de votre impact.",
+    "createNewItem": "CRÉER UN NOUVEL ARTICLE",
+    "createFirstItem": "CRÉEZ VOTRE PREMIER ARTICLE",
+    "retry": "Réessayer",
+    "noItems": "Aucun article pour le moment.",
+    "recentItems": "Articles récents",
+    "recentItemsDescription": "Une liste de vos dons récents et leur statut actuel.",
+    "givenAway": "Donné",
+    "markAsGivenAway": "Marquer comme donné",
+    "marking": "Marquage...",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer \"{{title}}\" ? Cette action ne peut pas être annulée.",
+    "confirmMarkGivenAway": "Êtes-vous sûr de vouloir marquer cet article comme \"Donné\" ? Cela empêchera les autres de vous contacter à ce sujet.",
+    "stats": {
+      "totalDonations": "Total des dons",
+      "activeDonations": "Dons actifs",
+      "completedDonations": "Dons terminés",
+      "totalBeneficiaries": "Total des bénéficiaires"
+    },
+    "status": {
+      "pending": "EN ATTENTE",
+      "claimed": "RÉCLAMÉ",
+      "completed": "TERMINÉ",
+      "given_away": "Donné"
+    },
+    "errors": {
+      "title": "Erreur de chargement du tableau de bord",
+      "loadData": "Échec du chargement des données du tableau de bord",
+      "itemNotFound": "Article introuvable",
+      "deleteItem": "Échec de la suppression de l'article. Veuillez réessayer.",
+      "deleteFailed": "Aucun article n'a été supprimé. L'article peut ne pas exister ou vous n'avez peut-être pas la permission de le supprimer.",
+      "markGivenAway": "Échec du marquage de l'article comme donné. Veuillez réessayer."
+    }
+  },
+  "profile": {
+    "title": "Paramètres du profil",
+    "subtitle": "Gérez vos informations personnelles et vos préférences.",
+    "signInRequired": "Veuillez vous connecter pour accéder à votre profil",
+    "goToLogin": "Aller à la connexion",
+    "memberSince": "Membre depuis",
+    "unknown": "Inconnu",
+    "donationCount": "{{count}} don",
+    "donationCount_plural": "{{count}} dons",
+    "adoptionCount": "{{count}} adoption",
+    "adoptionCount_plural": "{{count}} adoptions",
+    "reviews": "Avis",
+    "noReviews": "Aucun avis à afficher",
+    "seeAll": "Voir tout",
+    "profilePicture": "Profil",
+    "clickToChangePicture": "Cliquez pour changer la photo de profil",
+    "fullName": "Nom complet",
+    "enterFullName": "Entrez le nom complet",
+    "dateOfBirth": "Date de naissance",
+    "day": "JJ",
+    "month": "MM",
+    "year": "AAAA",
+    "gender": "Genre",
+    "selectGender": "Sélectionner le genre",
+    "genderMale": "Homme",
+    "genderFemale": "Femme",
+    "genderOther": "Autre",
+    "emailAddress": "Adresse e-mail",
+    "saving": "Enregistrement...",
+    "saveChanges": "Enregistrer les modifications",
+    "errors": {
+      "invalidFileType": "Veuillez sélectionner un fichier image",
+      "fileSizeTooLarge": "La taille du fichier doit être inférieure à 5 Mo",
+      "uploadFailed": "Échec du téléchargement de l'image",
+      "tryAgain": "Veuillez réessayer."
+    }
   }
 }
