@@ -314,12 +314,14 @@ export default function Profile() {
                       <img 
                         src={profile.avatar_url} 
                         alt={t('profile.profilePicture')} 
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     ) : getGmailImageUrl(user!) ? (
                       <img 
                         src={getGmailImageUrl(user!)!} 
                         alt={t('profile.profilePicture')} 
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     ) : (

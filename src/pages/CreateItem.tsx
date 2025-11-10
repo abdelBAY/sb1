@@ -375,6 +375,7 @@ export default function CreateItem() {
                           <img
                             src={photoPreview[index]}
                             alt={`Preview ${index + 1}`}
+                            loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
                           <button

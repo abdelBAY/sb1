@@ -72,6 +72,7 @@ export default function ImageOverlay({ item, onClose }: ImageOverlayProps) {
               <img
                 src={item.photos[0]}
                 alt={item.title}
+                loading="lazy"
                 className={`w-full h-full object-contain ${
                   item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                 }`}

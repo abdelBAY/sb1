@@ -311,12 +311,14 @@ export default function Layout() {
                           <img
                             src={profile.avatar_url}
                             alt="Profile"
+                            loading="lazy"
                             className="w-full h-full object-cover"
                           />
                         ) : user.user_metadata?.avatar_url ? (
                           <img
                             src={user.user_metadata.avatar_url}
                             alt="Profile"
+                            loading="lazy"
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -470,12 +472,14 @@ export default function Layout() {
                         <img
                           src={profile.avatar_url}
                           alt="Profile"
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                       ) : user.user_metadata?.avatar_url ? (
                         <img
                           src={user.user_metadata.avatar_url}
                           alt="Profile"
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                       ) : (

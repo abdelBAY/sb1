@@ -17,6 +17,7 @@ const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
     <img
       src={logo}
       alt="Logo"
+      loading={size === 'lg' ? 'lazy' : 'eager'}
       className={`${sizes[size]} ${className} object-contain`}
     />
   );

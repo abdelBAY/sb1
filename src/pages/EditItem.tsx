@@ -428,6 +428,7 @@ export default function EditItem() {
                       <img
                         src={photoUrl}
                         alt={`Item photo ${index + 1}`}
+                        loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       <button
@@ -449,6 +450,7 @@ export default function EditItem() {
                       <img
                         src={URL.createObjectURL(file)}
                         alt={`New photo ${index + 1}`}
+                        loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                       <button

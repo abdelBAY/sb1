@@ -780,6 +780,7 @@ export default function Messages() {
                         <img
                           src={chat.announcement.photos[0]}
                           alt={chat.announcement.title}
+                          loading="lazy"
                           className={`w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 ${
                             chat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                           }`}
@@ -788,6 +789,7 @@ export default function Messages() {
                         <img
                           src={chat.user.avatar_url}
                           alt={chat.user.full_name}
+                          loading="lazy"
                           className="w-16 h-16 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                         />
                       ) : (
@@ -843,6 +845,7 @@ export default function Messages() {
                         <img
                           src={selectedChat.user.avatar_url}
                           alt={selectedChat.user.full_name}
+                          loading="lazy"
                           className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                         />
                       ) : (
@@ -883,6 +886,7 @@ export default function Messages() {
                           <img
                             src={selectedChat.announcement.photos[0]}
                             alt={selectedChat.announcement.title}
+                            loading="lazy"
                             className={`w-16 h-16 rounded-lg object-cover ${
                               selectedChat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                             }`}

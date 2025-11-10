@@ -399,6 +399,7 @@ export default function ProductDetail() {
                   <img
                     src={product.photos[selectedImage]}
                     alt={`${product.title} - Image ${selectedImage + 1}`}
+                    loading="lazy"
                     className={`w-full h-full object-cover transition-transform duration-200 ${
                       isZoomed ? 'scale-150' : ''
                     } ${product.status === 'GIVEN_AWAY' ? 'blur-md' : ''}`}
@@ -433,6 +434,7 @@ export default function ProductDetail() {
                       <img
                         src={photo}
                         alt={`${product.title} - Thumbnail ${index + 1}`}
+                        loading="lazy"
                         className={`w-full h-full object-cover ${
                           product.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                         }`}
@@ -545,6 +547,7 @@ export default function ProductDetail() {
                     <img
                       src={product.user.avatar_url}
                       alt={product.user.full_name || 'Anonymous User'}
+                      loading="lazy"
                       className="w-12 h-12 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                     />
                   ) : (
@@ -629,6 +632,7 @@ export default function ProductDetail() {
                       <img
                         src={review.profiles.avatar_url}
                         alt={review.profiles.full_name || 'Anonymous User'}
+                        loading="lazy"
                         className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                       />
                     ) : (
@@ -697,6 +701,7 @@ export default function ProductDetail() {
                         <img
                           src={item.photos[0]}
                           alt={item.title}
+                          loading="lazy"
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 ${
                             item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                           }`}

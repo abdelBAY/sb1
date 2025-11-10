@@ -409,6 +409,7 @@ export default function Dashboard() {
                         <img
                           src={item.photos[0]}
                           alt={item.title}
+                          loading="lazy"
                           className={`w-full h-full object-cover ${
                             item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                           }`}

@@ -395,6 +395,7 @@ export default function Search() {
                       <img
                         src={item.photos[0]}
                         alt={item.title}
+                        loading="lazy"
                         className={`w-full h-full object-cover transition-transform duration-200 group-hover:scale-105 ${
                           item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                         }`}
