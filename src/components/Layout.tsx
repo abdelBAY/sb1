@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LogOut, 
   ChevronRight, 
@@ -19,6 +19,14 @@ import LanguageSelector from './LanguageSelector';
 import LogoutModal from './LogoutModal';
 import { useTranslation } from 'react-i18next';
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-10ZN0CT4KV';
+
 export default function Layout() {
   const [isLanguageOpen, setIsLanguageOpen] = React.useState(false);
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
@@ -37,6 +45,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation('common');
+  const location = useLocation();
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -102,6 +111,25 @@ export default function Layout() {
 
     return () => subscription.unsubscribe();
   }, [setUser, setIsLoading]);
+
+  React.useEffect(() => {
+    if (!GA_MEASUREMENT_ID) {
+      return;
+    }
+
+    if (typeof window.gtag !== 'function') {
+      if (import.meta.env.DEV) {
+        console.debug('Google Analytics has not been initialized yet.');
+      }
+      return;
+    }
+
+    window.gtag('config', GA_MEASUREMENT_ID, {
+      page_path: `${location.pathname}${location.search}`,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }, [location]);
 
   // Fetch profile data when user changes
   React.useEffect(() => {
