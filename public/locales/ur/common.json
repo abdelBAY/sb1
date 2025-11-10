@@ -34,6 +34,23 @@
       "title": "فرق پیدا کرنے کے لیے تیار ہیں؟",
       "subtitle": "ہزاروں دیگر لوگوں میں شامل ہوں جو پہلے ہی اپنی کمیونٹیز میں اثر پیدا کر رہے ہیں۔",
       "button": "شروع کریں"
+    },
+    "resources": {
+      "title": "اشیاء اور وسائل تلاش کریں",
+      "subtitle": "ہم آج آپ کو اشیاء اور مدد تلاش کرنے میں مدد کے لیے یہاں ہیں۔",
+      "quote": "یہ دراصل زندگی کی لکیر ہیں۔ انہوں نے واقعی اشیاء اور سامان میں مدد کی ہے۔",
+      "findItems": {
+        "title": "اپنے قریب اشیاء تلاش کریں",
+        "description": "اپنی کمیونٹی میں دستیاب اشیاء تلاش کریں۔"
+      },
+      "getHelp": {
+        "title": "مدد اور تعاون حاصل کریں",
+        "description": "عطیہ دہندگان سے جڑیں اور اپنی درخواستوں میں مدد حاصل کریں۔"
+      },
+      "exploreMore": {
+        "title": "مزید وسائل دریافت کریں",
+        "description": "اپنی کمیونٹی میں دینے اور لینے کے مزید طریقے دریافت کریں۔"
+      }
     }
   },
   "messages": {
@@ -208,5 +225,116 @@
       "uploadFailed": "تصویر اپ لوڈ کرنے میں ناکام",
       "tryAgain": "براہ کرم دوبارہ کوشش کریں۔"
     }
+  },
+  "createItem": {
+    "title": "نیا لسٹنگ بنائیں",
+    "fields": {
+      "title": "عنوان",
+      "titlePlaceholder": "مثال: لکڑی کی کھانے کی میز",
+      "titleCharacters": "{{current}}/50 حروف",
+      "category": "زمرہ",
+      "selectCategory": "زمرہ منتخب کریں",
+      "description": "تفصیل",
+      "descriptionPlaceholder": "شے کی خصوصیات، حالت، اور کوئی اہم تفصیلات بیان کریں...",
+      "descriptionCharacters": "{{current}}/500 حروف",
+      "condition": "حالت",
+      "photos": "تصاویر",
+      "photosHint": "زیادہ سے زیادہ 5 تصاویر، ہر ایک 5 میگا بائٹ",
+      "location": "مقام",
+      "locationPlaceholder": "اپنا مقام درج کریں",
+      "locationPrivacy": "رازداری کے لیے، آپ کا عین مقام تقریبی ہوگا",
+      "pickupInstructions": "واپسی کی ہدایات",
+      "pickupInstructionsPlaceholder": "شے کی واپسی کے لیے کوئی مخصوص ہدایات شامل کریں...",
+      "tags": "ٹیگز",
+      "tagsHint": "اضافہ کرنے کے لیے Enter دبائیں، زیادہ سے زیادہ 5 ٹیگز",
+      "tagsPlaceholder": "دوسروں کو آپ کی شے تلاش کرنے میں مدد کے لیے ٹیگز شامل کریں..."
+    },
+    "conditions": {
+      "likeNew": "جیسا نیا",
+      "likeNewDesc": "شے بہترین حالت میں ہے",
+      "good": "اچھا",
+      "goodDesc": "شے میں کم استعمال کے نشانات ہیں",
+      "worn": "پہنا ہوا",
+      "wornDesc": "شے میں زیادہ استعمال کے نشانات ہیں لیکن کام کر رہی ہے",
+      "broken": "ٹوٹا ہوا",
+      "brokenDesc": "شے کو مرمت کی ضرورت ہے"
+    },
+    "categories": {
+      "furniture": "فرنیچر",
+      "electronics": "الیکٹرانکس",
+      "clothing": "کپڑے",
+      "books": "کتابیں",
+      "kitchen": "باورچی خانہ",
+      "sports": "کھیل",
+      "toys": "کھلونے",
+      "tools": "اوزار",
+      "other": "دیگر"
+    },
+    "buttons": {
+      "createListing": "لسٹنگ بنائیں",
+      "creating": "بنایا جا رہا ہے...",
+      "clickToUpload": "اپ لوڈ کرنے کے لیے کلک کریں"
+    },
+    "errors": {
+      "signInRequired": "براہ کرم لسٹنگ بنانے کے لیے سائن ان کریں",
+      "titleRequired": "عنوان ضروری ہے",
+      "categoryRequired": "زمرہ ضروری ہے",
+      "descriptionRequired": "تفصیل ضروری ہے",
+      "locationRequired": "مقام ضروری ہے",
+      "maxPhotos": "زیادہ سے زیادہ 5 تصاویر کی اجازت ہے",
+      "maxTags": "زیادہ سے زیادہ 5 ٹیگز کی اجازت ہے",
+      "invalidFiles": "کچھ فائلیں چھوڑ دی گئیں۔ براہ کرم یقینی بنائیں کہ تمام فائلیں 5 میگا بائٹ سے کم تصاویر ہیں۔",
+      "databaseConnectionFailed": "ڈیٹا بیس کنکشن ناکام۔ براہ کرم دوبارہ کوشش کریں۔",
+      "uploadFailed": "تصویر اپ لوڈ کرنے میں ناکام: {{message}}",
+      "createFailed": "لسٹنگ بنانے میں ناکام: {{message}}",
+      "genericError": "لسٹنگ بنانے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔"
+    },
+    "required": "*"
+  },
+  "productDetail": {
+    "breadcrumb": {
+      "home": "ہوم",
+      "search": "تلاش"
+    },
+    "errors": {
+      "notFound": "اعلان نہیں ملا",
+      "loadingError": "پروڈکٹ لوڈ کرنے میں خرابی",
+      "retry": "دوبارہ کوشش کریں",
+      "givenAwayAlert": "یہ شے پہلے ہی دے دی گئی ہے۔ عطیہ دہندہ اب اس شے کے لیے درخواستیں قبول نہیں کر رہا۔"
+    },
+    "status": {
+      "pending": "زیر التواء",
+      "claimed": "دعویٰ کیا گیا",
+      "completed": "مکمل",
+      "givenAway": "دے دیا گیا"
+    },
+    "condition": {
+      "likeNew": "جیسا نیا",
+      "good": "اچھا",
+      "worn": "پہنا ہوا",
+      "broken": "ٹوٹا ہوا"
+    },
+    "sections": {
+      "pickupInstructions": "واپسی کی ہدایات",
+      "aboutDonor": "عطیہ دہندہ کے بارے میں",
+      "reviews": "جائزے",
+      "relatedItems": "متعلقہ اشیاء"
+    },
+    "buttons": {
+      "requestItem": "شے کی درخواست کریں",
+      "message": "پیغام"
+    },
+    "reviews": {
+      "helpful": "مددگار",
+      "notHelpful": "غیر مددگار",
+      "reviewsCount": "{{count}} جائزے",
+      "reviewsCount_one": "{{count}} جائزہ",
+      "reviewsCount_other": "{{count}} جائزے"
+    },
+    "givenAway": {
+      "title": "یہ شے پہلے ہی دے دی گئی ہے",
+      "description": "عطیہ دہندہ اب اس شے کے لیے درخواستیں قبول نہیں کر رہا۔"
+    },
+    "anonymousUser": "نامعلوم صارف"
   }
 }

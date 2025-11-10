@@ -34,6 +34,23 @@
       "title": "هل أنت مستعد لإحداث فرق؟",
       "subtitle": "انضم إلى آلاف الأشخاص الذين يحدثون تأثيراً في مجتمعاتهم.",
       "button": "ابدأ الآن"
+    },
+    "resources": {
+      "title": "العثور على العناصر والموارد",
+      "subtitle": "نحن هنا لمساعدتك في العثور على العناصر والدعم اليوم.",
+      "quote": "إنهم في الواقع شريان الحياة. لقد ساعدوا حقاً في العناصر والإمدادات.",
+      "findItems": {
+        "title": "العثور على العناصر بالقرب منك",
+        "description": "العثور على العناصر المتاحة في مجتمعك."
+      },
+      "getHelp": {
+        "title": "الحصول على المساعدة والدعم",
+        "description": "تواصل مع المتبرعين واحصل على المساعدة في طلباتك."
+      },
+      "exploreMore": {
+        "title": "استكشف المزيد من الموارد",
+        "description": "اكتشف المزيد من الطرق للعطاء والاستلام في مجتمعك."
+      }
     }
   },
   "messages": {
@@ -208,5 +225,116 @@
       "uploadFailed": "فشل تحميل الصورة",
       "tryAgain": "يرجى المحاولة مرة أخرى."
     }
+  },
+  "createItem": {
+    "title": "إنشاء قائمة جديدة",
+    "fields": {
+      "title": "العنوان",
+      "titlePlaceholder": "مثال: طاولة طعام خشبية",
+      "titleCharacters": "{{current}}/50 حرف",
+      "category": "الفئة",
+      "selectCategory": "اختر فئة",
+      "description": "الوصف",
+      "descriptionPlaceholder": "اوصف ميزات العنصر وحالته وأي تفاصيل مهمة...",
+      "descriptionCharacters": "{{current}}/500 حرف",
+      "condition": "الحالة",
+      "photos": "الصور",
+      "photosHint": "حد أقصى 5 صور، 5 ميجابايت لكل صورة",
+      "location": "الموقع",
+      "locationPlaceholder": "أدخل موقعك",
+      "locationPrivacy": "للخصوصية، سيتم تقريب موقعك الدقيق",
+      "pickupInstructions": "تعليمات الاستلام",
+      "pickupInstructionsPlaceholder": "أضف أي تعليمات محددة لاستلام العنصر...",
+      "tags": "العلامات",
+      "tagsHint": "اضغط Enter لإضافة، حد أقصى 5 علامات",
+      "tagsPlaceholder": "أضف علامات لمساعدة الآخرين في العثور على عنصرك..."
+    },
+    "conditions": {
+      "likeNew": "كالجديد",
+      "likeNewDesc": "العنصر في حالة مثالية",
+      "good": "جيد",
+      "goodDesc": "العنصر يظهر تآكل بسيط",
+      "worn": "مستعمل",
+      "wornDesc": "العنصر يظهر تآكل كبير ولكنه يعمل",
+      "broken": "مكسور",
+      "brokenDesc": "العنصر يحتاج إصلاح"
+    },
+    "categories": {
+      "furniture": "الأثاث",
+      "electronics": "الإلكترونيات",
+      "clothing": "الملابس",
+      "books": "الكتب",
+      "kitchen": "المطبخ",
+      "sports": "الرياضة",
+      "toys": "الألعاب",
+      "tools": "الأدوات",
+      "other": "أخرى"
+    },
+    "buttons": {
+      "createListing": "إنشاء القائمة",
+      "creating": "جارٍ الإنشاء...",
+      "clickToUpload": "انقر للتحميل"
+    },
+    "errors": {
+      "signInRequired": "يرجى تسجيل الدخول لإنشاء قائمة",
+      "titleRequired": "العنوان مطلوب",
+      "categoryRequired": "الفئة مطلوبة",
+      "descriptionRequired": "الوصف مطلوب",
+      "locationRequired": "الموقع مطلوب",
+      "maxPhotos": "حد أقصى 5 صور مسموح",
+      "maxTags": "حد أقصى 5 علامات مسموح",
+      "invalidFiles": "تم تخطي بعض الملفات. يرجى التأكد من أن جميع الملفات صور أقل من 5 ميجابايت.",
+      "databaseConnectionFailed": "فشل الاتصال بقاعدة البيانات. يرجى المحاولة مرة أخرى.",
+      "uploadFailed": "فشل تحميل الصورة: {{message}}",
+      "createFailed": "فشل إنشاء القائمة: {{message}}",
+      "genericError": "فشل إنشاء القائمة. يرجى المحاولة مرة أخرى."
+    },
+    "required": "*"
+  },
+  "productDetail": {
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "search": "البحث"
+    },
+    "errors": {
+      "notFound": "الإعلان غير موجود",
+      "loadingError": "خطأ في تحميل المنتج",
+      "retry": "إعادة المحاولة",
+      "givenAwayAlert": "تم التبرع بهذا العنصر بالفعل. المتبرع لم يعد يقبل الطلبات."
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "claimed": "مطالب به",
+      "completed": "مكتمل",
+      "givenAway": "تم التبرع به"
+    },
+    "condition": {
+      "likeNew": "كالجديد",
+      "good": "جيد",
+      "worn": "مستعمل",
+      "broken": "مكسور"
+    },
+    "sections": {
+      "pickupInstructions": "تعليمات الاستلام",
+      "aboutDonor": "حول المتبرع",
+      "reviews": "المراجعات",
+      "relatedItems": "العناصر ذات الصلة"
+    },
+    "buttons": {
+      "requestItem": "طلب العنصر",
+      "message": "رسالة"
+    },
+    "reviews": {
+      "helpful": "مفيد",
+      "notHelpful": "غير مفيد",
+      "reviewsCount": "{{count}} مراجعة",
+      "reviewsCount_one": "{{count}} مراجعة",
+      "reviewsCount_other": "{{count}} مراجعات"
+    },
+    "givenAway": {
+      "title": "تم التبرع بهذا العنصر بالفعل",
+      "description": "المتبرع لم يعد يقبل الطلبات لهذا العنصر."
+    },
+    "anonymousUser": "مستخدم مجهول"
   }
 }

@@ -21,6 +21,7 @@ import { useStore } from '../lib/store';
 import RequestModal from '../components/RequestModal';
 import RequestStatus from '../components/RequestStatus';
 import LocationMap from '../components/LocationMap';
+import { useTranslation } from 'react-i18next';
 
 interface ProductDetails {
   id: string;
@@ -69,6 +70,7 @@ interface ProductDetails {
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const [product, setProduct] = useState<ProductDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +81,38 @@ export default function ProductDetail() {
   const [requestStatus, setRequestStatus] = useState<'none' | 'pending' | 'accepted' | 'declined' | 'completed'>('none');
   const user = useStore((state) => state.user);
   const profile = useStore((state) => state.profile);
+
+  const getStatusTranslation = (status: string) => {
+    if (status === 'GIVEN_AWAY') {
+      return t('productDetail.status.givenAway');
+    }
+    return t(`productDetail.status.${status.toLowerCase()}`);
+  };
+
+  const getConditionTranslation = (condition: string) => {
+    const conditionMap: { [key: string]: string } = {
+      'LIKE_NEW': 'likeNew',
+      'GOOD': 'good',
+      'WORN': 'worn',
+      'BROKEN': 'broken'
+    };
+    return t(`productDetail.condition.${conditionMap[condition] || 'good'}`);
+  };
+
+  const getCategoryTranslation = (category: string) => {
+    const categoryMap: { [key: string]: string } = {
+      'Furniture': 'furniture',
+      'Electronics': 'electronics',
+      'Clothing': 'clothing',
+      'Books': 'books',
+      'Kitchen': 'kitchen',
+      'Sports': 'sports',
+      'Toys': 'toys',
+      'Tools': 'tools',
+      'Other': 'other'
+    };
+    return t(`search.categories.${categoryMap[category] || 'other'}`);
+  };
 
   useEffect(() => {
     loadProductDetails();
@@ -98,7 +132,7 @@ export default function ProductDetail() {
 
       if (announcementError) throw announcementError;
       if (!announcement) {
-        setError('Announcement not found');
+        setError(t('productDetail.errors.notFound'));
         return;
       }
 
@@ -112,7 +146,7 @@ export default function ProductDetail() {
       // Create default profile if none exists
       const profile = userProfile || {
         id: announcement.user_id,
-        full_name: 'Anonymous User',
+        full_name: t('productDetail.anonymousUser'),
         avatar_url: null
       };
 
@@ -299,7 +333,7 @@ export default function ProductDetail() {
     
     // Prevent chat if item is given away
     if (product?.status === 'GIVEN_AWAY') {
-      alert('This item has already been given away. The donor is no longer accepting requests.');
+      alert(t('productDetail.errors.givenAwayAlert'));
       return;
     }
     
@@ -319,7 +353,7 @@ export default function ProductDetail() {
     
     // Prevent requests if item is given away
     if (product?.status === 'GIVEN_AWAY') {
-      alert('This item has already been given away. The donor is no longer accepting requests.');
+      alert(t('productDetail.errors.givenAwayAlert'));
       return;
     }
     
@@ -340,14 +374,14 @@ export default function ProductDetail() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
           <div className="flex items-center space-x-3 text-red-600 dark:text-red-400 mb-4">
             <AlertCircle className="w-6 h-6" />
-            <h2 className="text-xl font-semibold">Error Loading Product</h2>
+            <h2 className="text-xl font-semibold">{t('productDetail.errors.loadingError')}</h2>
           </div>
           <p className="text-gray-600 dark:text-gray-300">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
           >
-            Retry
+            {t('productDetail.errors.retry')}
           </button>
         </div>
       </div>
@@ -365,7 +399,7 @@ export default function ProductDetail() {
                 to="/"
                 className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               >
-                Home
+                {t('productDetail.breadcrumb.home')}
               </Link>
             </li>
             <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -374,7 +408,7 @@ export default function ProductDetail() {
                 to="/search"
                 className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               >
-                Search
+                {t('productDetail.breadcrumb.search')}
               </Link>
             </li>
             <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -454,7 +488,7 @@ export default function ProductDetail() {
                   </h1>
                   <div className="mt-2 flex items-center space-x-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200">
-                      {product.category}
+                      {getCategoryTranslation(product.category)}
                     </span>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       product.condition === 'LIKE_NEW'
@@ -465,7 +499,7 @@ export default function ProductDetail() {
                         ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                         : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200'
                     }`}>
-                      {product.condition}
+                      {getConditionTranslation(product.condition)}
                     </span>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       product.status === 'PENDING'
@@ -476,7 +510,7 @@ export default function ProductDetail() {
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                     }`}>
-                      {product.status === 'GIVEN_AWAY' ? 'Given Away' : product.status}
+                      {getStatusTranslation(product.status)}
                     </span>
                   </div>
                 </div>
@@ -529,7 +563,7 @@ export default function ProductDetail() {
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                   <div className="flex items-center text-blue-800 dark:text-blue-200 mb-2">
                     <Info className="w-5 h-5 mr-2" />
-                    <h3 className="font-medium">Pickup Instructions</h3>
+                    <h3 className="font-medium">{t('productDetail.sections.pickupInstructions')}</h3>
                   </div>
                   <p className="text-blue-700 dark:text-blue-300">
                     {product.pickup_instructions}
@@ -540,13 +574,13 @@ export default function ProductDetail() {
               {/* Donor Info */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-                  About the Donor
+                  {t('productDetail.sections.aboutDonor')}
                 </h3>
                 <div className="flex items-center space-x-4">
                   {product.user.avatar_url ? (
                     <img
                       src={product.user.avatar_url}
-                      alt={product.user.full_name || 'Anonymous User'}
+                      alt={product.user.full_name || t('productDetail.anonymousUser')}
                       loading="lazy"
                       className="w-12 h-12 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                     />
@@ -557,7 +591,7 @@ export default function ProductDetail() {
                   )}
                   <div>
                     <h4 className="text-lg font-medium text-gray-900 dark:text-white">
-                      {product.user.full_name || 'Anonymous User'}
+                      {product.user.full_name || t('productDetail.anonymousUser')}
                     </h4>
                     {product.user.rating > 0 && (
                       <div className="flex items-center mt-1">
@@ -567,7 +601,7 @@ export default function ProductDetail() {
                         </span>
                         {product.user.review_count > 0 && (
                           <span className="text-gray-500 dark:text-gray-400 ml-1">
-                            ({product.user.review_count} reviews)
+                            ({t('productDetail.reviews.reviewsCount', { count: product.user.review_count })})
                           </span>
                         )}
                       </div>
@@ -581,10 +615,10 @@ export default function ProductDetail() {
                 <div className="pt-6">
                   <div className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-4 text-center">
                     <p className="text-gray-700 dark:text-gray-300 font-medium">
-                      This item has already been given away
+                      {t('productDetail.givenAway.title')}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      The donor is no longer accepting requests for this item.
+                      {t('productDetail.givenAway.description')}
                     </p>
                   </div>
                 </div>
@@ -592,7 +626,7 @@ export default function ProductDetail() {
                 <div className="pt-6">
                   <RequestStatus 
                     status={requestStatus} 
-                    donorName={product.user.full_name || 'Anonymous User'}
+                    donorName={product.user.full_name || t('productDetail.anonymousUser')}
                     onOpenChat={handleOpenChat}
                   />
                 </div>
@@ -602,14 +636,14 @@ export default function ProductDetail() {
                     onClick={handleRequestClick}
                     className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
                   >
-                    Request Item
+                    {t('productDetail.buttons.requestItem')}
                   </button>
                   <button
                     onClick={handleOpenChat}
                     className="flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <MessageCircle className="w-5 h-5 mr-2" />
-                    Message
+                    {t('productDetail.buttons.message')}
                   </button>
                 </div>
               )}
@@ -620,7 +654,7 @@ export default function ProductDetail() {
           {product.reviews && product.reviews.length > 0 && (
             <div className="border-t border-gray-200 dark:border-gray-700 p-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                Reviews
+                {t('productDetail.sections.reviews')}
               </h3>
               <div className="space-y-6">
                 {product.reviews.map((review) => (
@@ -631,7 +665,7 @@ export default function ProductDetail() {
                     {review.profiles.avatar_url ? (
                       <img
                         src={review.profiles.avatar_url}
-                        alt={review.profiles.full_name || 'Anonymous User'}
+                        alt={review.profiles.full_name || t('productDetail.anonymousUser')}
                         loading="lazy"
                         className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
                       />
@@ -644,7 +678,7 @@ export default function ProductDetail() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium text-gray-900 dark:text-white">
-                            {review.profiles.full_name || 'Anonymous User'}
+                            {review.profiles.full_name || t('productDetail.anonymousUser')}
                           </h4>
                           <div className="flex items-center mt-1">
                             {[...Array(5)].map((_, i) => (
@@ -669,11 +703,11 @@ export default function ProductDetail() {
                       <div className="mt-3 flex items-center space-x-4">
                         <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                           <ThumbsUp className="w-4 h-4 mr-1" />
-                          Helpful
+                          {t('productDetail.reviews.helpful')}
                         </button>
                         <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
                           <ThumbsDown className="w-4 h-4 mr-1" />
-                          Not Helpful
+                          {t('productDetail.reviews.notHelpful')}
                         </button>
                       </div>
                     </div>
@@ -685,9 +719,9 @@ export default function ProductDetail() {
 
           {/* Related Items */}
           {product.related_items && product.related_items.length > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-8">
+            <div className="border-t border-gray-200 dark:border-gray-700 p-8 bg-gray-100 dark:bg-gray-900/50">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-                Related Items
+                {t('productDetail.sections.relatedItems')}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {product.related_items.map((item) => (
@@ -725,7 +759,7 @@ export default function ProductDetail() {
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                           : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200'
                       }`}>
-                        {item.condition}
+                        {getConditionTranslation(item.condition)}
                       </span>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         item.status === 'PENDING'
@@ -736,7 +770,7 @@ export default function ProductDetail() {
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200'
                           : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                       }`}>
-                        {item.status === 'GIVEN_AWAY' ? 'Given Away' : item.status}
+                        {getStatusTranslation(item.status)}
                       </span>
                     </div>
                   </Link>
@@ -752,7 +786,7 @@ export default function ProductDetail() {
         <RequestModal
           itemId={product.id}
           itemName={product.title}
-          donorName={product.user.full_name || 'Anonymous User'}
+          donorName={product.user.full_name || t('productDetail.anonymousUser')}
           onClose={() => setShowRequestModal(false)}
           onSendRequest={handleSendRequest}
         />

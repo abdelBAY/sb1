@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
+import { useTranslation } from 'react-i18next';
 
 interface CreateItemForm {
   title: string;
@@ -35,17 +36,33 @@ const CATEGORIES = [
   'Other'
 ];
 
-const CONDITIONS = [
-  { value: 'LIKE_NEW', label: 'Like New', description: 'Item is in perfect condition' },
-  { value: 'GOOD', label: 'Good', description: 'Item shows minimal wear' },
-  { value: 'WORN', label: 'Worn', description: 'Item shows significant wear but is functional' },
-  { value: 'BROKEN', label: 'Broken', description: 'Item needs repair' }
-];
-
 export default function CreateItem() {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
+  
+  const CONDITIONS = [
+    { value: 'LIKE_NEW', label: t('createItem.conditions.likeNew'), description: t('createItem.conditions.likeNewDesc') },
+    { value: 'GOOD', label: t('createItem.conditions.good'), description: t('createItem.conditions.goodDesc') },
+    { value: 'WORN', label: t('createItem.conditions.worn'), description: t('createItem.conditions.wornDesc') },
+    { value: 'BROKEN', label: t('createItem.conditions.broken'), description: t('createItem.conditions.brokenDesc') }
+  ];
+  
+  const getCategoryTranslation = (category: string) => {
+    const categoryMap: { [key: string]: string } = {
+      'Furniture': 'furniture',
+      'Electronics': 'electronics',
+      'Clothing': 'clothing',
+      'Books': 'books',
+      'Kitchen': 'kitchen',
+      'Sports': 'sports',
+      'Toys': 'toys',
+      'Tools': 'tools',
+      'Other': 'other'
+    };
+    return t(`createItem.categories.${categoryMap[category] || 'other'}`);
+  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string[]>([]);
@@ -80,7 +97,7 @@ export default function CreateItem() {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + formData.photos.length > 5) {
-      setError('Maximum 5 photos allowed');
+      setError(t('createItem.errors.maxPhotos'));
       return;
     }
 
@@ -91,7 +108,7 @@ export default function CreateItem() {
     });
 
     if (validFiles.length !== files.length) {
-      setError('Some files were skipped. Please ensure all files are images under 5MB.');
+      setError(t('createItem.errors.invalidFiles'));
     }
 
     setFormData(prev => ({
@@ -121,7 +138,7 @@ export default function CreateItem() {
     if (e.key === 'Enter' && currentTag.trim()) {
       e.preventDefault();
       if (formData.tags.length >= 5) {
-        setError('Maximum 5 tags allowed');
+        setError(t('createItem.errors.maxTags'));
         return;
       }
       if (!formData.tags.includes(currentTag.trim())) {
@@ -143,19 +160,19 @@ export default function CreateItem() {
 
   const validateForm = () => {
     if (!user) {
-      throw new Error('Please sign in to create a listing');
+      throw new Error(t('createItem.errors.signInRequired'));
     }
     if (!formData.title.trim()) {
-      throw new Error('Title is required');
+      throw new Error(t('createItem.errors.titleRequired'));
     }
     if (!formData.category) {
-      throw new Error('Category is required');
+      throw new Error(t('createItem.errors.categoryRequired'));
     }
     if (!formData.description.trim()) {
-      throw new Error('Description is required');
+      throw new Error(t('createItem.errors.descriptionRequired'));
     }
     if (!formData.location.trim()) {
-      throw new Error('Location is required');
+      throw new Error(t('createItem.errors.locationRequired'));
     }
   };
 
@@ -172,7 +189,7 @@ export default function CreateItem() {
       // Check Supabase connection
       const { data: connectionTest, error: connectionError } = await supabase.from('announcements').select('count').limit(1);
       if (connectionError) {
-        throw new Error('Database connection failed. Please try again.');
+        throw new Error(t('createItem.errors.databaseConnectionFailed'));
       }
 
       // Upload photos first
@@ -192,7 +209,7 @@ export default function CreateItem() {
             });
 
           if (uploadError) {
-            throw new Error(`Failed to upload photo: ${uploadError.message}`);
+            throw new Error(t('createItem.errors.uploadFailed', { message: uploadError.message }));
           }
           
           const { data: { publicUrl } } = supabase.storage
@@ -228,13 +245,13 @@ export default function CreateItem() {
           .from('item-photos')
           .remove(filePathsToDelete);
           
-        throw new Error(`Failed to create listing: ${insertError.message}`);
+        throw new Error(t('createItem.errors.createFailed', { message: insertError.message }));
       }
 
       navigate('/dashboard');
     } catch (error) {
       console.error('Error creating item:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create listing. Please try again.');
+      setError(error instanceof Error ? error.message : t('createItem.errors.genericError'));
     } finally {
       setLoading(false);
       setUploadProgress(0);
@@ -247,7 +264,7 @@ export default function CreateItem() {
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
           <div className="p-6">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Create New Listing
+              {t('createItem.title')}
             </h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -261,9 +278,9 @@ export default function CreateItem() {
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Title <span className="text-red-500">*</span>
+                  {t('createItem.fields.title')} <span className="text-red-500">{t('createItem.required')}</span>
                   <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
-                    ({formData.title.length}/50 characters)
+                    ({t('createItem.fields.titleCharacters', { current: formData.title.length })})
                   </span>
                 </label>
                 <input
@@ -272,7 +289,7 @@ export default function CreateItem() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                  placeholder="e.g., Wooden dining table"
+                  placeholder={t('createItem.fields.titlePlaceholder')}
                   required
                 />
               </div>
@@ -280,7 +297,7 @@ export default function CreateItem() {
               {/* Category */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Category <span className="text-red-500">*</span>
+                  {t('createItem.fields.category')} <span className="text-red-500">{t('createItem.required')}</span>
                 </label>
                 <select
                   value={formData.category}
@@ -288,10 +305,10 @@ export default function CreateItem() {
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
                   required
                 >
-                  <option value="">Select a category</option>
+                  <option value="">{t('createItem.fields.selectCategory')}</option>
                   {CATEGORIES.map((category) => (
                     <option key={category} value={category}>
-                      {category}
+                      {getCategoryTranslation(category)}
                     </option>
                   ))}
                 </select>
@@ -300,9 +317,9 @@ export default function CreateItem() {
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Description <span className="text-red-500">*</span>
+                  {t('createItem.fields.description')} <span className="text-red-500">{t('createItem.required')}</span>
                   <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
-                    ({formData.description.length}/500 characters)
+                    ({t('createItem.fields.descriptionCharacters', { current: formData.description.length })})
                   </span>
                 </label>
                 <textarea
@@ -311,7 +328,7 @@ export default function CreateItem() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                  placeholder="Describe the item's features, condition, and any important details..."
+                  placeholder={t('createItem.fields.descriptionPlaceholder')}
                   required
                 />
               </div>
@@ -319,7 +336,7 @@ export default function CreateItem() {
               {/* Condition */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Condition <span className="text-red-500">*</span>
+                  {t('createItem.fields.condition')} <span className="text-red-500">{t('createItem.required')}</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {CONDITIONS.map((condition) => (
@@ -359,9 +376,9 @@ export default function CreateItem() {
               {/* Photos */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Photos
+                  {t('createItem.fields.photos')}
                   <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
-                    (Maximum 5 photos, 5MB each)
+                    ({t('createItem.fields.photosHint')})
                   </span>
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
@@ -390,7 +407,7 @@ export default function CreateItem() {
                         <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                           <ImageIcon className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" />
                           <span className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                            Click to upload
+                            {t('createItem.buttons.clickToUpload')}
                           </span>
                           <input
                             type="file"
@@ -408,7 +425,7 @@ export default function CreateItem() {
               {/* Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Location <span className="text-red-500">*</span>
+                  {t('createItem.fields.location')} <span className="text-red-500">{t('createItem.required')}</span>
                 </label>
                 <div className="mt-1 relative rounded-lg">
                   <input
@@ -416,7 +433,7 @@ export default function CreateItem() {
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 pl-10"
-                    placeholder="Enter your location"
+                    placeholder={t('createItem.fields.locationPlaceholder')}
                     required
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -425,30 +442,30 @@ export default function CreateItem() {
                 </div>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center">
                   <Info className="w-4 h-4 mr-1" />
-                  For privacy, your exact location will be approximated
+                  {t('createItem.fields.locationPrivacy')}
                 </p>
               </div>
 
               {/* Pickup Instructions */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Pickup Instructions
+                  {t('createItem.fields.pickupInstructions')}
                 </label>
                 <textarea
                   value={formData.pickupInstructions}
                   onChange={(e) => setFormData({ ...formData, pickupInstructions: e.target.value })}
                   rows={3}
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                  placeholder="Add any specific instructions for item pickup..."
+                  placeholder={t('createItem.fields.pickupInstructionsPlaceholder')}
                 />
               </div>
 
               {/* Tags */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Tags
+                  {t('createItem.fields.tags')}
                   <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
-                    (Press Enter to add, maximum 5 tags)
+                    ({t('createItem.fields.tagsHint')})
                   </span>
                 </label>
                 <input
@@ -457,7 +474,7 @@ export default function CreateItem() {
                   onChange={(e) => setCurrentTag(e.target.value)}
                   onKeyDown={handleAddTag}
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                  placeholder="Add tags to help others find your item..."
+                  placeholder={t('createItem.fields.tagsPlaceholder')}
                   disabled={formData.tags.length >= 5}
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -489,10 +506,10 @@ export default function CreateItem() {
                   {loading ? (
                     <>
                       <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Creating...
+                      {t('createItem.buttons.creating')}
                     </>
                   ) : (
-                    'Create Listing'
+                    t('createItem.buttons.createListing')
                   )}
                 </button>
               </div>

@@ -34,6 +34,23 @@
       "title": "Prêt à faire la différence ?",
       "subtitle": "Rejoignez des milliers d'autres personnes qui ont déjà un impact dans leurs communautés.",
       "button": "Commencer"
+    },
+    "resources": {
+      "title": "Trouver des articles et des ressources",
+      "subtitle": "Nous sommes là pour vous aider à trouver des articles et du soutien aujourd'hui.",
+      "quote": "Ils sont en fait une bouée de sauvetage. Ils ont vraiment aidé avec les articles et les fournitures.",
+      "findItems": {
+        "title": "Trouver des articles près de chez vous",
+        "description": "Trouvez les articles disponibles dans votre communauté."
+      },
+      "getHelp": {
+        "title": "Obtenir de l'aide et du soutien",
+        "description": "Connectez-vous avec les donateurs et obtenez de l'aide pour vos demandes."
+      },
+      "exploreMore": {
+        "title": "Explorer plus de ressources",
+        "description": "Découvrez plus de façons de donner et de recevoir dans votre communauté."
+      }
     }
   },
   "messages": {
@@ -208,5 +225,116 @@
       "uploadFailed": "Échec du téléchargement de l'image",
       "tryAgain": "Veuillez réessayer."
     }
+  },
+  "createItem": {
+    "title": "Créer une nouvelle annonce",
+    "fields": {
+      "title": "Titre",
+      "titlePlaceholder": "ex. Table à manger en bois",
+      "titleCharacters": "{{current}}/50 caractères",
+      "category": "Catégorie",
+      "selectCategory": "Sélectionner une catégorie",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez les caractéristiques de l'article, son état et tout détail important...",
+      "descriptionCharacters": "{{current}}/500 caractères",
+      "condition": "État",
+      "photos": "Photos",
+      "photosHint": "Maximum 5 photos, 5 Mo chacune",
+      "location": "Emplacement",
+      "locationPlaceholder": "Entrez votre emplacement",
+      "locationPrivacy": "Pour la confidentialité, votre emplacement exact sera approximé",
+      "pickupInstructions": "Instructions de récupération",
+      "pickupInstructionsPlaceholder": "Ajoutez des instructions spécifiques pour la récupération de l'article...",
+      "tags": "Tags",
+      "tagsHint": "Appuyez sur Entrée pour ajouter, maximum 5 tags",
+      "tagsPlaceholder": "Ajoutez des tags pour aider les autres à trouver votre article..."
+    },
+    "conditions": {
+      "likeNew": "Comme neuf",
+      "likeNewDesc": "L'article est en parfait état",
+      "good": "Bon",
+      "goodDesc": "L'article montre une usure minimale",
+      "worn": "Usé",
+      "wornDesc": "L'article montre une usure importante mais est fonctionnel",
+      "broken": "Cassé",
+      "brokenDesc": "L'article nécessite une réparation"
+    },
+    "categories": {
+      "furniture": "Mobilier",
+      "electronics": "Électronique",
+      "clothing": "Vêtements",
+      "books": "Livres",
+      "kitchen": "Cuisine",
+      "sports": "Sports",
+      "toys": "Jouets",
+      "tools": "Outils",
+      "other": "Autre"
+    },
+    "buttons": {
+      "createListing": "Créer l'annonce",
+      "creating": "Création...",
+      "clickToUpload": "Cliquez pour télécharger"
+    },
+    "errors": {
+      "signInRequired": "Veuillez vous connecter pour créer une annonce",
+      "titleRequired": "Le titre est requis",
+      "categoryRequired": "La catégorie est requise",
+      "descriptionRequired": "La description est requise",
+      "locationRequired": "L'emplacement est requis",
+      "maxPhotos": "Maximum 5 photos autorisées",
+      "maxTags": "Maximum 5 tags autorisés",
+      "invalidFiles": "Certains fichiers ont été ignorés. Veuillez vous assurer que tous les fichiers sont des images de moins de 5 Mo.",
+      "databaseConnectionFailed": "Échec de la connexion à la base de données. Veuillez réessayer.",
+      "uploadFailed": "Échec du téléchargement de la photo : {{message}}",
+      "createFailed": "Échec de la création de l'annonce : {{message}}",
+      "genericError": "Échec de la création de l'annonce. Veuillez réessayer."
+    },
+    "required": "*"
+  },
+  "productDetail": {
+    "breadcrumb": {
+      "home": "Accueil",
+      "search": "Recherche"
+    },
+    "errors": {
+      "notFound": "Annonce introuvable",
+      "loadingError": "Erreur de chargement du produit",
+      "retry": "Réessayer",
+      "givenAwayAlert": "Cet article a déjà été donné. Le donneur n'accepte plus de demandes."
+    },
+    "status": {
+      "pending": "EN ATTENTE",
+      "claimed": "RÉCLAMÉ",
+      "completed": "TERMINÉ",
+      "givenAway": "Donné"
+    },
+    "condition": {
+      "likeNew": "Comme neuf",
+      "good": "Bon",
+      "worn": "Usé",
+      "broken": "Cassé"
+    },
+    "sections": {
+      "pickupInstructions": "Instructions de récupération",
+      "aboutDonor": "À propos du donneur",
+      "reviews": "Avis",
+      "relatedItems": "Articles connexes"
+    },
+    "buttons": {
+      "requestItem": "Demander l'article",
+      "message": "Message"
+    },
+    "reviews": {
+      "helpful": "Utile",
+      "notHelpful": "Pas utile",
+      "reviewsCount": "{{count}} avis",
+      "reviewsCount_one": "{{count}} avis",
+      "reviewsCount_other": "{{count}} avis"
+    },
+    "givenAway": {
+      "title": "Cet article a déjà été donné",
+      "description": "Le donneur n'accepte plus de demandes pour cet article."
+    },
+    "anonymousUser": "Utilisateur anonyme"
   }
 }

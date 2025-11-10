@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from './lib/store';
 import { useTranslation } from 'react-i18next';
 import HeroSection from "./components/HeroSection.tsx";
+import ResourcesSection from "./components/ResourcesSection.tsx";
 import Footer from "./components/Footer.tsx"; // 👈 Import Footer
+import ctaImage from "./assets/givea-image3 (1).png";
 
 console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
 console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY);
@@ -33,6 +35,9 @@ function App() {
     <div className="min-h-screen bg-light dark:bg-dark transition-colors duration-300 flex flex-col justify-between">
       {/* ✅ Hero Section */}
       <HeroSection />
+
+      {/* ✅ Resources Section */}
+      <ResourcesSection />
 
       {/* Features Section */}
       <div className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -77,12 +82,29 @@ function App() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-dark-200 dark:to-dark-300">
-        <div className="max-w-7xl mx-auto py-12 md:py-16 px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white">
+      <div className="relative py-12 md:py-16 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 w-full h-full">
+          <img
+            src={ctaImage}
+            alt="Community helping"
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.src = "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop";
+            }}
+          />
+          {/* Darkened overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 via-blue-700/80 to-blue-600/80 dark:from-blue-900/80 dark:via-blue-800/80 dark:to-blue-900/80"></div>
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto py-12 md:py-16 px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-white drop-shadow-lg">
             {t('home.cta.title')}
           </h2>
-          <p className="mt-4 text-lg md:text-xl text-blue-100 dark:text-light-300">
+          <p className="mt-4 text-lg md:text-xl text-white/95 drop-shadow-md">
             {t('home.cta.subtitle')}
           </p>
           <button

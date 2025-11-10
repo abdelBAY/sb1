@@ -34,6 +34,23 @@
       "title": "Ready to make a difference?",
       "subtitle": "Join thousands of others who are already making an impact in their communities.",
       "button": "Get Started"
+    },
+    "resources": {
+      "title": "Find Items and Resources",
+      "subtitle": "We are here to help you find items and support today.",
+      "quote": "They're actually a lifeline. They've really helped with items and supplies.",
+      "findItems": {
+        "title": "Find Items Near You",
+        "description": "Find the items available in your community."
+      },
+      "getHelp": {
+        "title": "Get Help & Support",
+        "description": "Connect with donors and get assistance with your requests."
+      },
+      "exploreMore": {
+        "title": "Explore More Resources",
+        "description": "Discover more ways to give and receive in your community."
+      }
     }
   },
   "messages": {
@@ -208,5 +225,116 @@
       "uploadFailed": "Failed to upload image",
       "tryAgain": "Please try again."
     }
+  },
+  "createItem": {
+    "title": "Create New Listing",
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "e.g., Wooden dining table",
+      "titleCharacters": "{{current}}/50 characters",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the item's features, condition, and any important details...",
+      "descriptionCharacters": "{{current}}/500 characters",
+      "condition": "Condition",
+      "photos": "Photos",
+      "photosHint": "Maximum 5 photos, 5MB each",
+      "location": "Location",
+      "locationPlaceholder": "Enter your location",
+      "locationPrivacy": "For privacy, your exact location will be approximated",
+      "pickupInstructions": "Pickup Instructions",
+      "pickupInstructionsPlaceholder": "Add any specific instructions for item pickup...",
+      "tags": "Tags",
+      "tagsHint": "Press Enter to add, maximum 5 tags",
+      "tagsPlaceholder": "Add tags to help others find your item..."
+    },
+    "conditions": {
+      "likeNew": "Like New",
+      "likeNewDesc": "Item is in perfect condition",
+      "good": "Good",
+      "goodDesc": "Item shows minimal wear",
+      "worn": "Worn",
+      "wornDesc": "Item shows significant wear but is functional",
+      "broken": "Broken",
+      "brokenDesc": "Item needs repair"
+    },
+    "categories": {
+      "furniture": "Furniture",
+      "electronics": "Electronics",
+      "clothing": "Clothing",
+      "books": "Books",
+      "kitchen": "Kitchen",
+      "sports": "Sports",
+      "toys": "Toys",
+      "tools": "Tools",
+      "other": "Other"
+    },
+    "buttons": {
+      "createListing": "Create Listing",
+      "creating": "Creating...",
+      "clickToUpload": "Click to upload"
+    },
+    "errors": {
+      "signInRequired": "Please sign in to create a listing",
+      "titleRequired": "Title is required",
+      "categoryRequired": "Category is required",
+      "descriptionRequired": "Description is required",
+      "locationRequired": "Location is required",
+      "maxPhotos": "Maximum 5 photos allowed",
+      "maxTags": "Maximum 5 tags allowed",
+      "invalidFiles": "Some files were skipped. Please ensure all files are images under 5MB.",
+      "databaseConnectionFailed": "Database connection failed. Please try again.",
+      "uploadFailed": "Failed to upload photo: {{message}}",
+      "createFailed": "Failed to create listing: {{message}}",
+      "genericError": "Failed to create listing. Please try again."
+    },
+    "required": "*"
+  },
+  "productDetail": {
+    "breadcrumb": {
+      "home": "Home",
+      "search": "Search"
+    },
+    "errors": {
+      "notFound": "Announcement not found",
+      "loadingError": "Error Loading Product",
+      "retry": "Retry",
+      "givenAwayAlert": "This item has already been given away. The donor is no longer accepting requests."
+    },
+    "status": {
+      "pending": "PENDING",
+      "claimed": "CLAIMED",
+      "completed": "COMPLETED",
+      "givenAway": "Given Away"
+    },
+    "condition": {
+      "likeNew": "LIKE_NEW",
+      "good": "GOOD",
+      "worn": "WORN",
+      "broken": "BROKEN"
+    },
+    "sections": {
+      "pickupInstructions": "Pickup Instructions",
+      "aboutDonor": "About the Donor",
+      "reviews": "Reviews",
+      "relatedItems": "Related Items"
+    },
+    "buttons": {
+      "requestItem": "Request Item",
+      "message": "Message"
+    },
+    "reviews": {
+      "helpful": "Helpful",
+      "notHelpful": "Not Helpful",
+      "reviewsCount": "{{count}} reviews",
+      "reviewsCount_one": "{{count}} review",
+      "reviewsCount_other": "{{count}} reviews"
+    },
+    "givenAway": {
+      "title": "This item has already been given away",
+      "description": "The donor is no longer accepting requests for this item."
+    },
+    "anonymousUser": "Anonymous User"
   }
 }
