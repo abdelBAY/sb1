@@ -6,7 +6,8 @@ import {
   AlertCircle, 
   X,
   Image as ImageIcon,
-  Info
+  Info,
+  Navigation
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
@@ -68,6 +69,10 @@ export default function CreateItem() {
   const [photoPreview, setPhotoPreview] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationDetected, setLocationDetected] = useState(false);
+  const [locationCoordinates, setLocationCoordinates] = useState<{ lat: number; lon: number } | null>(null);
   
   const [formData, setFormData] = useState<CreateItemForm>({
     title: '',
@@ -156,6 +161,120 @@ export default function CreateItem() {
       ...prev,
       tags: prev.tags.filter(tag => tag !== tagToRemove)
     }));
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError(t('createItem.location.geolocationNotSupported'));
+      return;
+    }
+
+    setGettingLocation(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          
+          // Reverse geocode to get address
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            {
+              headers: {
+                'User-Agent': 'Givea-Donation-App/1.0',
+                'Accept': 'application/json',
+              }
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error('Failed to get address');
+          }
+
+          const data = await response.json();
+          
+          // Store coordinates
+          setLocationCoordinates({ lat: latitude, lon: longitude });
+          
+          if (data && data.address) {
+            // Build address string from components
+            const addressParts = [];
+            if (data.address.road) addressParts.push(data.address.road);
+            if (data.address.house_number) addressParts.push(data.address.house_number);
+            if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
+            if (data.address.city || data.address.town || data.address.village) {
+              addressParts.push(data.address.city || data.address.town || data.address.village);
+            }
+            if (data.address.state) addressParts.push(data.address.state);
+            if (data.address.country) addressParts.push(data.address.country);
+
+            const address = addressParts.length > 0 
+              ? addressParts.join(', ')
+              : data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+            setFormData(prev => ({
+              ...prev,
+              location: address
+            }));
+            
+            // Show success visual feedback
+            setLocationDetected(true);
+            setTimeout(() => setLocationDetected(false), 3000);
+          } else {
+            // Fallback to coordinates if address not available
+            setFormData(prev => ({
+              ...prev,
+              location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+            }));
+            
+            // Show success visual feedback
+            setLocationDetected(true);
+            setTimeout(() => setLocationDetected(false), 3000);
+          }
+        } catch (error) {
+          // Only log if it's not a network/CORS error (which is expected in some cases)
+          if (error instanceof Error && !error.message.includes('Failed to fetch') && !error.message.includes('CORS')) {
+            console.warn('Error reverse geocoding:', error.message);
+          }
+          setLocationError(t('createItem.location.addressError'));
+        } finally {
+          setGettingLocation(false);
+        }
+      },
+      (error) => {
+        let errorMessage = t('createItem.location.error');
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = t('createItem.location.permissionDenied');
+            // Don't log permission denied as it's a user choice
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = t('createItem.location.positionUnavailable');
+            // Don't log position unavailable as it's a common scenario (GPS disabled, etc.)
+            break;
+          case error.TIMEOUT:
+            errorMessage = t('createItem.location.timeout');
+            // Don't log timeout as it's a common scenario
+            break;
+          default:
+            // Only log truly unexpected errors
+            if (error.code !== undefined) {
+              console.error('Unexpected geolocation error:', error.message || error.code);
+            }
+            break;
+        }
+        
+        setLocationError(errorMessage);
+        setGettingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
   const validateForm = () => {
@@ -277,9 +396,9 @@ export default function CreateItem() {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.title')} <span className="text-red-500">{t('createItem.required')}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
+                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2 font-normal">
                     ({t('createItem.fields.titleCharacters', { current: formData.title.length })})
                   </span>
                 </label>
@@ -288,7 +407,7 @@ export default function CreateItem() {
                   maxLength={50}
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg"
                   placeholder={t('createItem.fields.titlePlaceholder')}
                   required
                 />
@@ -296,29 +415,36 @@ export default function CreateItem() {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.category')} <span className="text-red-500">{t('createItem.required')}</span>
                 </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                  required
-                >
-                  <option value="">{t('createItem.fields.selectCategory')}</option>
-                  {CATEGORIES.map((category) => (
-                    <option key={category} value={category}>
-                      {getCategoryTranslation(category)}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg appearance-none cursor-pointer"
+                    required
+                  >
+                    <option value="">{t('createItem.fields.selectCategory')}</option>
+                    {CATEGORIES.map((category) => (
+                      <option key={category} value={category}>
+                        {getCategoryTranslation(category)}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.description')} <span className="text-red-500">{t('createItem.required')}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
+                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2 font-normal">
                     ({t('createItem.fields.descriptionCharacters', { current: formData.description.length })})
                   </span>
                 </label>
@@ -327,7 +453,7 @@ export default function CreateItem() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg resize-none"
                   placeholder={t('createItem.fields.descriptionPlaceholder')}
                   required
                 />
@@ -335,7 +461,7 @@ export default function CreateItem() {
 
               {/* Condition */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.condition')} <span className="text-red-500">{t('createItem.required')}</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -343,10 +469,10 @@ export default function CreateItem() {
                     <label
                       key={condition.value}
                       className={`
-                        relative flex items-start p-4 cursor-pointer rounded-lg border
+                        relative flex items-start p-5 cursor-pointer rounded-xl border-2 transition-all duration-200 shadow-sm hover:shadow-md
                         ${formData.condition === condition.value
-                          ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                          ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20 shadow-md ring-2 ring-blue-500/20 dark:ring-blue-400/20'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
                         }
                       `}
                     >
@@ -358,13 +484,13 @@ export default function CreateItem() {
                             value={condition.value}
                             checked={formData.condition === condition.value}
                             onChange={(e) => setFormData({ ...formData, condition: e.target.value as CreateItemForm['condition'] })}
-                            className="h-4 w-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400"
+                            className="h-5 w-5 text-blue-600 dark:text-blue-400 border-2 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 cursor-pointer"
                           />
-                          <span className="ml-3 font-medium text-gray-900 dark:text-white">
+                          <span className="ml-3 font-semibold text-gray-900 dark:text-white">
                             {condition.label}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                           {condition.description}
                         </p>
                       </div>
@@ -375,9 +501,9 @@ export default function CreateItem() {
 
               {/* Photos */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.photos')}
-                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
+                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2 font-normal">
                     ({t('createItem.fields.photosHint')})
                   </span>
                 </label>
@@ -385,7 +511,7 @@ export default function CreateItem() {
                   {[...Array(5)].map((_, index) => (
                     <div
                       key={index}
-                      className="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center relative overflow-hidden"
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center relative overflow-hidden bg-gray-50 dark:bg-gray-800/50 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-200 group"
                     >
                       {photoPreview[index] ? (
                         <>
@@ -395,18 +521,19 @@ export default function CreateItem() {
                             loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
                           <button
                             type="button"
                             onClick={() => removePhoto(index)}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-all duration-200 shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
                           >
                             <X className="w-4 h-4" />
                           </button>
                         </>
                       ) : (
-                        <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                          <ImageIcon className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                        <label className="cursor-pointer w-full h-full flex flex-col items-center justify-center p-4 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                          <ImageIcon className="w-10 h-10 text-gray-400 dark:text-gray-500 mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
+                          <span className="text-xs text-gray-500 dark:text-gray-400 text-center group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                             {t('createItem.buttons.clickToUpload')}
                           </span>
                           <input
@@ -423,48 +550,160 @@ export default function CreateItem() {
               </div>
 
               {/* Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('createItem.fields.location')} <span className="text-red-500">{t('createItem.required')}</span>
-                </label>
-                <div className="mt-1 relative rounded-lg">
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 pl-10"
-                    placeholder={t('createItem.fields.locationPlaceholder')}
-                    required
-                  />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    {t('createItem.fields.location')} <span className="text-red-500">{t('createItem.required')}</span>
+                  </label>
+                  
+                  {/* Large Visual Location Button */}
+                  <button
+                    type="button"
+                    onClick={getCurrentLocation}
+                    disabled={gettingLocation}
+                    className={`w-full relative overflow-hidden rounded-xl border-2 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                      locationDetected
+                        ? 'border-green-500 dark:border-green-400 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 shadow-lg ring-2 ring-green-500/20 dark:ring-green-400/20'
+                        : gettingLocation
+                        ? 'border-blue-400 dark:border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 shadow-md'
+                        : 'border-blue-300 dark:border-blue-600 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg'
+                    }`}
+                  >
+                    <div className="p-4 flex items-center justify-center space-x-3">
+                      {gettingLocation ? (
+                        <>
+                          <div className="w-8 h-8 border-4 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin" />
+                          <div className="text-left">
+                            <p className="text-base font-semibold text-blue-700 dark:text-blue-300">
+                              {t('createItem.location.getting')}
+                            </p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400">
+                              {t('createItem.location.requesting')}
+                            </p>
+                          </div>
+                        </>
+                      ) : locationDetected ? (
+                        <>
+                          <div className="w-10 h-10 rounded-full bg-green-500 dark:bg-green-400 flex items-center justify-center shadow-lg">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <div className="text-left flex-1">
+                            <p className="text-base font-semibold text-green-700 dark:text-green-300">
+                              {t('createItem.location.detected')}
+                            </p>
+                            <p className="text-xs text-green-600 dark:text-green-400">
+                              {formData.location}
+                            </p>
+                            {locationCoordinates && (
+                              <p className="text-xs text-green-500 dark:text-green-400 mt-1">
+                                {locationCoordinates.lat.toFixed(6)}, {locationCoordinates.lon.toFixed(6)}
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 dark:from-blue-600 dark:to-cyan-600 flex items-center justify-center shadow-lg">
+                            <Navigation className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="text-left flex-1">
+                            <p className="text-base font-semibold text-blue-700 dark:text-blue-300">
+                              {t('createItem.location.useCurrent')}
+                            </p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400">
+                              {t('createItem.location.tapToDetect')}
+                            </p>
+                          </div>
+                          <MapPin className="w-5 h-5 text-blue-400 dark:text-blue-500" />
+                        </>
+                      )}
+                    </div>
+                  </button>
+                  
+                  {/* Location Input Field */}
+                  <div className="mt-4 relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => {
+                        setFormData({ ...formData, location: e.target.value });
+                        setLocationError(null);
+                        setLocationDetected(false);
+                      }}
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg ${
+                        locationDetected
+                          ? 'border-green-300 dark:border-green-600 bg-green-50/50 dark:bg-green-900/10'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20'
+                      } text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none`}
+                      placeholder={t('createItem.fields.locationPlaceholder')}
+                      required
+                    />
+                    {locationDetected && (
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                        <div className="w-6 h-6 rounded-full bg-green-500 dark:bg-green-400 flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Coordinates Display */}
+                  {locationCoordinates && locationDetected && (
+                    <div className="mt-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse"></div>
+                        <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                          {t('createItem.location.coordinates')}: 
+                        </p>
+                        <p className="text-xs text-blue-600 dark:text-blue-400 font-mono">
+                          {locationCoordinates.lat.toFixed(6)}, {locationCoordinates.lon.toFixed(6)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {locationError && (
+                    <div className="mt-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                        {locationError}
+                      </p>
+                    </div>
+                  )}
+                  
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                    <Info className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                    {t('createItem.fields.locationPrivacy')}
+                  </p>
                 </div>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center">
-                  <Info className="w-4 h-4 mr-1" />
-                  {t('createItem.fields.locationPrivacy')}
-                </p>
               </div>
 
               {/* Pickup Instructions */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.pickupInstructions')}
                 </label>
                 <textarea
                   value={formData.pickupInstructions}
                   onChange={(e) => setFormData({ ...formData, pickupInstructions: e.target.value })}
                   rows={3}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg resize-none"
                   placeholder={t('createItem.fields.pickupInstructionsPlaceholder')}
                 />
               </div>
 
               {/* Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {t('createItem.fields.tags')}
-                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
+                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2 font-normal">
                     ({t('createItem.fields.tagsHint')})
                   </span>
                 </label>
@@ -473,21 +712,21 @@ export default function CreateItem() {
                   value={currentTag}
                   onChange={(e) => setCurrentTag(e.target.value)}
                   onKeyDown={handleAddTag}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder={t('createItem.fields.tagsPlaceholder')}
                   disabled={formData.tags.length >= 5}
                 />
-                <div className="mt-2 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {formData.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
+                      className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
+                        className="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
                       >
                         <X className="w-3 h-3" />
                       </button>

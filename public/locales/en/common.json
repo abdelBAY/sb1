@@ -275,6 +275,20 @@
       "creating": "Creating...",
       "clickToUpload": "Click to upload"
     },
+    "location": {
+      "useCurrent": "Use Current Location",
+      "getting": "Detecting your location...",
+      "requesting": "Requesting GPS access...",
+      "detected": "Location Detected!",
+      "tapToDetect": "Tap to automatically detect your current location",
+      "coordinates": "GPS Coordinates",
+      "geolocationNotSupported": "Geolocation is not supported by your browser",
+      "error": "Error getting your location",
+      "permissionDenied": "Location permission denied. Please enable location access in your browser settings.",
+      "positionUnavailable": "Location information is unavailable",
+      "timeout": "Location request timed out. Please try again.",
+      "addressError": "Could not get address from location. Coordinates will be used instead."
+    },
     "errors": {
       "signInRequired": "Please sign in to create a listing",
       "titleRequired": "Title is required",
@@ -336,5 +350,82 @@
       "description": "The donor is no longer accepting requests for this item."
     },
     "anonymousUser": "Anonymous User"
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Don't have an account?",
+    "createAccount": "Create a new account",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset Password",
+    "forgotPasswordDescription": "Enter your email address and we'll send you a link to reset your password.",
+    "sendResetLink": "Send Reset Link",
+    "sendingResetLink": "Sending...",
+    "resetLinkSent": "Password reset link sent!",
+    "resetLinkSentMessage": "Check your email for instructions to reset your password.",
+    "checkSpamFolder": "If you don't see the email, check your spam/junk folder.",
+    "backToLogin": "Back to Login",
+    "errors": {
+      "captchaRequired": "Please complete the CAPTCHA before signing in.",
+      "signInError": "An error occurred during sign in",
+      "emailRequired": "Please enter your email address",
+      "resetError": "Failed to send reset link. Please try again."
+    }
+  },
+  "register": {
+    "title": "Create your account",
+    "subtitle": "Already have an account?",
+    "signIn": "Sign in",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Enter your full name",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Create a secure password",
+    "roleLabel": "I want to",
+    "donateItems": "Donate Items",
+    "receiveItems": "Receive Items",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account...",
+    "errors": {
+      "captchaRequired": "Please complete the CAPTCHA before creating an account.",
+      "registrationError": "An error occurred during registration",
+      "registrationFailed": "Registration failed. Please try again."
+    }
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "description": "Enter your new password below",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your new password",
+    "passwordHint": "Password must be at least 6 characters long",
+    "resetPassword": "Reset Password",
+    "resetting": "Resetting...",
+    "validating": "Validating reset link...",
+    "success": "Password Reset Successful!",
+    "successMessage": "Your password has been successfully reset. You can now log in with your new password.",
+    "redirecting": "Redirecting to login page...",
+    "invalidToken": "Invalid Reset Link",
+    "invalidTokenMessage": "This password reset link is invalid or has expired. Please request a new password reset link.",
+    "backToLogin": "Back to Login",
+    "errors": {
+      "passwordRequired": "Please enter a new password",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "resetFailed": "Failed to reset password. Please try again."
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Page Not Found",
+    "message": "Sorry, we couldn't find the page you're looking for.",
+    "goHome": "Go Back Home"
   }
 }

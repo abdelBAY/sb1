@@ -79,17 +79,27 @@ export default function Layout() {
         // Set loading to true initially
         setIsLoading(true);
         
-        const { data: { user }, error } = await supabase.auth.getUser();
+        // First check if there's a session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Auth error:', error);
+        if (sessionError) {
+          // Only log non-session-missing errors
+          if (sessionError.message && !sessionError.message.includes('session missing')) {
+            console.error('Auth session error:', sessionError);
+          }
           setUser(null);
+        } else if (session?.user) {
+          console.log('Current user: Authenticated');
+          setUser(session.user);
         } else {
-          console.log('Current user:', user ? 'Authenticated' : 'Not authenticated');
-          setUser(user);
+          console.log('Current user: Not authenticated');
+          setUser(null);
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
+      } catch (error: any) {
+        // Only log errors that aren't about missing sessions
+        if (error?.message && !error.message.includes('session missing') && !error.message.includes('Auth session missing')) {
+          console.error('Error initializing auth:', error);
+        }
         setUser(null);
       } finally {
         // Set loading to false after auth initialization completes

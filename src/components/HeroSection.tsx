@@ -33,7 +33,8 @@ const HeroSection: React.FC = () => {
           <motion.div
             className="text-white"
             initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1 }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight text-white drop-shadow-lg">

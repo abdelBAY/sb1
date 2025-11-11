@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import CreateItem from './pages/CreateItem';
 import EditItem from './pages/EditItem';
 import Search from './pages/Search';
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
+      { path: 'reset-password', element: <ResetPassword /> },
       { path: 'create-item', element: <CreateItem /> },
       { path: 'edit-item/:id', element: <EditItem /> },
       { path: 'search', element: <Search /> },

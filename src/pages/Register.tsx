@@ -3,14 +3,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
 import { UserPlus } from 'lucide-react';
-import Turnstile from 'react-turnstile'; // ✅ NEW
+import Turnstile from 'react-turnstile';
+import { useTranslation } from 'react-i18next';
 
 export default function Register() {
+  const { t } = useTranslation('common');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<'DONOR' | 'BENEFICIARY'>('DONOR');
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null); // ✅ NEW
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ export default function Register() {
 
     try {
       if (!captchaToken) {
-        throw new Error('رجاءً أكمل التحقق (CAPTCHA) قبل إنشاء الحساب.');
+        throw new Error(t('register.errors.captchaRequired'));
       }
 
       // 1️⃣ تسجيل المستخدم
@@ -37,7 +39,7 @@ export default function Register() {
       });
 
       if (authError) throw authError;
-      if (!authData.user) throw new Error('Registration failed. Please try again.');
+      if (!authData.user) throw new Error(t('register.errors.registrationFailed'));
 
       // 2️⃣ إنشاء سجل الملف الشخصي
       const { error: profileError } = await supabase
@@ -65,7 +67,7 @@ export default function Register() {
       setUser(authData.user);
       navigate('/search');
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred during registration');
+      setError(error instanceof Error ? error.message : t('register.errors.registrationError'));
     } finally {
       setLoading(false);
     }
@@ -79,15 +81,15 @@ export default function Register() {
             <UserPlus className="h-12 w-12 text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Create your account
+            {t('register.title')}
           </h1>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
+            {t('register.subtitle')}{' '}
             <Link
               to="/login"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
             >
-              Sign in
+              {t('register.signIn')}
             </Link>
           </p>
         </div>
@@ -102,7 +104,7 @@ export default function Register() {
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Full name
+                {t('register.fullName')}
               </label>
               <input
                 id="fullName"
@@ -112,13 +114,13 @@ export default function Register() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
-                placeholder="Enter your full name"
+                placeholder={t('register.fullNamePlaceholder')}
               />
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email address
+                {t('register.email')}
               </label>
               <input
                 id="email"
@@ -129,13 +131,13 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
-                placeholder="name@example.com"
+                placeholder={t('register.emailPlaceholder')}
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
+                {t('register.password')}
               </label>
               <input
                 id="password"
@@ -146,13 +148,13 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
-                placeholder="Create a secure password"
+                placeholder={t('register.passwordPlaceholder')}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                I want to
+                {t('register.roleLabel')}
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -164,7 +166,7 @@ export default function Register() {
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  Donate Items
+                  {t('register.donateItems')}
                 </button>
                 <button
                   type="button"
@@ -175,7 +177,7 @@ export default function Register() {
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  Receive Items
+                  {t('register.receiveItems')}
                 </button>
               </div>
             </div>
@@ -201,7 +203,7 @@ export default function Register() {
                   <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 </span>
               ) : null}
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? t('register.creatingAccount') : t('register.createAccount')}
             </button>
           </div>
         </form>

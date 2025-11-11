@@ -275,6 +275,20 @@
       "creating": "جارٍ الإنشاء...",
       "clickToUpload": "انقر للتحميل"
     },
+    "location": {
+      "useCurrent": "استخدام الموقع الحالي",
+      "getting": "جارٍ اكتشاف موقعك...",
+      "requesting": "جارٍ طلب الوصول إلى GPS...",
+      "detected": "تم اكتشاف الموقع!",
+      "tapToDetect": "اضغط لاكتشاف موقعك الحالي تلقائياً",
+      "coordinates": "إحداثيات GPS",
+      "geolocationNotSupported": "الموقع الجغرافي غير مدعوم من متصفحك",
+      "error": "خطأ في الحصول على موقعك",
+      "permissionDenied": "تم رفض إذن الموقع. يرجى تمكين الوصول إلى الموقع في إعدادات المتصفح.",
+      "positionUnavailable": "معلومات الموقع غير متاحة",
+      "timeout": "انتهت مهلة طلب الموقع. يرجى المحاولة مرة أخرى.",
+      "addressError": "تعذر الحصول على العنوان من الموقع. سيتم استخدام الإحداثيات بدلاً من ذلك."
+    },
     "errors": {
       "signInRequired": "يرجى تسجيل الدخول لإنشاء قائمة",
       "titleRequired": "العنوان مطلوب",
@@ -336,5 +350,82 @@
       "description": "المتبرع لم يعد يقبل الطلبات لهذا العنصر."
     },
     "anonymousUser": "مستخدم مجهول"
+  },
+  "login": {
+    "title": "مرحباً بعودتك",
+    "subtitle": "ليس لديك حساب؟",
+    "createAccount": "إنشاء حساب جديد",
+    "email": "عنوان البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "signIn": "تسجيل الدخول",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "forgotPasswordTitle": "إعادة تعيين كلمة المرور",
+    "forgotPasswordDescription": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "sendingResetLink": "جارٍ الإرسال...",
+    "resetLinkSent": "تم إرسال رابط إعادة التعيين!",
+    "resetLinkSentMessage": "تحقق من بريدك الإلكتروني للحصول على تعليمات إعادة تعيين كلمة المرور.",
+    "checkSpamFolder": "إذا لم تجد البريد الإلكتروني، تحقق من مجلد الرسائل غير المرغوب فيها.",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "errors": {
+      "captchaRequired": "يرجى إكمال التحقق (CAPTCHA) قبل تسجيل الدخول.",
+      "signInError": "حدث خطأ أثناء تسجيل الدخول",
+      "emailRequired": "يرجى إدخال عنوان بريدك الإلكتروني",
+      "resetError": "فشل إرسال رابط إعادة التعيين. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "register": {
+    "title": "إنشاء حسابك",
+    "subtitle": "لديك حساب بالفعل؟",
+    "signIn": "تسجيل الدخول",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "أدخل اسمك الكامل",
+    "email": "عنوان البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أنشئ كلمة مرور آمنة",
+    "roleLabel": "أريد أن",
+    "donateItems": "التبرع بالعناصر",
+    "receiveItems": "استلام العناصر",
+    "createAccount": "إنشاء حساب",
+    "creatingAccount": "جارٍ إنشاء الحساب...",
+    "errors": {
+      "captchaRequired": "يرجى إكمال التحقق (CAPTCHA) قبل إنشاء الحساب.",
+      "registrationError": "حدث خطأ أثناء التسجيل",
+      "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "resetPassword": {
+    "title": "إعادة تعيين كلمة المرور",
+    "description": "أدخل كلمة المرور الجديدة أدناه",
+    "newPassword": "كلمة المرور الجديدة",
+    "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+    "passwordHint": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "resetting": "جارٍ إعادة التعيين...",
+    "validating": "جارٍ التحقق من رابط إعادة التعيين...",
+    "success": "تم إعادة تعيين كلمة المرور بنجاح!",
+    "successMessage": "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.",
+    "redirecting": "جارٍ إعادة التوجيه إلى صفحة تسجيل الدخول...",
+    "invalidToken": "رابط إعادة التعيين غير صالح",
+    "invalidTokenMessage": "رابط إعادة تعيين كلمة المرور هذا غير صالح أو انتهت صلاحيته. يرجى طلب رابط إعادة تعيين جديد.",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "errors": {
+      "passwordRequired": "يرجى إدخال كلمة مرور جديدة",
+      "passwordTooShort": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+      "resetFailed": "فشل إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "الصفحة غير موجودة",
+    "message": "عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها.",
+    "goHome": "العودة إلى الصفحة الرئيسية"
   }
 }

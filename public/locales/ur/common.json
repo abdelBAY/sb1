@@ -275,6 +275,20 @@
       "creating": "بنایا جا رہا ہے...",
       "clickToUpload": "اپ لوڈ کرنے کے لیے کلک کریں"
     },
+    "location": {
+      "useCurrent": "موجودہ مقام استعمال کریں",
+      "getting": "آپ کا مقام دریافت ہو رہا ہے...",
+      "requesting": "GPS تک رسائی کی درخواست...",
+      "detected": "مقام دریافت ہو گیا!",
+      "tapToDetect": "اپنے موجودہ مقام کو خودکار طور پر دریافت کرنے کے لیے ٹیپ کریں",
+      "coordinates": "GPS نقاط",
+      "geolocationNotSupported": "آپ کے براؤزر میں جغرافیائی مقام کی حمایت نہیں کی جاتی",
+      "error": "آپ کا مقام حاصل کرنے میں خرابی",
+      "permissionDenied": "مقام کی اجازت مسترد کر دی گئی۔ براہ کرم اپنے براؤزر کی ترتیبات میں مقام تک رسائی کو فعال کریں۔",
+      "positionUnavailable": "مقام کی معلومات دستیاب نہیں ہیں",
+      "timeout": "مقام کی درخواست کی میعاد ختم ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔",
+      "addressError": "مقام سے پتہ حاصل نہیں کیا جا سکا۔ اس کے بجائے نقاط کا استعمال کیا جائے گا۔"
+    },
     "errors": {
       "signInRequired": "براہ کرم لسٹنگ بنانے کے لیے سائن ان کریں",
       "titleRequired": "عنوان ضروری ہے",
@@ -336,5 +350,82 @@
       "description": "عطیہ دہندہ اب اس شے کے لیے درخواستیں قبول نہیں کر رہا۔"
     },
     "anonymousUser": "نامعلوم صارف"
+  },
+  "login": {
+    "title": "خوش آمدید",
+    "subtitle": "آپ کا اکاؤنٹ نہیں ہے؟",
+    "createAccount": "نیا اکاؤنٹ بنائیں",
+    "email": "ای میل پتہ",
+    "emailPlaceholder": "name@example.com",
+    "password": "پاس ورڈ",
+    "passwordPlaceholder": "اپنا پاس ورڈ درج کریں",
+    "signIn": "سائن ان",
+    "signingIn": "سائن ان ہو رہا ہے...",
+    "forgotPassword": "پاس ورڈ بھول گئے؟",
+    "forgotPasswordTitle": "پاس ورڈ ری سیٹ کریں",
+    "forgotPasswordDescription": "اپنا ای میل پتہ درج کریں اور ہم آپ کو پاس ورڈ ری سیٹ کرنے کے لیے ایک لنک بھیجیں گے۔",
+    "sendResetLink": "ری سیٹ لنک بھیجیں",
+    "sendingResetLink": "بھیجا جا رہا ہے...",
+    "resetLinkSent": "پاس ورڈ ری سیٹ لنک بھیج دیا گیا!",
+    "resetLinkSentMessage": "اپنا پاس ورڈ ری سیٹ کرنے کی ہدایات کے لیے اپنا ای میل چیک کریں۔",
+    "checkSpamFolder": "اگر آپ کو ای میل نظر نہیں آتا، تو اپنے اسپام/جنگ فولڈر کو چیک کریں۔",
+    "backToLogin": "لاگ ان پر واپس جائیں",
+    "errors": {
+      "captchaRequired": "سائن ان کرنے سے پہلے براہ کرم CAPTCHA مکمل کریں۔",
+      "signInError": "سائن ان کے دوران ایک خرابی پیش آئی",
+      "emailRequired": "براہ کرم اپنا ای میل پتہ درج کریں",
+      "resetError": "ری سیٹ لنک بھیجنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔"
+    }
+  },
+  "register": {
+    "title": "اپنا اکاؤنٹ بنائیں",
+    "subtitle": "پہلے سے اکاؤنٹ ہے؟",
+    "signIn": "سائن ان",
+    "fullName": "پورا نام",
+    "fullNamePlaceholder": "اپنا پورا نام درج کریں",
+    "email": "ای میل پتہ",
+    "emailPlaceholder": "name@example.com",
+    "password": "پاس ورڈ",
+    "passwordPlaceholder": "ایک محفوظ پاس ورڈ بنائیں",
+    "roleLabel": "میں چاہتا ہوں",
+    "donateItems": "اشیاء عطیہ کریں",
+    "receiveItems": "اشیاء وصول کریں",
+    "createAccount": "اکاؤنٹ بنائیں",
+    "creatingAccount": "اکاؤنٹ بنایا جا رہا ہے...",
+    "errors": {
+      "captchaRequired": "اکاؤنٹ بنانے سے پہلے براہ کرم CAPTCHA مکمل کریں۔",
+      "registrationError": "رجسٹریشن کے دوران ایک خرابی پیش آئی",
+      "registrationFailed": "رجسٹریشن ناکام ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔"
+    }
+  },
+  "resetPassword": {
+    "title": "پاس ورڈ ری سیٹ کریں",
+    "description": "نیچے اپنا نیا پاس ورڈ درج کریں",
+    "newPassword": "نیا پاس ورڈ",
+    "newPasswordPlaceholder": "اپنا نیا پاس ورڈ درج کریں",
+    "confirmPassword": "پاس ورڈ کی تصدیق کریں",
+    "confirmPasswordPlaceholder": "اپنے نئے پاس ورڈ کی تصدیق کریں",
+    "passwordHint": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
+    "resetPassword": "پاس ورڈ ری سیٹ کریں",
+    "resetting": "ری سیٹ ہو رہا ہے...",
+    "validating": "ری سیٹ لنک کی تصدیق ہو رہی ہے...",
+    "success": "پاس ورڈ کامیابی سے ری سیٹ ہو گیا!",
+    "successMessage": "آپ کا پاس ورڈ کامیابی سے ری سیٹ ہو گیا ہے۔ اب آپ اپنے نئے پاس ورڈ کے ساتھ لاگ ان کر سکتے ہیں۔",
+    "redirecting": "لاگ ان صفحہ پر ری ڈائریکٹ ہو رہا ہے...",
+    "invalidToken": "غلط ری سیٹ لنک",
+    "invalidTokenMessage": "یہ پاس ورڈ ری سیٹ لنک غلط ہے یا اس کی میعاد ختم ہو گئی ہے۔ براہ کرم نیا پاس ورڈ ری سیٹ لنک طلب کریں۔",
+    "backToLogin": "لاگ ان پر واپس جائیں",
+    "errors": {
+      "passwordRequired": "براہ کرم نیا پاس ورڈ درج کریں",
+      "passwordTooShort": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
+      "passwordsDoNotMatch": "پاس ورڈز مماثل نہیں ہیں",
+      "resetFailed": "پاس ورڈ ری سیٹ کرنے میں ناکام۔ براہ کرم دوبارہ کوشش کریں۔"
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "صفحہ نہیں ملا",
+    "message": "معذرت، ہم آپ کی تلاش کردہ صفحہ نہیں ڈھونڈ سکے۔",
+    "goHome": "ہوم پر واپس جائیں"
   }
 }

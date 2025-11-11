@@ -275,6 +275,20 @@
       "creating": "Création...",
       "clickToUpload": "Cliquez pour télécharger"
     },
+    "location": {
+      "useCurrent": "Utiliser l'emplacement actuel",
+      "getting": "Détection de votre emplacement...",
+      "requesting": "Demande d'accès GPS...",
+      "detected": "Emplacement détecté !",
+      "tapToDetect": "Appuyez pour détecter automatiquement votre emplacement actuel",
+      "coordinates": "Coordonnées GPS",
+      "geolocationNotSupported": "La géolocalisation n'est pas prise en charge par votre navigateur",
+      "error": "Erreur lors de l'obtention de votre emplacement",
+      "permissionDenied": "Permission de localisation refusée. Veuillez activer l'accès à la localisation dans les paramètres de votre navigateur.",
+      "positionUnavailable": "Les informations de localisation ne sont pas disponibles",
+      "timeout": "La demande de localisation a expiré. Veuillez réessayer.",
+      "addressError": "Impossible d'obtenir l'adresse à partir de la localisation. Les coordonnées seront utilisées à la place."
+    },
     "errors": {
       "signInRequired": "Veuillez vous connecter pour créer une annonce",
       "titleRequired": "Le titre est requis",
@@ -336,5 +350,82 @@
       "description": "Le donneur n'accepte plus de demandes pour cet article."
     },
     "anonymousUser": "Utilisateur anonyme"
+  },
+  "login": {
+    "title": "Bon retour",
+    "subtitle": "Vous n'avez pas de compte ?",
+    "createAccount": "Créer un nouveau compte",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "nom@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion...",
+    "forgotPassword": "Mot de passe oublié ?",
+    "forgotPasswordTitle": "Réinitialiser le mot de passe",
+    "forgotPasswordDescription": "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "sendingResetLink": "Envoi...",
+    "resetLinkSent": "Lien de réinitialisation envoyé !",
+    "resetLinkSentMessage": "Vérifiez votre e-mail pour les instructions de réinitialisation de votre mot de passe.",
+    "checkSpamFolder": "Si vous ne voyez pas l'e-mail, vérifiez votre dossier spam/courrier indésirable.",
+    "backToLogin": "Retour à la connexion",
+    "errors": {
+      "captchaRequired": "Veuillez compléter le CAPTCHA avant de vous connecter.",
+      "signInError": "Une erreur s'est produite lors de la connexion",
+      "emailRequired": "Veuillez entrer votre adresse e-mail",
+      "resetError": "Échec de l'envoi du lien de réinitialisation. Veuillez réessayer."
+    }
+  },
+  "register": {
+    "title": "Créez votre compte",
+    "subtitle": "Vous avez déjà un compte ?",
+    "signIn": "Se connecter",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Entrez votre nom complet",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "nom@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Créez un mot de passe sécurisé",
+    "roleLabel": "Je veux",
+    "donateItems": "Donner des articles",
+    "receiveItems": "Recevoir des articles",
+    "createAccount": "Créer un compte",
+    "creatingAccount": "Création du compte...",
+    "errors": {
+      "captchaRequired": "Veuillez compléter le CAPTCHA avant de créer un compte.",
+      "registrationError": "Une erreur s'est produite lors de l'inscription",
+      "registrationFailed": "L'inscription a échoué. Veuillez réessayer."
+    }
+  },
+  "resetPassword": {
+    "title": "Réinitialiser le mot de passe",
+    "description": "Entrez votre nouveau mot de passe ci-dessous",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Entrez votre nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
+    "passwordHint": "Le mot de passe doit contenir au moins 6 caractères",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "resetting": "Réinitialisation...",
+    "validating": "Validation du lien de réinitialisation...",
+    "success": "Mot de passe réinitialisé avec succès !",
+    "successMessage": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+    "redirecting": "Redirection vers la page de connexion...",
+    "invalidToken": "Lien de réinitialisation invalide",
+    "invalidTokenMessage": "Ce lien de réinitialisation de mot de passe est invalide ou a expiré. Veuillez demander un nouveau lien de réinitialisation.",
+    "backToLogin": "Retour à la connexion",
+    "errors": {
+      "passwordRequired": "Veuillez entrer un nouveau mot de passe",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "resetFailed": "Échec de la réinitialisation du mot de passe. Veuillez réessayer."
+    }
+  },
+  "notFound": {
+    "title": "404",
+    "heading": "Page non trouvée",
+    "message": "Désolé, nous n'avons pas pu trouver la page que vous recherchez.",
+    "goHome": "Retour à l'accueil"
   }
 }
