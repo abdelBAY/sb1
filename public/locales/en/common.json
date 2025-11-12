@@ -51,6 +51,23 @@
         "title": "Explore More Resources",
         "description": "Discover more ways to give and receive in your community."
       }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "steps": {
+        "list": {
+          "title": "List",
+          "description": "Items are listed on the Givea marketplace. Alert emails are sent to all members who have registered and signed up to receive alerts."
+        },
+        "chat": {
+          "title": "Chat",
+          "description": "Items are usually requested within 12-24 hours. The listing member chooses who the items go to. The members chat and agree on a collection date and time."
+        },
+        "collect": {
+          "title": "Collect",
+          "description": "Items are collected by requesting members. Members fill out a feedback form. The information is used to create case studies and collect ESG data."
+        }
+      }
     }
   },
   "messages": {

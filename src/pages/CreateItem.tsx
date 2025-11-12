@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Upload, 
@@ -7,7 +7,8 @@ import {
   X,
   Image as ImageIcon,
   Info,
-  Navigation
+  Navigation,
+  Search
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
@@ -73,6 +74,12 @@ export default function CreateItem() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationDetected, setLocationDetected] = useState(false);
   const [locationCoordinates, setLocationCoordinates] = useState<{ lat: number; lon: number } | null>(null);
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchingLocation, setSearchingLocation] = useState(false);
+  const locationInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [formData, setFormData] = useState<CreateItemForm>({
     title: '',
@@ -172,110 +179,223 @@ export default function CreateItem() {
     setGettingLocation(true);
     setLocationError(null);
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          
-          // Reverse geocode to get address
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
-            {
-              headers: {
-                'User-Agent': 'Givea-Donation-App/1.0',
-                'Accept': 'application/json',
+    // First try with high accuracy, but allow cached positions
+    const tryGetLocation = (options: PositionOptions, attempt: number = 1) => {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            
+            // Store coordinates immediately
+            setLocationCoordinates({ lat: latitude, lon: longitude });
+            
+            // Try to reverse geocode to get address
+            try {
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+                {
+                  headers: {
+                    'User-Agent': 'Givea-Donation-App/1.0',
+                    'Accept': 'application/json',
+                  }
+                }
+              );
+
+              if (response.ok) {
+                const data = await response.json();
+                
+                if (data && data.address) {
+                  // Build address string from components
+                  const addressParts = [];
+                  if (data.address.road) addressParts.push(data.address.road);
+                  if (data.address.house_number) addressParts.push(data.address.house_number);
+                  if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
+                  if (data.address.city || data.address.town || data.address.village) {
+                    addressParts.push(data.address.city || data.address.town || data.address.village);
+                  }
+                  if (data.address.state) addressParts.push(data.address.state);
+                  if (data.address.country) addressParts.push(data.address.country);
+
+                  const address = addressParts.length > 0 
+                    ? addressParts.join(', ')
+                    : data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+                  setFormData(prev => ({
+                    ...prev,
+                    location: address
+                  }));
+                } else {
+                  // Use display_name or coordinates
+                  setFormData(prev => ({
+                    ...prev,
+                    location: data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+                  }));
+                }
+              } else {
+                // Fallback to coordinates if reverse geocoding fails
+                setFormData(prev => ({
+                  ...prev,
+                  location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+                }));
               }
+            } catch (geocodeError) {
+              // If reverse geocoding fails, still use coordinates
+              setFormData(prev => ({
+                ...prev,
+                location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+              }));
             }
-          );
-
-          if (!response.ok) {
-            throw new Error('Failed to get address');
-          }
-
-          const data = await response.json();
-          
-          // Store coordinates
-          setLocationCoordinates({ lat: latitude, lon: longitude });
-          
-          if (data && data.address) {
-            // Build address string from components
-            const addressParts = [];
-            if (data.address.road) addressParts.push(data.address.road);
-            if (data.address.house_number) addressParts.push(data.address.house_number);
-            if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
-            if (data.address.city || data.address.town || data.address.village) {
-              addressParts.push(data.address.city || data.address.town || data.address.village);
-            }
-            if (data.address.state) addressParts.push(data.address.state);
-            if (data.address.country) addressParts.push(data.address.country);
-
-            const address = addressParts.length > 0 
-              ? addressParts.join(', ')
-              : data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-
-            setFormData(prev => ({
-              ...prev,
-              location: address
-            }));
             
             // Show success visual feedback
             setLocationDetected(true);
             setTimeout(() => setLocationDetected(false), 3000);
-          } else {
-            // Fallback to coordinates if address not available
-            setFormData(prev => ({
-              ...prev,
-              location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
-            }));
-            
-            // Show success visual feedback
-            setLocationDetected(true);
-            setTimeout(() => setLocationDetected(false), 3000);
+            setGettingLocation(false);
+          } catch (error) {
+            setLocationError(t('createItem.location.error'));
+            setGettingLocation(false);
           }
-        } catch (error) {
-          // Only log if it's not a network/CORS error (which is expected in some cases)
-          if (error instanceof Error && !error.message.includes('Failed to fetch') && !error.message.includes('CORS')) {
-            console.warn('Error reverse geocoding:', error.message);
+        },
+        (error) => {
+          // If high accuracy fails and this is the first attempt, try with less strict options
+          if (attempt === 1 && options.enableHighAccuracy) {
+            // Retry with less strict options
+            tryGetLocation({
+              enableHighAccuracy: false,
+              timeout: 15000,
+              maximumAge: 60000 // Allow cached position up to 1 minute old
+            }, 2);
+            return;
           }
-          setLocationError(t('createItem.location.addressError'));
-        } finally {
+          
+          let errorMessage = t('createItem.location.error');
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = t('createItem.location.permissionDenied');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = t('createItem.location.positionUnavailable');
+              break;
+            case error.TIMEOUT:
+              errorMessage = t('createItem.location.timeout');
+              break;
+            default:
+              if (error.code !== undefined) {
+                console.error('Geolocation error:', error.message || error.code);
+              }
+              break;
+          }
+          
+          setLocationError(errorMessage);
           setGettingLocation(false);
-        }
-      },
-      (error) => {
-        let errorMessage = t('createItem.location.error');
-        
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = t('createItem.location.permissionDenied');
-            // Don't log permission denied as it's a user choice
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = t('createItem.location.positionUnavailable');
-            // Don't log position unavailable as it's a common scenario (GPS disabled, etc.)
-            break;
-          case error.TIMEOUT:
-            errorMessage = t('createItem.location.timeout');
-            // Don't log timeout as it's a common scenario
-            break;
-          default:
-            // Only log truly unexpected errors
-            if (error.code !== undefined) {
-              console.error('Unexpected geolocation error:', error.message || error.code);
-            }
-            break;
-        }
-        
-        setLocationError(errorMessage);
-        setGettingLocation(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
-    );
+        },
+        options
+      );
+    };
+
+    // Start with high accuracy, but will fallback if needed
+    tryGetLocation({
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 30000 // Allow cached position up to 30 seconds old
+    });
   };
+
+  const searchLocation = async (query: string) => {
+    if (!query || query.trim().length < 2) {
+      setLocationSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Debounce the search
+    searchTimeoutRef.current = setTimeout(async () => {
+      setSearchingLocation(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&addressdetails=1`,
+          {
+            headers: {
+              'User-Agent': 'Givea-Donation-App/1.0',
+              'Accept': 'application/json',
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to search locations');
+        }
+
+        const data = await response.json();
+        setLocationSuggestions(data || []);
+        setShowSuggestions(true);
+      } catch (error) {
+        // Silently fail - user can still type manually
+        setLocationSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setSearchingLocation(false);
+      }
+    }, 300);
+  };
+
+  const handleLocationInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData({ ...formData, location: value });
+    setLocationError(null);
+    setLocationDetected(false);
+    searchLocation(value);
+  };
+
+  const selectLocation = (suggestion: { display_name: string; lat: string; lon: string }) => {
+    setFormData({ ...formData, location: suggestion.display_name });
+    setLocationCoordinates({ lat: parseFloat(suggestion.lat), lon: parseFloat(suggestion.lon) });
+    setLocationSuggestions([]);
+    setShowSuggestions(false);
+    setLocationDetected(true);
+    setTimeout(() => setLocationDetected(false), 3000);
+    if (locationInputRef.current) {
+      locationInputRef.current.blur();
+    }
+  };
+
+  const clearLocation = () => {
+    setFormData({ ...formData, location: '' });
+    setLocationSuggestions([]);
+    setShowSuggestions(false);
+    setLocationCoordinates(null);
+    setLocationDetected(false);
+    if (locationInputRef.current) {
+      locationInputRef.current.focus();
+    }
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node) &&
+        locationInputRef.current &&
+        !locationInputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     if (!user) {
@@ -622,29 +742,72 @@ export default function CreateItem() {
                     </div>
                   </button>
                   
-                  {/* Location Input Field */}
+                  {/* Location Input Field with Autocomplete */}
                   <div className="mt-4 relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                      </div>
+                      <input
+                        ref={locationInputRef}
+                        type="text"
+                        value={formData.location}
+                        onChange={handleLocationInputChange}
+                        onFocus={() => {
+                          if (locationSuggestions.length > 0) {
+                            setShowSuggestions(true);
+                          }
+                        }}
+                        className={`w-full pl-12 pr-10 py-3 rounded-xl border-2 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg ${
+                          locationDetected
+                            ? 'border-green-300 dark:border-green-600 bg-green-50/50 dark:bg-green-900/10'
+                            : showSuggestions
+                            ? 'border-blue-500 dark:border-blue-400 bg-white dark:bg-gray-700/50'
+                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20'
+                        } text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none`}
+                        placeholder={t('createItem.fields.locationPlaceholder')}
+                        required
+                      />
+                      {formData.location && (
+                        <button
+                          type="button"
+                          onClick={clearLocation}
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded-r-xl transition-colors"
+                        >
+                          <X className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+                        </button>
+                      )}
+                      {searchingLocation && (
+                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
                     </div>
-                    <input
-                      type="text"
-                      value={formData.location}
-                      onChange={(e) => {
-                        setFormData({ ...formData, location: e.target.value });
-                        setLocationError(null);
-                        setLocationDetected(false);
-                      }}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-lg ${
-                        locationDetected
-                          ? 'border-green-300 dark:border-green-600 bg-green-50/50 dark:bg-green-900/10'
-                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700/50 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20'
-                      } text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none`}
-                      placeholder={t('createItem.fields.locationPlaceholder')}
-                      required
-                    />
-                    {locationDetected && (
-                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                    
+                    {/* Suggestions Dropdown */}
+                    {showSuggestions && locationSuggestions.length > 0 && (
+                      <div
+                        ref={suggestionsRef}
+                        className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-80 overflow-y-auto"
+                      >
+                        {locationSuggestions.map((suggestion, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => selectLocation(suggestion)}
+                            className="w-full px-4 py-3 flex items-start space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                          >
+                            <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5" />
+                            <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                              {suggestion.display_name}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {locationDetected && !showSuggestions && (
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                         <div className="w-6 h-6 rounded-full bg-green-500 dark:bg-green-400 flex items-center justify-center">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />

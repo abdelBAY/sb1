@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import HeroSection from "./components/HeroSection.tsx";
 import ResourcesSection from "./components/ResourcesSection.tsx";
+import HowItWorksSection from "./components/HowItWorksSection.tsx";
 import Footer from "./components/Footer.tsx"; // 👈 Import Footer
 import ctaImage from "./assets/givea-image3 (1).png";
 
@@ -39,6 +40,9 @@ function App() {
 
       {/* ✅ Resources Section */}
       <ResourcesSection />
+
+      {/* ✅ How It Works Section */}
+      <HowItWorksSection />
 
       {/* Features Section */}
       <div className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">

@@ -51,6 +51,23 @@
         "title": "Explorer plus de ressources",
         "description": "Découvrez plus de façons de donner et de recevoir dans votre communauté."
       }
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "steps": {
+        "list": {
+          "title": "Lister",
+          "description": "Les articles sont listés sur le marché Givea. Des e-mails d'alerte sont envoyés à tous les membres qui se sont inscrits et ont choisi de recevoir des alertes."
+        },
+        "chat": {
+          "title": "Discuter",
+          "description": "Les articles sont généralement demandés dans les 12-24 heures. Le membre qui a créé l'annonce choisit à qui vont les articles. Les membres discutent et conviennent d'une date et d'une heure de collecte."
+        },
+        "collect": {
+          "title": "Collecter",
+          "description": "Les articles sont collectés par les membres demandeurs. Les membres remplissent un formulaire de retour. Les informations sont utilisées pour créer des études de cas et collecter des données ESG."
+        }
+      }
     }
   },
   "messages": {
