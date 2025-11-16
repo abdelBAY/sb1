@@ -22,6 +22,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ImageOverlay from '../components/ImageOverlay';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface SearchResult {
   id: string;
@@ -392,13 +393,15 @@ export default function Search() {
                     aria-label={`View details for ${item.title}`}
                   >
                     {item.photos && item.photos[0] ? (
-                      <img
+                      <OptimizedImage
                         src={item.photos[0]}
                         alt={item.title}
-                        loading="lazy"
-                        className={`w-full h-full object-cover transition-transform duration-200 group-hover:scale-105 ${
+                        className={`w-full h-full transition-transform duration-200 group-hover:scale-105 ${
                           item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                         }`}
+                        priority={false}
+                        placeholder="blur"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors">

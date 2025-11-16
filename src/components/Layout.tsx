@@ -8,7 +8,8 @@ import {
   X,
   LayoutDashboard,
   User,
-  Bell
+  Bell,
+  Home
 } from 'lucide-react';
 import { useStore } from '../lib/store';
 import { Link } from 'react-router-dom';
@@ -18,6 +19,7 @@ import LanguageSelector from './LanguageSelector';
 import LogoutModal from './LogoutModal';
 import { useTranslation } from 'react-i18next';
 import SeedBalance from './seeds/SeedBalance';
+import OptimizedImage from './OptimizedImage';
 
 declare global {
   interface Window {
@@ -273,10 +275,17 @@ export default function Layout() {
       <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-blue-100 dark:border-gray-700 relative z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
+              <Link to="/search" className="flex items-center space-x-2">
                 <Logo size="md" />
                 <span className="text-xl font-bold text-orange-600 dark:text-orange">Givea</span>
+              </Link>
+              <Link
+                to="/"
+                className="flex items-center space-x-1.5 px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200 font-medium"
+              >
+                <Home className="w-4 h-4" />
+                <span>Home</span>
               </Link>
             </div>
 
@@ -344,18 +353,24 @@ export default function Layout() {
                     >
                       <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-600 ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]">
                         {profile?.avatar_url ? (
-                          <img
+                          <OptimizedImage
                             src={profile.avatar_url}
                             alt="Profile"
-                            loading="lazy"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full"
+                            width={36}
+                            height={36}
+                            priority={true}
+                            placeholder="blur"
                           />
                         ) : user.user_metadata?.avatar_url ? (
-                          <img
+                          <OptimizedImage
                             src={user.user_metadata.avatar_url}
                             alt="Profile"
-                            loading="lazy"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full"
+                            width={36}
+                            height={36}
+                            priority={true}
+                            placeholder="blur"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -495,18 +510,24 @@ export default function Layout() {
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]">
                       {profile?.avatar_url ? (
-                        <img
+                        <OptimizedImage
                           src={profile.avatar_url}
                           alt="Profile"
-                          loading="lazy"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full"
+                          width={40}
+                          height={40}
+                          priority={false}
+                          placeholder="blur"
                         />
                       ) : user.user_metadata?.avatar_url ? (
-                        <img
+                        <OptimizedImage
                           src={user.user_metadata.avatar_url}
                           alt="Profile"
-                          loading="lazy"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full"
+                          width={40}
+                          height={40}
+                          priority={false}
+                          placeholder="blur"
                         />
                       ) : (
                         <User className="w-6 h-6 text-gray-400 dark:text-gray-500" />

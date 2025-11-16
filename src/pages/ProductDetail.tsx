@@ -22,6 +22,7 @@ import RequestModal from '../components/RequestModal';
 import RequestStatus from '../components/RequestStatus';
 import LocationMap from '../components/LocationMap';
 import { useTranslation } from 'react-i18next';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface ProductDetails {
   id: string;
@@ -472,14 +473,15 @@ export default function ProductDetail() {
                 }`}
               >
                 {product.photos && product.photos[selectedImage] ? (
-                  <img
+                  <OptimizedImage
                     src={product.photos[selectedImage]}
                     alt={`${product.title} - Image ${selectedImage + 1}`}
-                    loading="lazy"
-                    className={`w-full h-full object-cover transition-transform duration-200 ${
+                    className={`w-full h-full transition-transform duration-200 ${
                       isZoomed ? 'scale-150' : ''
                     } ${product.status === 'GIVEN_AWAY' ? 'blur-md' : ''}`}
-                    onClick={() => setIsZoomed(!isZoomed)}
+                    priority={selectedImage === 0}
+                    placeholder="blur"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -507,13 +509,15 @@ export default function ProductDetail() {
                           : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
-                      <img
+                      <OptimizedImage
                         src={photo}
                         alt={`${product.title} - Thumbnail ${index + 1}`}
-                        loading="lazy"
-                        className={`w-full h-full object-cover ${
+                        className={`w-full h-full ${
                           product.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                         }`}
+                        priority={false}
+                        placeholder="blur"
+                        sizes="(max-width: 768px) 25vw, 12.5vw"
                       />
                     </button>
                   ))}
@@ -620,11 +624,14 @@ export default function ProductDetail() {
                 </h3>
                 <div className="flex items-center space-x-4">
                   {product.user.avatar_url ? (
-                    <img
+                    <OptimizedImage
                       src={product.user.avatar_url}
                       alt={product.user.full_name || t('productDetail.anonymousUser')}
-                      loading="lazy"
-                      className="w-12 h-12 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                      className="w-12 h-12 rounded-full ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                      width={48}
+                      height={48}
+                      priority={false}
+                      placeholder="blur"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -774,13 +781,15 @@ export default function ProductDetail() {
                   >
                     <div className="aspect-square rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700">
                       {item.photos && item.photos[0] ? (
-                        <img
+                        <OptimizedImage
                           src={item.photos[0]}
                           alt={item.title}
-                          loading="lazy"
-                          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 ${
+                          className={`w-full h-full group-hover:scale-105 transition-transform duration-200 ${
                             item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                           }`}
+                          priority={false}
+                          placeholder="blur"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

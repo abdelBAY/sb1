@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface DonorProfile {
   id: string;
@@ -180,10 +181,14 @@ export default function DonorProfile() {
             {/* Avatar */}
             <div className="flex-shrink-0">
               {donorProfile.avatar_url ? (
-                <img
+                <OptimizedImage
                   src={donorProfile.avatar_url}
                   alt={donorProfile.full_name || 'Donor'}
-                  className="w-24 h-24 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                  className="w-24 h-24 rounded-full ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                  width={96}
+                  height={96}
+                  priority={false}
+                  placeholder="blur"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]">

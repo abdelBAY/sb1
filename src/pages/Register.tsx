@@ -13,6 +13,7 @@ export default function Register() {
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<'DONOR' | 'BENEFICIARY'>('DONOR');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -26,6 +27,10 @@ export default function Register() {
     try {
       if (!captchaToken) {
         throw new Error(t('register.errors.captchaRequired'));
+      }
+
+      if (!acceptedTerms) {
+        throw new Error(t('register.errors.termsRequired'));
       }
 
       // 1️⃣ تسجيل المستخدم
@@ -190,6 +195,35 @@ export default function Register() {
               onVerify={(token) => setCaptchaToken(token)}
               theme="light"
             />
+          </div>
+
+          {/* Terms & Conditions Checkbox */}
+          <div className="flex items-start">
+            <div className="flex items-center h-5">
+              <input
+                id="acceptTerms"
+                name="acceptTerms"
+                type="checkbox"
+                required
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+              />
+            </div>
+            <div className="ml-3 text-sm">
+              <label htmlFor="acceptTerms" className="text-gray-700 dark:text-gray-300 cursor-pointer">
+                {t('register.acceptTerms')}{' '}
+                <Link
+                  to="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {t('register.termsAndConditions')}
+                </Link>
+              </label>
+            </div>
           </div>
 
           <div>

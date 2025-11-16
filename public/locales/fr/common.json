@@ -421,8 +421,11 @@
     "receiveItems": "Recevoir des articles",
     "createAccount": "Créer un compte",
     "creatingAccount": "Création du compte...",
+    "acceptTerms": "J'accepte les",
+    "termsAndConditions": "Conditions générales",
     "errors": {
       "captchaRequired": "Veuillez compléter le CAPTCHA avant de créer un compte.",
+      "termsRequired": "Vous devez accepter les conditions générales pour créer un compte.",
       "registrationError": "Une erreur s'est produite lors de l'inscription",
       "registrationFailed": "L'inscription a échoué. Veuillez réessayer."
     }

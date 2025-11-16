@@ -23,6 +23,7 @@ import { useStore } from '../lib/store';
 import ConfirmationModal from '../components/ConfirmationModal';
 import FeedbackModal from '../components/FeedbackModal';
 import SeedBalance from '../components/seeds/SeedBalance';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface Message {
   id: string;
@@ -888,20 +889,26 @@ export default function Messages() {
                     >
                       {/* Show item thumbnail if available, otherwise show user avatar */}
                       {chat.announcement?.photos?.[0] ? (
-                        <img
+                        <OptimizedImage
                           src={chat.announcement.photos[0]}
                           alt={chat.announcement.title}
-                          loading="lazy"
-                          className={`w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 ${
+                          className={`w-16 h-16 rounded-full border-2 border-gray-200 dark:border-gray-600 ${
                             chat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                           }`}
+                          width={64}
+                          height={64}
+                          priority={false}
+                          placeholder="blur"
                         />
                       ) : chat.user.avatar_url ? (
-                        <img
+                        <OptimizedImage
                           src={chat.user.avatar_url}
                           alt={chat.user.full_name}
-                          loading="lazy"
-                          className="w-16 h-16 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                          className="w-16 h-16 rounded-full ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                          width={64}
+                          height={64}
+                          priority={false}
+                          placeholder="blur"
                         />
                       ) : (
                         <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -955,11 +962,14 @@ export default function Messages() {
                   <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       {selectedChat.user.avatar_url ? (
-                        <img
+                        <OptimizedImage
                           src={selectedChat.user.avatar_url}
                           alt={selectedChat.user.full_name}
-                          loading="lazy"
-                          className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                          className="w-10 h-10 rounded-full ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                          width={40}
+                          height={40}
+                          priority={false}
+                          placeholder="blur"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -1168,13 +1178,15 @@ export default function Messages() {
                   {/* Product Image */}
                   {selectedChat.announcement.photos?.[0] && (
                     <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md">
-                      <img
+                      <OptimizedImage
                         src={selectedChat.announcement.photos[0]}
                         alt={selectedChat.announcement.title}
-                        loading="lazy"
-                        className={`w-full h-full object-cover ${
+                        className={`w-full h-full ${
                           selectedChat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                         }`}
+                        priority={false}
+                        placeholder="blur"
+                        sizes="(max-width: 768px) 100vw, 33vw"
                       />
                     </div>
                   )}

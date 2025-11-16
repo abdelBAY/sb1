@@ -421,8 +421,11 @@
     "receiveItems": "Receive Items",
     "createAccount": "Create account",
     "creatingAccount": "Creating account...",
+    "acceptTerms": "I agree to the",
+    "termsAndConditions": "Terms & Conditions",
     "errors": {
       "captchaRequired": "Please complete the CAPTCHA before creating an account.",
+      "termsRequired": "You must accept the Terms & Conditions to create an account.",
       "registrationError": "An error occurred during registration",
       "registrationFailed": "Registration failed. Please try again."
     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, MapPin, Calendar, Tag, Star, Package } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
 
 interface ImageOverlayProps {
   item: {
@@ -69,13 +70,15 @@ export default function ImageOverlay({ item, onClose }: ImageOverlayProps) {
           {/* Image Section */}
           <div className="w-full md:w-2/3 bg-gray-900">
             {item.photos && item.photos[0] ? (
-              <img
+              <OptimizedImage
                 src={item.photos[0]}
                 alt={item.title}
-                loading="lazy"
-                className={`w-full h-full object-contain ${
+                className={`w-full h-full ${
                   item.status === 'GIVEN_AWAY' ? 'blur-md' : ''
                 }`}
+                priority={true}
+                placeholder="blur"
+                sizes="(max-width: 768px) 100vw, 66vw"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">

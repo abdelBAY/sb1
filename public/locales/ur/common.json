@@ -421,8 +421,11 @@
     "receiveItems": "اشیاء وصول کریں",
     "createAccount": "اکاؤنٹ بنائیں",
     "creatingAccount": "اکاؤنٹ بنایا جا رہا ہے...",
+    "acceptTerms": "میں اس سے متفق ہوں",
+    "termsAndConditions": "شرائط و ضوابط",
     "errors": {
       "captchaRequired": "اکاؤنٹ بنانے سے پہلے براہ کرم CAPTCHA مکمل کریں۔",
+      "termsRequired": "اکاؤنٹ بنانے کے لیے آپ کو شرائط و ضوابط سے اتفاق کرنا ہوگا۔",
       "registrationError": "رجسٹریشن کے دوران ایک خرابی پیش آئی",
       "registrationFailed": "رجسٹریشن ناکام ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔"
     }

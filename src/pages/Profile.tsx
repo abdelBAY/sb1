@@ -12,6 +12,7 @@ import {
   Camera
 } from 'lucide-react';
 import SeedBalance from '../components/seeds/SeedBalance';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface Profile {
   username: string;
@@ -368,18 +369,24 @@ export default function Profile() {
                     onClick={handleImageClick}
                   >
                     {profile?.avatar_url ? (
-                      <img 
+                      <OptimizedImage 
                         src={profile.avatar_url} 
                         alt={t('profile.profilePicture')} 
-                        loading="lazy"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
+                        width={96}
+                        height={96}
+                        priority={true}
+                        placeholder="blur"
                       />
                     ) : getGmailImageUrl(user!) ? (
-                      <img 
+                      <OptimizedImage 
                         src={getGmailImageUrl(user!)!} 
                         alt={t('profile.profilePicture')} 
-                        loading="lazy"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full"
+                        width={96}
+                        height={96}
+                        priority={true}
+                        placeholder="blur"
                       />
                     ) : (
                       <UserIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />

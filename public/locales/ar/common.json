@@ -429,8 +429,11 @@
     "receiveItems": "استلام العناصر",
     "createAccount": "إنشاء حساب",
     "creatingAccount": "جارٍ إنشاء الحساب...",
+    "acceptTerms": "أوافق على",
+    "termsAndConditions": "الشروط والأحكام",
     "errors": {
       "captchaRequired": "يرجى إكمال التحقق (CAPTCHA) قبل إنشاء الحساب.",
+      "termsRequired": "يجب عليك الموافقة على الشروط والأحكام لإنشاء حساب.",
       "registrationError": "حدث خطأ أثناء التسجيل",
       "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى."
     }
