@@ -3,7 +3,6 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LogOut, 
   ChevronRight, 
-  Settings, 
   HelpCircle, 
   Menu,
   X,
@@ -18,6 +17,7 @@ import Logo from './Logo';
 import LanguageSelector from './LanguageSelector';
 import LogoutModal from './LogoutModal';
 import { useTranslation } from 'react-i18next';
+import SeedBalance from './seeds/SeedBalance';
 
 declare global {
   interface Window {
@@ -30,8 +30,6 @@ const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-10ZN0CT4K
 export default function Layout() {
   const [isLanguageOpen, setIsLanguageOpen] = React.useState(false);
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
-  const [showSettings, setShowSettings] = React.useState(false);
-  const [showResources, setShowResources] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
   const user = useStore((state) => state.user);
@@ -51,8 +49,6 @@ export default function Layout() {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
-        setShowSettings(false);
-        setShowResources(false);
       }
     };
 
@@ -166,6 +162,34 @@ export default function Layout() {
     fetchProfile();
   }, [user]);
 
+  React.useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    const channel = supabase
+      .channel(`profile-seeds-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.new) {
+            setProfile(payload.new as any);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, setProfile]);
+
   // Fetch unread messages count when user changes
   React.useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -239,11 +263,6 @@ export default function Layout() {
     return 'account';
   };
 
-
-  const getInitials = (email: string) => {
-    return email.split('@')[0].slice(0, 2).toUpperCase();
-  };
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
     if (isProfileOpen) setIsProfileOpen(false);
@@ -284,6 +303,13 @@ export default function Layout() {
               />
               {user ? (
                 <>
+                  <SeedBalance
+                    balance={profile?.seed_balance}
+                    size="sm"
+                    variant="nav"
+                    showLabel={false}
+                    className="hidden lg:flex"
+                  />
                   {/* Donate Now Button */}
                   <Link
                     to="/create-item"
@@ -345,7 +371,7 @@ export default function Layout() {
                   
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-out scale-100 opacity-100 z-50">
-                      <div className="p-2">
+                      <div className="p-2 space-y-2">
                         <Link
                           to="/profile"
                           className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
@@ -389,27 +415,17 @@ export default function Layout() {
                           </div>
                         </Link>
 
-                        <button
-                          onClick={() => setShowSettings(!showSettings)}
+                        <Link
+                          to="/resources"
                           className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Settings className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                            <span>Settings</span>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        </button>
-
-                        <button
-                          onClick={() => setShowResources(!showResources)}
-                          className="w-full px-3 py-2 flex items-center justify-between text-sm text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                          onClick={() => setIsProfileOpen(false)}
                         >
                           <div className="flex items-center space-x-2">
                             <HelpCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                             <span>Resources</span>
                           </div>
                           <ChevronRight className="w-4 h-4 text-gray-400" />
-                        </button>
+                        </Link>
                       </div>
 
                       <div className="border-t border-gray-200 dark:border-gray-700 p-2">

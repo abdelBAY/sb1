@@ -111,6 +111,18 @@
     "startConversationDesc": "Connect with fellow users, donors, or the Give community. Select an existing chats on the left or click 'New Message' to begin.",
     "newMessage": "NEW MESSAGE"
   },
+  "seeds": {
+    "zeroMessage": "You've used all your seeds. Give something to earn more and keep growing!",
+    "requestHelper": "Sending a new request costs 1 seed. You’ll earn more when you donate.",
+    "sendRequest": "Send Request",
+    "sending": "Sending...",
+    "label": "Seeds",
+    "balanceLabel": "Balance",
+    "seedUnit_one": "{{count}} seed",
+    "seedUnit_other": "{{count}} seeds",
+    "costTag_one": "-{{count}} seed",
+    "costTag_other": "-{{count}} seeds"
+  },
   "logout": {
     "title": "Logout",
     "message": "You will be logged out of your account: {{account}}",

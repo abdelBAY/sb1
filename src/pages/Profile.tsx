@@ -11,6 +11,7 @@ import {
   User as UserIcon,
   Camera
 } from 'lucide-react';
+import SeedBalance from '../components/seeds/SeedBalance';
 
 interface Profile {
   username: string;
@@ -28,6 +29,7 @@ interface Profile {
   gender?: string;
   donation_count?: number;
   adoption_count?: number;
+  seed_balance?: number;
 }
 
 export default function Profile() {
@@ -35,6 +37,10 @@ export default function Profile() {
   const navigate = useNavigate();
   const storeUser = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
+  const seedsEmptyMessage = t(
+    'seeds.zeroMessage',
+    "You've used all your seeds. Give something to earn more and keep growing!"
+  );
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const setStoreProfile = useStore((state) => state.setProfile);
@@ -85,12 +91,54 @@ export default function Profile() {
           .single();
 
         if (error) throw error;
+
+        // Calculate donation count from announcements
+        const { data: donations, error: donationsError } = await supabase
+          .from('announcements')
+          .select('id, status')
+          .eq('user_id', user.id)
+          .in('status', ['COMPLETED', 'GIVEN_AWAY']);
+
+        if (donationsError) {
+          console.error('Error fetching donations:', donationsError);
+        }
+
+        // Calculate adoption count from messages where user received items
+        // (messages where user is receiver and announcement status is COMPLETED or GIVEN_AWAY)
+        let adoptionCount = 0;
+        try {
+          const { data: messages, error: messagesError } = await supabase
+            .from('messages')
+            .select('announcement_id')
+            .eq('receiver_id', user.id)
+            .not('announcement_id', 'is', null);
+
+          if (!messagesError && messages && messages.length > 0) {
+            // Get unique announcement IDs
+            const announcementIds = [...new Set(messages.map(m => m.announcement_id).filter(Boolean))];
+            
+            if (announcementIds.length > 0) {
+              const { data: completedAnnouncements } = await supabase
+                .from('announcements')
+                .select('id')
+                .in('id', announcementIds)
+                .in('status', ['COMPLETED', 'GIVEN_AWAY']);
+              
+              adoptionCount = completedAnnouncements?.length || 0;
+            }
+          }
+        } catch (adoptionError) {
+          console.error('Error calculating adoption count:', adoptionError);
+        }
         
         const profileData = {
           ...data,
           connect_id: user.id,
           // Use Gmail image if no custom avatar and user has Google provider
-          avatar_url: data.avatar_url || getGmailImageUrl(user) || data.avatar_url
+          avatar_url: data.avatar_url || getGmailImageUrl(user) || data.avatar_url,
+          // Update counts from actual data
+          donation_count: donations?.length || 0,
+          adoption_count: adoptionCount
         };
         
         setProfile(profileData);
@@ -268,6 +316,15 @@ export default function Profile() {
           {/* Left Sidebar */}
           <div className="w-full lg:w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
             <div className="space-y-6">
+              <SeedBalance
+                balance={profile?.seed_balance}
+                variant="card"
+                showLabel
+                label={t('seeds.label', 'Seeds')}
+                showEmptyMessage
+                emptyMessage={seedsEmptyMessage}
+              />
+
               {/* Membership Info */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">

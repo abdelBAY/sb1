@@ -52,6 +52,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
+  const setProfile = useStore((state) => state.setProfile);
 
   useEffect(() => {
     // Don't redirect while auth is still initializing
@@ -243,6 +244,18 @@ export default function Dashboard() {
       });
 
       // Reload dashboard data to ensure consistency
+      if (user?.id) {
+        const { data: refreshedProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (!profileError && refreshedProfile) {
+          setProfile(refreshedProfile);
+        }
+      }
+
       await loadDashboardData();
     } catch (error) {
       console.error('Error marking item as given away:', error);

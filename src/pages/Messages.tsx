@@ -1,13 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Search,
   Send,
-  Image as ImageIcon,
-  Paperclip,
-  Smile,
-  MoreVertical,
   User,
   Check,
   CheckCheck,
@@ -26,6 +22,7 @@ import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
 import ConfirmationModal from '../components/ConfirmationModal';
 import FeedbackModal from '../components/FeedbackModal';
+import SeedBalance from '../components/seeds/SeedBalance';
 
 interface Message {
   id: string;
@@ -62,15 +59,23 @@ interface Chat {
     title: string;
     photos: string[];
     status?: string;
+    category?: string;
+    user_id?: string;
   };
 }
 
 export default function Messages() {
   const { t } = useTranslation('common');
+  const seedsEmptyMessage = t(
+    'seeds.zeroMessage',
+    "You've used all your seeds. Give something to earn more and keep growing!"
+  );
   const navigate = useNavigate();
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
   const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
+  const profile = useStore((state) => state.profile);
+  const setProfile = useStore((state) => state.setProfile);
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -79,6 +84,7 @@ export default function Messages() {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'donations' | 'requests'>('donations');
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [pendingRequest, setPendingRequest] = useState<{
@@ -87,6 +93,10 @@ export default function Messages() {
     suggestedDate?: string;
     suggestedPlace?: string;
   } | null>(null);
+  const lacksSeedsForFirstMessage = useMemo(
+    () => messages.length === 0 && (profile?.seed_balance ?? 0) <= 0,
+    [messages.length, profile?.seed_balance]
+  );
 
   useEffect(() => {
     // Don't redirect while auth is still initializing
@@ -218,7 +228,7 @@ export default function Messages() {
       if (announcementIds.size > 0) {
         const { data: announcementsData, error: announcementsError } = await supabase
           .from('announcements')
-          .select('id, title, photos, status')
+          .select('id, title, photos, status, category, user_id')
           .in('id', Array.from(announcementIds));
 
         if (announcementsError) {
@@ -293,7 +303,9 @@ export default function Messages() {
               id: message.announcement_id,
               title: announcement?.title || t('messages.item'),
               photos: announcement?.photos || [],
-              status: announcement?.status
+              status: announcement?.status,
+              category: announcement?.category,
+              user_id: announcement?.user_id
             } : undefined
           });
         } else {
@@ -480,14 +492,39 @@ export default function Messages() {
 
       const { error: sendError } = await supabase
         .from('messages')
-        .insert([message]);
+        .insert([message])
+        .select();
 
       if (sendError) throw sendError;
+
+      const { data: refreshedProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+
+      if (!profileError && refreshedProfile) {
+        setProfile(refreshedProfile);
+      }
 
       setNewMessage('');
       loadMessages(selectedChat.id);
     } catch (error) {
       console.error('Error sending message:', error);
+      const rawMessage =
+        (error as any)?.message ||
+        (error as any)?.details ||
+        '';
+
+      if (
+        typeof rawMessage === 'string' &&
+        (rawMessage.includes('INSUFFICIENT_SEEDS') ||
+          rawMessage.includes('You’ve used all your seeds'))
+      ) {
+        setError(seedsEmptyMessage);
+        return;
+      }
+
       setError(t('messages.errors.send'));
     }
   };
@@ -716,9 +753,41 @@ export default function Messages() {
     }
   };
 
-  const filteredChats = chats.filter((chat) =>
-    chat.user.full_name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Calculate counts for each tab
+  const donationsCount = chats.filter((chat) => {
+    if (chat.announcement?.user_id) {
+      return chat.announcement.user_id === user?.id;
+    }
+    return false;
+  }).length;
+
+  const requestsCount = chats.filter((chat) => {
+    if (chat.announcement?.user_id) {
+      return chat.announcement.user_id !== user?.id;
+    }
+    return false;
+  }).length;
+
+  const filteredChats = chats.filter((chat) => {
+    const matchesSearch = chat.user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      chat.announcement?.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (!matchesSearch) return false;
+    
+    // Filter by tab: Donations = user is donor, Requests = user is beneficiary
+    if (chat.announcement?.user_id) {
+      if (activeTab === 'donations') {
+        // User is the donor (they own the announcement)
+        return chat.announcement.user_id === user?.id;
+      } else {
+        // User is the beneficiary (they're requesting)
+        return chat.announcement.user_id !== user?.id;
+      }
+    }
+    
+    // If no announcement, show in both tabs or default to donations
+    return activeTab === 'donations';
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -738,11 +807,11 @@ export default function Messages() {
           </div>
         )}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-            {/* Chat List */}
-            <div className="border-r border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-12 md:h-[calc(100vh-12rem)]">
+            {/* Left Sidebar - Chat List */}
+            <div className="md:col-span-3 lg:col-span-3 border-r border-gray-200 dark:border-gray-700 flex flex-col">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="relative flex items-center gap-2">
+                <div className="relative flex items-center gap-2 mb-3">
                   <div className="relative flex-1">
                     <input
                       type="text"
@@ -757,9 +826,51 @@ export default function Messages() {
                     <Filter className="h-5 w-5" />
                   </button>
                 </div>
+                
+                {/* Tabs for Donations and Requests */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setActiveTab('donations')}
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors relative ${
+                      activeTab === 'donations'
+                        ? 'bg-blue-600 text-white dark:bg-blue-500'
+                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {t('messages.donations', 'Donations')}
+                    {donationsCount > 0 && (
+                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        activeTab === 'donations'
+                          ? 'bg-white/20 text-white'
+                          : 'bg-blue-600 text-white dark:bg-blue-500'
+                      }`}>
+                        {donationsCount}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('requests')}
+                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors relative ${
+                      activeTab === 'requests'
+                        ? 'bg-blue-600 text-white dark:bg-blue-500'
+                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {t('messages.requests', 'Requests')}
+                    {requestsCount > 0 && (
+                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        activeTab === 'requests'
+                          ? 'bg-white/20 text-white'
+                          : 'bg-blue-600 text-white dark:bg-blue-500'
+                      }`}>
+                        {requestsCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              <div className="overflow-y-auto h-[calc(100vh-12rem)]">
+              <div className="overflow-y-auto flex-1">
                 {loading ? (
                   <div className="flex justify-center items-center h-32">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
@@ -828,14 +939,16 @@ export default function Messages() {
                   ))
                 ) : (
                   <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                    {t('messages.empty')}
+                    {activeTab === 'donations' 
+                      ? t('messages.emptyDonations', 'No donation conversations yet')
+                      : t('messages.emptyRequests', 'No request conversations yet')}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Chat Window */}
-            <div className="col-span-2 lg:col-span-3 flex flex-col h-[calc(100vh-12rem)]">
+            {/* Center - Chat Window */}
+            <div className="md:col-span-9 lg:col-span-6 flex flex-col border-r border-gray-200 dark:border-gray-700 order-2 md:order-2">
               {selectedChat ? (
                 <>
                   {/* Chat Header */}
@@ -872,38 +985,8 @@ export default function Messages() {
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
-                      <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
                     </div>
                   </div>
-
-                  {/* Item Display Section */}
-                  {selectedChat.announcement && (
-                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-                      <div className="flex items-center space-x-3">
-                        {selectedChat.announcement.photos?.[0] && (
-                          <img
-                            src={selectedChat.announcement.photos[0]}
-                            alt={selectedChat.announcement.title}
-                            loading="lazy"
-                            className={`w-16 h-16 rounded-lg object-cover ${
-                              selectedChat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
-                            }`}
-                          />
-                        )}
-                        <div className="flex-1">
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {selectedChat.announcement.title}
-                          </h3>
-                          <div className="flex items-center text-xs text-gray-600 dark:text-gray-400 mt-1">
-                            <User className="w-3 h-3 mr-1" />
-                            <span>{selectedChat.user.full_name}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Messages */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -1014,7 +1097,7 @@ export default function Messages() {
 
                   {/* Message Input */}
                   <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-end space-x-3">
+                    <div className="flex items-center space-x-3">
                       <div className="flex-1">
                         <textarea
                           value={newMessage}
@@ -1022,7 +1105,9 @@ export default function Messages() {
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                               e.preventDefault();
-                              sendMessage();
+                              if (!lacksSeedsForFirstMessage) {
+                                sendMessage();
+                              }
                             }
                           }}
                           placeholder={t('messages.inputPlaceholder')}
@@ -1030,25 +1115,19 @@ export default function Messages() {
                           rows={1}
                         />
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                          <ImageIcon className="w-5 h-5" />
-                        </button>
-                        <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                          <Paperclip className="w-5 h-5" />
-                        </button>
-                        <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                          <Smile className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={sendMessage}
-                          disabled={!newMessage.trim()}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <Send className="w-5 h-5" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={sendMessage}
+                        disabled={!newMessage.trim() || lacksSeedsForFirstMessage}
+                        className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center h-[42px]"
+                      >
+                        <Send className="w-5 h-5" />
+                      </button>
                     </div>
+                    {lacksSeedsForFirstMessage && (
+                      <p className="mt-2 text-sm text-emerald-600 dark:text-emerald-300 font-medium">
+                        {seedsEmptyMessage}
+                      </p>
+                    )}
                   </div>
                 </>
               ) : (
@@ -1077,6 +1156,63 @@ export default function Messages() {
                       <Plus className="w-5 h-5" />
                       {t('messages.newMessage')}
                     </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Panel - Item Details */}
+            <div className="md:col-span-12 lg:col-span-3 flex flex-col bg-gray-50 dark:bg-gray-900/50 border-t md:border-t-0 lg:border-t-0 border-gray-200 dark:border-gray-700 order-3 lg:order-3 max-h-[50vh] md:max-h-none overflow-y-auto">
+              {selectedChat?.announcement ? (
+                <div className="p-6 space-y-4">
+                  {/* Product Image */}
+                  {selectedChat.announcement.photos?.[0] && (
+                    <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow-md">
+                      <img
+                        src={selectedChat.announcement.photos[0]}
+                        alt={selectedChat.announcement.title}
+                        loading="lazy"
+                        className={`w-full h-full object-cover ${
+                          selectedChat.announcement.status === 'GIVEN_AWAY' ? 'blur-md' : ''
+                        }`}
+                      />
+                    </div>
+                  )}
+
+                  {/* Item Name & Category */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {selectedChat.announcement.title}
+                    </h3>
+                    {selectedChat.announcement.category && (
+                      <div className="flex items-center">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200">
+                          {selectedChat.announcement.category}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Donor Profile Button */}
+                  <button
+                    onClick={() => {
+                      if (selectedChat.announcement?.user_id) {
+                        navigate(`/donor/${selectedChat.announcement.user_id}`);
+                      }
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5"
+                  >
+                    <User className="w-5 h-5" />
+                    {t('messages.sellerProfile', 'Donor Profile')}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-center p-6">
+                  <div className="text-center text-gray-500 dark:text-gray-400">
+                    <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-sm">
+                      {t('messages.selectChatToViewItem', 'Select a conversation to view item details')}
+                    </p>
                   </div>
                 </div>
               )}

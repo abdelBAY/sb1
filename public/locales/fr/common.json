@@ -111,6 +111,18 @@
     "startConversationDesc": "Connectez-vous avec d'autres utilisateurs, donateurs ou la communauté Give. Sélectionnez une conversation existante à gauche ou cliquez sur 'Nouveau message' pour commencer.",
     "newMessage": "NOUVEAU MESSAGE"
   },
+  "seeds": {
+    "zeroMessage": "Vous avez utilisé toutes vos graines. Faites un don pour en gagner davantage et continuer à grandir !",
+    "requestHelper": "Envoyer une nouvelle demande coûte 1 graine. Vous en gagnerez davantage lorsque vous faites un don.",
+    "sendRequest": "Envoyer la demande",
+    "sending": "Envoi...",
+    "label": "Graines",
+    "balanceLabel": "Solde",
+    "seedUnit_one": "{{count}} graine",
+    "seedUnit_other": "{{count}} graines",
+    "costTag_one": "-{{count}} graine",
+    "costTag_other": "-{{count}} graines"
+  },
   "logout": {
     "title": "Déconnexion",
     "message": "Vous serez déconnecté de votre compte : {{account}}",

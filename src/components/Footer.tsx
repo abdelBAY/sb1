@@ -33,6 +33,10 @@ const Footer: React.FC = () => {
           Privacy Policy
         </Link>
         <span className="mx-2">|</span>
+        <Link to="/terms" className="hover:underline">
+          Terms & Conditions
+        </Link>
+        <span className="mx-2">|</span>
         <Link to="/contact" className="hover:underline">
           Contact Us
         </Link>

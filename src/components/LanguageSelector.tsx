@@ -71,8 +71,11 @@ export default function LanguageSelector({ isOpen, onToggle, onClose, isMobile =
       <button
         onClick={onToggle}
         className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-colors duration-200"
+        aria-label={currentLanguage.name}
       >
-        <span>{currentLanguage.name}</span>
+        <span className="text-sm font-semibold tracking-wide uppercase">
+          {currentLanguage.code.toUpperCase()}
+        </span>
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-out scale-100 opacity-100 z-50">

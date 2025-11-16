@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
   MessageCircle,
-  Send,
   X,
   AlertCircle
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface RequestModalProps {
   itemId: string;
@@ -12,6 +12,8 @@ interface RequestModalProps {
   donorName: string;
   onClose: () => void;
   onSendRequest: (message: string) => void;
+  seedBalance: number;
+  seedEmptyMessage: string;
 }
 
 export default function RequestModal({ 
@@ -19,16 +21,21 @@ export default function RequestModal({
   itemName, 
   donorName, 
   onClose, 
-  onSendRequest 
+  onSendRequest,
+  seedBalance,
+  seedEmptyMessage,
 }: RequestModalProps) {
   const [message, setMessage] = useState('Hi! I\'m interested in this item. Is it still available?');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation('common');
+  const helperCopy = t(
+    'seeds.requestHelper',
+    'Sending a new request costs 1 seed. You’ll earn more when you donate.'
+  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitRequest = async () => {
     if (!message.trim()) return;
-
     setLoading(true);
     setError(null);
 
@@ -76,7 +83,7 @@ export default function RequestModal({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Your Message
@@ -91,32 +98,48 @@ export default function RequestModal({
               />
             </div>
 
-            <div className="flex items-center justify-end space-x-3">
+            <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancel
               </button>
               <button
-                type="submit"
-                disabled={loading || !message.trim()}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                type="button"
+                onClick={async () => {
+                  await submitRequest();
+                }}
+                disabled={!message.trim() || loading || (seedBalance ?? 0) < 1}
+                className={`
+                  flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm
+                  transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+                  shadow-md hover:shadow-lg
+                  ${
+                    !message.trim() || loading || (seedBalance ?? 0) < 1
+                      ? 'bg-emerald-200 text-emerald-700 cursor-not-allowed opacity-70'
+                      : 'bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white hover:from-emerald-600 hover:via-green-600 hover:to-lime-600 focus-visible:ring-emerald-400'
+                  }
+                `}
               >
-                {loading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Request
-                  </>
-                )}
+                {loading ? t('seeds.sending', 'Sending...') : t('seeds.sendRequest', 'Send Request')}
               </button>
             </div>
+            {(helperCopy || (seedBalance ?? 0) < 1) && (
+              <div className="flex flex-col gap-1 text-right">
+                {helperCopy && (
+                  <p className="text-xs text-emerald-700/70 dark:text-emerald-300/70">
+                    {helperCopy}
+                  </p>
+                )}
+                {(seedBalance ?? 0) < 1 && (
+                  <p className="text-sm rounded-lg bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-100/80 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-200 px-3 py-2 font-medium">
+                    {seedEmptyMessage}
+                  </p>
+                )}
+              </div>
+            )}
           </form>
         </div>
       </div>

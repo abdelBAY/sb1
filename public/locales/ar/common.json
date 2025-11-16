@@ -111,6 +111,26 @@
     "startConversationDesc": "تواصل مع المستخدمين الآخرين أو المتبرعين أو مجتمع Give. اختر محادثة موجودة على اليسار أو انقر على 'رسالة جديدة' للبدء.",
     "newMessage": "رسالة جديدة"
   },
+  "seeds": {
+    "zeroMessage": "لقد استخدمت كل بذورك. قدّم شيئًا لتحصل على المزيد وتستمر في النمو!",
+    "requestHelper": "إرسال طلب جديد يكلّف بذرة واحدة. ستحصل على المزيد عندما تتبرع.",
+    "sendRequest": "إرسال الطلب",
+    "sending": "جارٍ الإرسال...",
+    "label": "البذور",
+    "balanceLabel": "باقي الرصيد",
+    "seedUnit_zero": "0 بذور",
+    "seedUnit_one": "{{count}} بذرة",
+    "seedUnit_two": "{{count}} بذرتان",
+    "seedUnit_few": "{{count}} بذور",
+    "seedUnit_many": "{{count}} بذور",
+    "seedUnit_other": "{{count}} بذرة",
+    "costTag_zero": "-0 بذور",
+    "costTag_one": "-{{count}} بذرة",
+    "costTag_two": "-{{count}} بذرتان",
+    "costTag_few": "-{{count}} بذور",
+    "costTag_many": "-{{count}} بذور",
+    "costTag_other": "-{{count}} بذرة"
+  },
   "logout": {
     "title": "تسجيل الخروج",
     "message": "سيتم تسجيل خروجك من حسابك: {{account}}",

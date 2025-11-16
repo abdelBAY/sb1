@@ -19,6 +19,7 @@ interface Profile {
   donation_count?: number;
   adoption_count?: number;
   tagline?: string;
+  seed_balance?: number;
 }
 
 interface AppState {

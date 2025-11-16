@@ -17,6 +17,7 @@ console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY);
 function App() {
   const navigate = useNavigate();
   const setDarkMode = useStore((state) => state.setDarkMode);
+  const user = useStore((state) => state.user);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -30,7 +31,11 @@ function App() {
   }, [setDarkMode]);
 
   const handleStartDonating = () => {
-    navigate('/register');
+    if (user) {
+      navigate('/search');
+    } else {
+      navigate('/register');
+    }
   };
 
   return (
@@ -150,7 +155,7 @@ function App() {
             onClick={handleStartDonating}
             className="mt-6 md:mt-8 inline-flex items-center px-8 md:px-10 py-4 md:py-5 border border-transparent text-lg md:text-xl font-bold rounded-2xl text-blue-600 dark:text-blue-400 bg-white dark:bg-dark-50 hover:bg-blue-50 dark:hover:bg-dark-100 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500"
           >
-            {t('home.cta.button')}
+            {user ? t('home.hero.browseItems') : t('home.cta.button')}
           </motion.button>
         </motion.div>
       </div>

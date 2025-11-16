@@ -81,6 +81,11 @@ export default function ProductDetail() {
   const [requestStatus, setRequestStatus] = useState<'none' | 'pending' | 'accepted' | 'declined' | 'completed'>('none');
   const user = useStore((state) => state.user);
   const profile = useStore((state) => state.profile);
+  const setStoreProfile = useStore((state) => state.setProfile);
+  const seedsEmptyMessage = t(
+    'seeds.zeroMessage',
+    "You've used all your seeds. Give something to earn more and keep growing!"
+  );
 
   const getStatusTranslation = (status: string) => {
     if (status === 'GIVEN_AWAY') {
@@ -304,10 +309,29 @@ export default function ProductDetail() {
 
       if (messageError) {
         console.error('Database error:', messageError);
+        if (
+          messageError.message === 'INSUFFICIENT_SEEDS' ||
+          messageError.details?.includes('You’ve used all your seeds')
+        ) {
+          throw new Error(seedsEmptyMessage);
+        }
         throw new Error(`Database error: ${messageError.message}`);
       }
 
       console.log('Message sent successfully:', data);
+
+      // Refresh profile to reflect new seed balance
+      const { data: refreshedProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.warn('Failed to refresh profile after sending request:', profileError);
+      } else if (refreshedProfile) {
+        setStoreProfile(refreshedProfile);
+      }
 
       // Update request status
       setRequestStatus('pending');
@@ -316,7 +340,20 @@ export default function ProductDetail() {
       navigate('/messages');
     } catch (error) {
       console.error('Error sending request:', error);
-      throw error;
+      const rawMessage =
+        (error as any)?.message ||
+        (error as any)?.details ||
+        'Failed to send request';
+
+      if (
+        typeof rawMessage === 'string' &&
+        (rawMessage.includes('INSUFFICIENT_SEEDS') ||
+          rawMessage.includes('You’ve used all your seeds'))
+      ) {
+        throw new Error(seedsEmptyMessage);
+      }
+
+      throw error instanceof Error ? error : new Error('Failed to send request');
     }
   };
 
@@ -357,6 +394,11 @@ export default function ProductDetail() {
       return;
     }
     
+    if ((profile?.seed_balance ?? 0) <= 0) {
+      alert(seedsEmptyMessage);
+      return;
+    }
+
     setShowRequestModal(true);
   };
 
@@ -789,6 +831,8 @@ export default function ProductDetail() {
           donorName={product.user.full_name || t('productDetail.anonymousUser')}
           onClose={() => setShowRequestModal(false)}
           onSendRequest={handleSendRequest}
+          seedBalance={profile?.seed_balance ?? 0}
+          seedEmptyMessage={seedsEmptyMessage}
         />
       )}
     </div>
