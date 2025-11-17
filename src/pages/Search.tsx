@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { debounce } from 'lodash';
 import { supabase } from '../lib/supabase';
 import { 
@@ -17,7 +17,8 @@ import {
   Package,
   DollarSign,
   Truck,
-  BarChart2
+  BarChart2,
+  Navigation
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -70,6 +71,11 @@ export default function Search() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
   const [pendingOnly, setPendingOnly] = useState<boolean>(false);
+  const [locationSearch, setLocationSearch] = useState<string>('');
+  const [searchCoordinates, setSearchCoordinates] = useState<{ lat: number; lon: number } | null>(null);
+  const [distanceRadius, setDistanceRadius] = useState<number>(15);
+  const [gettingLocation, setGettingLocation] = useState<boolean>(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Category mapping: English database values to translation keys
   const categoryMap: { [key: string]: string } = {
@@ -133,12 +139,184 @@ export default function Search() {
     };
   }, []);
 
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  // Geocode address to coordinates
+  const geocodeAddress = async (address: string): Promise<{ lat: number; lon: number } | null> => {
+    try {
+      if (!address || !address.trim()) {
+        return null;
+      }
+      
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address.trim())}&limit=1`,
+        {
+          headers: {
+            'User-Agent': 'Givea-Donation-App/1.0',
+            'Accept': 'application/json',
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.length > 0 && data[0].lat && data[0].lon) {
+          const coords = {
+            lat: parseFloat(data[0].lat),
+            lon: parseFloat(data[0].lon)
+          };
+          console.log('Geocoding successful:', address, '->', coords);
+          return coords;
+        } else {
+          console.log('Geocoding returned no results for:', address);
+        }
+      } else {
+        console.error('Geocoding API error:', response.status, response.statusText);
+      }
+      return null;
+    } catch (error) {
+      console.error('Error geocoding address:', error);
+      return null;
+    }
+  };
+
+  // Get current location
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError(t('search.location.geolocationNotSupported'));
+      return;
+    }
+
+    setGettingLocation(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          setSearchCoordinates({ lat: latitude, lon: longitude });
+          
+          // Reverse geocode to get address
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+              {
+                headers: {
+                  'User-Agent': 'Givea-Donation-App/1.0',
+                  'Accept': 'application/json',
+                }
+              }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data && data.address) {
+                const addressParts = [];
+                if (data.address.road) addressParts.push(data.address.road);
+                if (data.address.house_number) addressParts.push(data.address.house_number);
+                if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
+                if (data.address.city || data.address.town || data.address.village) {
+                  addressParts.push(data.address.city || data.address.town || data.address.village);
+                }
+                if (data.address.state) addressParts.push(data.address.state);
+                if (data.address.country) addressParts.push(data.address.country);
+
+                const address = addressParts.length > 0 
+                  ? addressParts.join(', ')
+                  : data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+                setLocationSearch(address);
+              } else {
+                setLocationSearch(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+              }
+            } else {
+              setLocationSearch(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+            }
+          } catch (geocodeError) {
+            setLocationSearch(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+          }
+          
+          setGettingLocation(false);
+        } catch (error) {
+          setLocationError(t('search.location.error'));
+          setGettingLocation(false);
+        }
+      },
+      (error) => {
+        let errorMessage = t('search.location.error');
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = t('search.location.permissionDenied');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = t('search.location.positionUnavailable');
+            break;
+          case error.TIMEOUT:
+            errorMessage = t('search.location.timeout');
+            break;
+        }
+        
+        setLocationError(errorMessage);
+        setGettingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
+  // Debounced geocoding function
+  const debouncedGeocode = useMemo(
+    () => debounce(async (address: string) => {
+      console.log('Geocoding address:', address);
+      const coords = await geocodeAddress(address);
+      if (coords) {
+        console.log('Geocoded address:', address, 'to coordinates:', coords);
+        setSearchCoordinates(coords);
+        setLocationError(null);
+      } else {
+        console.log('Failed to geocode address:', address);
+        setSearchCoordinates(null);
+        setLocationError(t('search.location.addressNotFound'));
+      }
+    }, 800),
+    [t]
+  );
+
+  // Handle location search input change with debounce
+  const handleLocationSearchChange = useCallback((value: string) => {
+    setLocationSearch(value);
+    setLocationError(null);
+    
+    if (!value.trim()) {
+      setSearchCoordinates(null);
+      debouncedGeocode.cancel();
+      return;
+    }
+
+    debouncedGeocode(value);
+  }, [debouncedGeocode]);
+
   const performSearch = async () => {
     setLoading(true);
     try {
       let queryBuilder = supabase
         .from('announcements')
-        .select('*', { count: 'exact' })
+        .select('*, announcement_locations(latitude, longitude)', { count: 'exact' })
         .range((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE - 1);
 
       // Find the English category value from the translated selected category
@@ -166,8 +344,65 @@ export default function Search() {
 
       if (error) throw error;
 
-      setResults(data || []);
-      setTotalResults(count || 0);
+      console.log('Search results before location filter:', data?.length || 0);
+      console.log('Search coordinates:', searchCoordinates);
+      console.log('Distance radius:', distanceRadius);
+
+      // Filter by distance if location search is active
+      let filteredData = data || [];
+      if (searchCoordinates && distanceRadius > 0) {
+        const itemsWithCoords: any[] = [];
+        const itemsWithoutCoords: any[] = [];
+        
+        // First, try to filter items with coordinates in announcement_locations
+        filteredData.forEach((item: any) => {
+          const location = item.announcement_locations?.[0];
+          if (location && location.latitude && location.longitude) {
+            itemsWithCoords.push(item);
+          } else if (item.location) {
+            // If no coordinates in announcement_locations, try to geocode the location text
+            itemsWithoutCoords.push(item);
+          }
+        });
+
+        // Filter items with coordinates
+        const filteredWithCoords = itemsWithCoords.filter((item: any) => {
+          const location = item.announcement_locations[0];
+          const distance = calculateDistance(
+            searchCoordinates.lat,
+            searchCoordinates.lon,
+            parseFloat(location.latitude),
+            parseFloat(location.longitude)
+          );
+          console.log(`Item ${item.id}: distance = ${distance.toFixed(2)} km`);
+          return distance <= distanceRadius;
+        });
+
+        // For items without coordinates, geocode their location text and filter
+        const geocodePromises = itemsWithoutCoords.map(async (item: any) => {
+          if (!item.location) return null;
+          const itemCoords = await geocodeAddress(item.location);
+          if (itemCoords) {
+            const distance = calculateDistance(
+              searchCoordinates.lat,
+              searchCoordinates.lon,
+              itemCoords.lat,
+              itemCoords.lon
+            );
+            console.log(`Item ${item.id} (${item.location}): distance = ${distance.toFixed(2)} km`);
+            return distance <= distanceRadius ? item : null;
+          }
+          return null;
+        });
+
+        const filteredWithoutCoords = (await Promise.all(geocodePromises)).filter(Boolean);
+        
+        filteredData = [...filteredWithCoords, ...filteredWithoutCoords];
+        console.log('Filtered results:', filteredData.length);
+      }
+
+      setResults(filteredData);
+      setTotalResults(filteredData.length);
     } catch (error) {
       console.error('Error searching:', error);
     } finally {
@@ -179,7 +414,7 @@ export default function Search() {
     const debouncedSearch = debounce(performSearch, 300);
     debouncedSearch();
     return () => debouncedSearch.cancel();
-  }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly]);
+  }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly, searchCoordinates, distanceRadius]);
 
   const toggleItemSelection = (itemId: string) => {
     setSelectedItems(prev => 
@@ -274,29 +509,27 @@ export default function Search() {
               <SearchIcon className="absolute left-4 top-3.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
             </div>
 
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-            >
-              {categories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-            >
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            {/* Location Search - Inline with search bar */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 min-w-[200px]">
+                <input
+                  type="text"
+                  value={locationSearch}
+                  onChange={(e) => handleLocationSearchChange(e.target.value)}
+                  placeholder={t('search.location.addressPlaceholder')}
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
+                />
+                <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
+              </div>
+              <button
+                onClick={getCurrentLocation}
+                disabled={gettingLocation}
+                className="px-3 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title={t('search.location.useCurrent')}
+              >
+                <Navigation className={`w-5 h-5 ${gettingLocation ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
 
             <div className="flex gap-2">
               <button
@@ -324,7 +557,23 @@ export default function Search() {
 
           {showFilters && (
             <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('search.categories.all')}
+                  </label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    {categories.map((category, index) => (
+                      <option key={index} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('search.condition')}
@@ -342,7 +591,53 @@ export default function Search() {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('search.sortOptions.newestFirst')}
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    {sortOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('search.location.within')}
+                  </label>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {distanceRadius} {t('search.location.km')}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="100"
+                      value={distanceRadius}
+                      onChange={(e) => setDistanceRadius(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #fbbf24 0%, #fbbf24 ${((distanceRadius - 1) / 99) * 100}%, #e5e7eb ${((distanceRadius - 1) / 99) * 100}%, #e5e7eb 100%)`
+                      }}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>1 {t('search.location.km')}</span>
+                      <span>100 {t('search.location.km')}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+              {locationError && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400">{locationError}</p>
+              )}
             </div>
           )}
         </div>

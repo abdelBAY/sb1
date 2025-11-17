@@ -35,6 +35,9 @@
       "subtitle": "Join thousands of others who are already making an impact in their communities.",
       "button": "Get Started"
     },
+    "testimonials": {
+      "subtitle": "10,000+ people love us"
+    },
     "resources": {
       "title": "Find Items and Resources",
       "subtitle": "We are here to help you find items and support today.",
@@ -178,6 +181,25 @@
       "claimed": "CLAIMED",
       "completed": "COMPLETED",
       "givenAway": "Given Away"
+    },
+    "location": {
+      "title": "Location Search",
+      "show": "Show",
+      "hide": "Hide",
+      "address": "Address",
+      "addressPlaceholder": "Enter an address",
+      "useCurrent": "My position",
+      "getting": "Detecting your location...",
+      "within": "Within",
+      "km": "Km",
+      "confirm": "Confirm",
+      "geolocationNotSupported": "Geolocation is not supported by your browser",
+      "error": "Error getting your location",
+      "permissionDenied": "Location permission denied. Please enable location access in your browser settings.",
+      "positionUnavailable": "Location information is unavailable",
+      "timeout": "Location request timed out. Please try again.",
+      "addressNotFound": "Address not found. Please try a different address.",
+      "clear": "Clear"
     }
   },
   "dashboard": {

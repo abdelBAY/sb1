@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import HeroSection from "./components/HeroSection.tsx";
 import ResourcesSection from "./components/ResourcesSection.tsx";
 import HowItWorksSection from "./components/HowItWorksSection.tsx";
+import TestimonialsSection from "./components/TestimonialsSection.tsx";
 import Footer from "./components/Footer.tsx"; // 👈 Import Footer
 import ctaImage from "./assets/givea-image3 (1).png";
 
@@ -100,6 +101,9 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* ✅ Testimonials Section */}
+      <TestimonialsSection />
 
       {/* CTA Section */}
       <div className="relative py-12 md:py-16 overflow-hidden">
