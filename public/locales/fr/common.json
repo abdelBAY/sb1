@@ -35,6 +35,38 @@
       "subtitle": "Rejoignez des milliers d'autres personnes qui ont déjà un impact dans leurs communautés.",
       "button": "Commencer"
     },
+    "testimonials": {
+      "subtitle": "Plus de 10 000 personnes nous aiment",
+      "itemsCount": "10 000+",
+      "items": "articles",
+      "shared": "partagés",
+      "cards": {
+        "sarah": {
+          "name": "Sarah Johnson",
+          "review": "J'ai essayé d'autres plateformes de don, gratuites et payantes, et cette application est la seule que je recommanderais 10 fois sur 10. La communauté est incroyable !"
+        },
+        "michael": {
+          "name": "Michael Chen",
+          "review": "Il y a 10 ans, j'avais du mal à trouver des moyens de donner des articles. Cette plateforme a rendu cela si facile et efficace. Je ne peux pas recommander assez !"
+        },
+        "emma": {
+          "name": "Emma Rodriguez",
+          "review": "Plateforme incroyable. Professionnellement parlant, c'est salvateur. La fonctionnalité de communication directe rend la coordination des dons transparente."
+        },
+        "david": {
+          "name": "David Thompson",
+          "review": "Cette application est devenue essentielle à mon flux de travail et elle ne cesse de s'améliorer. Le système de récompenses par graines est un excellent incitatif !"
+        },
+        "lisa": {
+          "name": "Lisa Anderson",
+          "review": "Je dirige une petite boutique de charité et certains des articles que j'ai reçus via cette plateforme ont été parfaits pour les besoins de notre communauté."
+        },
+        "james": {
+          "name": "James Wilson",
+          "review": "Solution numérique brillante, c'est formidable de voir la technologie utilisée pour une cause si significative. L'expérience utilisateur est excellente !"
+        }
+      }
+    },
     "resources": {
       "title": "Trouver des articles et des ressources",
       "subtitle": "Nous sommes là pour vous aider à trouver des articles et du soutien aujourd'hui.",
@@ -459,5 +491,18 @@
     "heading": "Page non trouvée",
     "message": "Désolé, nous n'avons pas pu trouver la page que vous recherchez.",
     "goHome": "Retour à l'accueil"
+  },
+  "donorProfile": {
+    "goBack": "Retour",
+    "anonymousDonor": "Donateur anonyme",
+    "reviews": "avis",
+    "items": "Articles",
+    "noItems": "Aucun article pour le moment",
+    "noItemsDesc": "Ce donneur n'a pas encore publié d'articles.",
+    "errors": {
+      "notFound": "Profil du donneur introuvable",
+      "notFoundDesc": "Le profil du donneur que vous recherchez n'existe pas.",
+      "loadData": "Erreur lors du chargement du profil du donneur"
+    }
   }
 }

@@ -15,35 +15,35 @@ const TestimonialsSection: React.FC = () => {
 
   const testimonials: Testimonial[] = [
     {
-      name: 'Sarah Johnson',
+      name: t('home.testimonials.cards.sarah.name', 'Sarah Johnson'),
       rating: 5,
-      review: "I've tried other donation platforms, both free and paid, and this app is the only one that I would recommend 10 out of 10 times. The community is amazing!",
+      review: t('home.testimonials.cards.sarah.review', "I've tried other donation platforms, both free and paid, and this app is the only one that I would recommend 10 out of 10 times. The community is amazing!"),
     },
     {
-      name: 'Michael Chen',
+      name: t('home.testimonials.cards.michael.name', 'Michael Chen'),
       rating: 5,
-      review: "10 years ago, I struggled to find ways to donate items. This platform has made it so easy and efficient. Can't recommend enough!",
+      review: t('home.testimonials.cards.michael.review', "10 years ago, I struggled to find ways to donate items. This platform has made it so easy and efficient. Can't recommend enough!"),
     },
     {
-      name: 'Emma Rodriguez',
+      name: t('home.testimonials.cards.emma.name', 'Emma Rodriguez'),
       rating: 5,
-      review: "Incredible platform. Professionally speaking it's life-saving. The direct communication feature makes coordinating donations seamless.",
+      review: t('home.testimonials.cards.emma.review', "Incredible platform. Professionally speaking it's life-saving. The direct communication feature makes coordinating donations seamless."),
       gradient: true,
     },
     {
-      name: 'David Thompson',
+      name: t('home.testimonials.cards.david.name', 'David Thompson'),
       rating: 5,
-      review: "This app has become integral to my workflow and it keeps getting better and better. The seed rewards system is a great incentive!",
+      review: t('home.testimonials.cards.david.review', "This app has become integral to my workflow and it keeps getting better and better. The seed rewards system is a great incentive!"),
     },
     {
-      name: 'Lisa Anderson',
+      name: t('home.testimonials.cards.lisa.name', 'Lisa Anderson'),
       rating: 5,
-      review: "I run a small charity shop and some of the items I've received through this platform have been perfect for our community needs.",
+      review: t('home.testimonials.cards.lisa.review', "I run a small charity shop and some of the items I've received through this platform have been perfect for our community needs."),
     },
     {
-      name: 'James Wilson',
+      name: t('home.testimonials.cards.james.name', 'James Wilson'),
       rating: 5,
-      review: "Brilliant digital solution, it's great to see technology being used for such a meaningful cause. The user experience is excellent!",
+      review: t('home.testimonials.cards.james.review', "Brilliant digital solution, it's great to see technology being used for such a meaningful cause. The user experience is excellent!"),
     },
   ];
 
@@ -61,12 +61,12 @@ const TestimonialsSection: React.FC = () => {
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
               <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
-                10,000+
+                {t('home.testimonials.itemsCount', '10,000+')}
               </span>{' '}
               <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
-                items
+                {t('home.testimonials.items', 'items')}
               </span>{' '}
-              <span className="text-purple-400">shared</span>
+              <span className="text-purple-400">{t('home.testimonials.shared', 'shared')}</span>
             </h2>
             <p className="text-xl md:text-2xl text-white/90 font-medium">
               {t('home.testimonials.subtitle', '10,000+ people love us')}

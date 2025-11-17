@@ -13,7 +13,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useStore } from '../lib/store';
 import OptimizedImage from '../components/OptimizedImage';
 
 interface DonorProfile {
@@ -42,7 +41,6 @@ export default function DonorProfile() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('common');
   const navigate = useNavigate();
-  const user = useStore((state) => state.user);
   const [donorProfile, setDonorProfile] = useState<DonorProfile | null>(null);
   const [items, setItems] = useState<DonorItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,6 +128,16 @@ export default function DonorProfile() {
       'Other': 'other'
     };
     return t(`search.categories.${categoryMap[category] || 'other'}`, category);
+  };
+
+  const getStatusTranslation = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      'PENDING': 'pending',
+      'CLAIMED': 'claimed',
+      'COMPLETED': 'completed',
+      'GIVEN_AWAY': 'givenAway'
+    };
+    return t(`search.status.${statusMap[status] || status.toLowerCase()}`, status);
   };
 
   if (loading) {
@@ -341,7 +349,7 @@ export default function DonorProfile() {
                           ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                       }`}>
-                        {item.status}
+                        {getStatusTranslation(item.status)}
                       </span>
                     </div>
                   </div>
