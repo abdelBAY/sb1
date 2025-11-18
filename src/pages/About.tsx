@@ -181,7 +181,7 @@ const About: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <div className="text-center p-6 bg-blue-50 dark:bg-gray-700 rounded-xl">
                 <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                  10,000+
+                  1,000+
                 </div>
                 <div className="text-gray-700 dark:text-gray-300 font-medium">
                   Items Donated
@@ -189,7 +189,7 @@ const About: React.FC = () => {
               </div>
               <div className="text-center p-6 bg-blue-50 dark:bg-gray-700 rounded-xl">
                 <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                  5,000+
+                  500+
                 </div>
                 <div className="text-gray-700 dark:text-gray-300 font-medium">
                   Active Users

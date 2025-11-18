@@ -53,7 +53,7 @@ const Footer: React.FC = () => {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="text-xs mt-3 text-white"
       >
-        Made with ❤️ in Morocco by the Givea team
+        Made with 💙 in Morocco by the Givea team
       </motion.p>
     </motion.footer>
   );

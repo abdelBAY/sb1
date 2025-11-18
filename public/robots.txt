@@ -1,0 +1,29 @@
+# robots.txt for Givea - Community Donation Platform
+# https://givea.netlify.app/
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /profile
+Disallow: /create-item
+Disallow: /edit-item/
+Disallow: /reset-password
+
+# Allow search engines to crawl public pages
+Allow: /search
+Allow: /product/
+Allow: /donor/
+Allow: /about
+Allow: /contact
+Allow: /resources
+Allow: /privacy
+Allow: /terms
+
+# Sitemap location
+Sitemap: https://givea.netlify.app/sitemap.xml
+
+# Crawl-delay (optional, adjust as needed)
+Crawl-delay: 1
+
