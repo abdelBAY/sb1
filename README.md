@@ -1,4 +1,4 @@
-# BladiShare: Community Donation Platform 🌍🤝
+# Givea: Community Donation Platform 🌍🤝
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Backend: Django](https://img.shields.io/badge/Backend-Django-44B78B?logo=django)](https://www.djangoproject.com/)
