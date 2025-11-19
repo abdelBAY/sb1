@@ -450,11 +450,13 @@
     "resetLinkSentMessage": "Check your email for instructions to reset your password.",
     "checkSpamFolder": "If you don't see the email, check your spam/junk folder.",
     "backToLogin": "Back to Login",
+    "orContinueWith": "Or continue with",
     "errors": {
       "captchaRequired": "Please complete the CAPTCHA before signing in.",
       "signInError": "An error occurred during sign in",
       "emailRequired": "Please enter your email address",
-      "resetError": "Failed to send reset link. Please try again."
+      "resetError": "Failed to send reset link. Please try again.",
+      "oauthError": "An error occurred during {{provider}} sign in. Please try again."
     }
   },
   "register": {
@@ -474,11 +476,13 @@
     "creatingAccount": "Creating account...",
     "acceptTerms": "I agree to the",
     "termsAndConditions": "Terms & Conditions",
+    "orContinueWith": "Or continue with",
     "errors": {
       "captchaRequired": "Please complete the CAPTCHA before creating an account.",
       "termsRequired": "You must accept the Terms & Conditions to create an account.",
       "registrationError": "An error occurred during registration",
-      "registrationFailed": "Registration failed. Please try again."
+      "registrationFailed": "Registration failed. Please try again.",
+      "oauthError": "An error occurred during {{provider}} sign in. Please try again."
     }
   },
   "resetPassword": {

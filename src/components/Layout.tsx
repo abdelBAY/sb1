@@ -111,6 +111,47 @@ export default function Layout() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session ? 'User authenticated' : 'User not authenticated');
+        
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Check if profile exists for OAuth users
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          // If profile doesn't exist, create one (for OAuth users)
+          if (!profile) {
+            const userMetadata = session.user.user_metadata || {};
+            const fullName = userMetadata.full_name || userMetadata.name || 
+                           userMetadata.email?.split('@')[0] || 'User';
+            const email = session.user.email || '';
+            
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert([
+                {
+                  id: session.user.id,
+                  username: email.split('@')[0] || 'user',
+                  full_name: fullName,
+                  role: userMetadata.role || 'DONOR',
+                  biography: '',
+                  city: '',
+                  visibility: true,
+                  avatar_url: userMetadata.avatar_url || 
+                            userMetadata.picture || 
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
+                },
+              ]);
+
+            if (insertError) {
+              console.error('Error creating profile for OAuth user:', insertError);
+            } else {
+              console.log('Profile created for OAuth user');
+            }
+          }
+        }
+        
         setUser(session?.user ?? null);
         // Ensure loading is set to false when auth state changes after initial load
         setIsLoading(false);

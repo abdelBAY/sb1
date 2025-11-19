@@ -431,11 +431,13 @@
     "resetLinkSentMessage": "Vérifiez votre e-mail pour les instructions de réinitialisation de votre mot de passe.",
     "checkSpamFolder": "Si vous ne voyez pas l'e-mail, vérifiez votre dossier spam/courrier indésirable.",
     "backToLogin": "Retour à la connexion",
+    "orContinueWith": "Ou continuer avec",
     "errors": {
       "captchaRequired": "Veuillez compléter le CAPTCHA avant de vous connecter.",
       "signInError": "Une erreur s'est produite lors de la connexion",
       "emailRequired": "Veuillez entrer votre adresse e-mail",
-      "resetError": "Échec de l'envoi du lien de réinitialisation. Veuillez réessayer."
+      "resetError": "Échec de l'envoi du lien de réinitialisation. Veuillez réessayer.",
+      "oauthError": "Une erreur s'est produite lors de la connexion avec {{provider}}. Veuillez réessayer."
     }
   },
   "register": {
@@ -455,11 +457,13 @@
     "creatingAccount": "Création du compte...",
     "acceptTerms": "J'accepte les",
     "termsAndConditions": "Conditions générales",
+    "orContinueWith": "Ou continuer avec",
     "errors": {
       "captchaRequired": "Veuillez compléter le CAPTCHA avant de créer un compte.",
       "termsRequired": "Vous devez accepter les conditions générales pour créer un compte.",
       "registrationError": "Une erreur s'est produite lors de l'inscription",
-      "registrationFailed": "L'inscription a échoué. Veuillez réessayer."
+      "registrationFailed": "L'inscription a échoué. Veuillez réessayer.",
+      "oauthError": "Une erreur s'est produite lors de la connexion avec {{provider}}. Veuillez réessayer."
     }
   },
   "resetPassword": {
