@@ -24,6 +24,5 @@ Allow: /terms
 # Sitemap location
 Sitemap: https://givea.netlify.app/sitemap.xml
 
-# Crawl-delay (optional, adjust as needed)
-Crawl-delay: 1
+
 
