@@ -1,11 +1,24 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
     exclude: ['lucide-react'],
+  },
+  build: {
+    outDir: 'dist/client',
+    rollupOptions: {
+      input: resolve(__dirname, 'index.html'),
+    },
+  },
+  ssr: {
+    noExternal: ['react-router-dom'],
   },
   server: {
     host: '0.0.0.0', // Allow external connections (for mobile device testing)
