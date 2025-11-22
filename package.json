@@ -9,6 +9,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
+    "build:netlify": "npm run build:client",
     "preview": "cross-env NODE_ENV=production node server.js",
     "lint": "eslint ."
   },
