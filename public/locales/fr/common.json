@@ -404,13 +404,42 @@
       "notHelpful": "Pas utile",
       "reviewsCount": "{{count}} avis",
       "reviewsCount_one": "{{count}} avis",
-      "reviewsCount_other": "{{count}} avis"
+      "reviewsCount_other": "{{count}} avis",
+      "leaveReview": "Partagez votre expérience avec ce donneur",
+      "loginToReview": "Connectez-vous pour laisser un avis et aider les autres à savoir à quoi s'attendre.",
+      "signInCta": "Se connecter",
+      "cannotReviewOwn": "Vous ne pouvez pas évaluer votre propre annonce.",
+      "ratingLabel": "Note globale",
+      "ratingRequired": "Veuillez sélectionner une note avant d'envoyer.",
+      "commentLabel": "Commentaire",
+      "commentPlaceholder": "Parlez de votre expérience de collecte ou de la façon dont le donneur vous a aidé.",
+      "submit": "Envoyer l'avis",
+      "submitting": "Envoi...",
+      "update": "Mettre à jour l'avis",
+      "delete": "Supprimer l'avis",
+      "deleting": "Suppression...",
+      "confirmDelete": "Supprimer votre avis ?",
+      "submitError": "Impossible d'envoyer l'avis. Veuillez réessayer.",
+      "deleteError": "Impossible de supprimer l'avis. Veuillez réessayer.",
+      "noReviews": "Pas encore d'avis. Soyez le premier à partager votre expérience !",
+      "notificationMessage": "{{name}} a laissé un nouvel avis sur {{item}}"
     },
     "givenAway": {
       "title": "Cet article a déjà été donné",
       "description": "Le donneur n'accepte plus de demandes pour cet article."
     },
     "anonymousUser": "Utilisateur anonyme"
+  },
+  "notifications": {
+    "reviews": {
+      "title": "Alertes d'avis",
+      "subtitle": "Restez informé des nouveaux retours",
+      "markAll": "Tout marquer comme lu",
+      "loading": "Chargement des notifications...",
+      "empty": "Aucune alerte d'avis pour le moment.",
+      "newReview": "{{name}} a laissé un nouvel avis",
+      "viewAll": "Voir l'historique des avis"
+    }
   },
   "login": {
     "title": "Bon retour",

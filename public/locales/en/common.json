@@ -423,13 +423,42 @@
       "notHelpful": "Not Helpful",
       "reviewsCount": "{{count}} reviews",
       "reviewsCount_one": "{{count}} review",
-      "reviewsCount_other": "{{count}} reviews"
+      "reviewsCount_other": "{{count}} reviews",
+      "leaveReview": "Share your experience with this donor",
+      "loginToReview": "Sign in to leave a review and help others know what to expect.",
+      "signInCta": "Sign In",
+      "cannotReviewOwn": "You cannot review your own listing.",
+      "ratingLabel": "Overall rating",
+      "ratingRequired": "Please select a rating before submitting.",
+      "commentLabel": "Comment",
+      "commentPlaceholder": "Tell others about your pickup experience or how the donor helped you.",
+      "submit": "Submit Review",
+      "submitting": "Submitting...",
+      "update": "Update Review",
+      "delete": "Delete Review",
+      "deleting": "Deleting...",
+      "confirmDelete": "Delete your review?",
+      "submitError": "Failed to submit review. Please try again.",
+      "deleteError": "Failed to delete review. Please try again.",
+      "noReviews": "No reviews yet. Be the first to share your experience!",
+      "notificationMessage": "{{name}} left a new review on {{item}}"
     },
     "givenAway": {
       "title": "This item has already been given away",
       "description": "The donor is no longer accepting requests for this item."
     },
     "anonymousUser": "Anonymous User"
+  },
+  "notifications": {
+    "reviews": {
+      "title": "Review alerts",
+      "subtitle": "Stay up to date with new feedback",
+      "markAll": "Mark all read",
+      "loading": "Loading notifications...",
+      "empty": "No review notifications yet.",
+      "newReview": "{{name}} left a new review",
+      "viewAll": "View review history"
+    }
   },
   "login": {
     "title": "Welcome back",

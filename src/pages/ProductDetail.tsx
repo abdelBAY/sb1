@@ -24,6 +24,20 @@ import LocationMap from '../components/LocationMap';
 import { useTranslation } from 'react-i18next';
 import OptimizedImage from '../components/OptimizedImage';
 
+interface ReviewProfile {
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
+interface ProductReview {
+  id: string;
+  rating: number;
+  comment: string | null;
+  reviewer_id: string;
+  created_at: string;
+  profiles: ReviewProfile | null;
+}
+
 interface ProductDetails {
   id: string;
   title: string;
@@ -49,16 +63,7 @@ interface ProductDetails {
     rating: number;
     review_count: number;
   };
-  reviews: {
-    id: string;
-    rating: number;
-    comment: string;
-    created_at: string;
-    profiles: {
-      full_name: string | null;
-      avatar_url: string | null;
-    };
-  }[] | null;
+  reviews: ProductReview[];
   related_items: {
     id: string;
     title: string;
@@ -87,6 +92,12 @@ export default function ProductDetail() {
     'seeds.zeroMessage',
     "You've used all your seeds. Give something to earn more and keep growing!"
   );
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [userReview, setUserReview] = useState<ProductReview | null>(null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [deletingReview, setDeletingReview] = useState(false);
 
   const getStatusTranslation = (status: string) => {
     if (status === 'GIVEN_AWAY') {
@@ -123,6 +134,27 @@ export default function ProductDetail() {
   useEffect(() => {
     loadProductDetails();
   }, [id]);
+
+  useEffect(() => {
+    if (product && user) {
+      const existing = product.reviews?.find((review) => review.reviewer_id === user.id) || null;
+      setUserReview(existing || null);
+
+      if (existing) {
+        setReviewRating(existing.rating);
+        setReviewComment(existing.comment || '');
+      } else {
+        setReviewRating(0);
+        setReviewComment('');
+      }
+    }
+
+    if (!user) {
+      setUserReview(null);
+      setReviewRating(0);
+      setReviewComment('');
+    }
+  }, [product, user]);
 
   const loadProductDetails = async () => {
     try {
@@ -161,6 +193,7 @@ export default function ProductDetail() {
         .from('reviews')
         .select(`
           id,
+          reviewer_id,
           rating,
           comment,
           created_at,
@@ -169,7 +202,8 @@ export default function ProductDetail() {
             avatar_url
           )
         `)
-        .eq('reviewed_id', announcement.user_id);
+        .eq('reviewed_id', announcement.user_id)
+        .order('created_at', { ascending: false });
 
       if (reviewsError) throw reviewsError;
 
@@ -196,7 +230,7 @@ export default function ProductDetail() {
           rating: userRating,
           review_count: reviews?.length || 0
         },
-        reviews,
+        reviews: reviews || [],
         related_items: relatedItems
       };
 
@@ -218,6 +252,167 @@ export default function ProductDetail() {
       setError('Failed to load product details. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateProductReviews = (nextReviews: ProductReview[]) => {
+    setProduct((prev) => {
+      if (!prev) return prev;
+      const total = nextReviews.reduce((acc, review) => acc + review.rating, 0);
+      const average = nextReviews.length ? total / nextReviews.length : 0;
+      return {
+        ...prev,
+        reviews: nextReviews,
+        user: {
+          ...prev.user,
+          rating: average,
+          review_count: nextReviews.length
+        }
+      };
+    });
+  };
+
+  const reviewSelect = `
+    id,
+    reviewer_id,
+    rating,
+    comment,
+    created_at,
+    profiles!reviewer_id (
+      full_name,
+      avatar_url
+    )
+  `;
+
+  const handleReviewSubmit = async () => {
+    if (!product) return;
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (user.id === product.user.id) {
+      setReviewError(t('productDetail.reviews.cannotReviewOwn'));
+      return;
+    }
+
+    if (reviewRating < 1) {
+      setReviewError(t('productDetail.reviews.ratingRequired'));
+      return;
+    }
+
+    setSubmittingReview(true);
+    setReviewError(null);
+
+    try {
+      const payload = {
+        rating: reviewRating,
+        comment: reviewComment.trim() || null
+      };
+
+      let persistedReview: ProductReview | null = null;
+
+      if (userReview) {
+        const { data, error } = await supabase
+          .from('reviews')
+          .update(payload)
+          .eq('id', userReview.id)
+          .eq('reviewer_id', user.id)
+          .select(reviewSelect)
+          .maybeSingle();
+
+        if (error) throw error;
+        persistedReview = data;
+      } else {
+        const { data, error } = await supabase
+          .from('reviews')
+          .insert({
+            reviewer_id: user.id,
+            reviewed_id: product.user.id,
+            rating: reviewRating,
+            comment: reviewComment.trim() || null
+          })
+          .select(reviewSelect)
+          .maybeSingle();
+
+        if (error) throw error;
+        persistedReview = data;
+      }
+
+      if (!persistedReview) {
+        throw new Error('Failed to save review');
+      }
+
+      setUserReview(persistedReview);
+
+      const existingReviews = product.reviews || [];
+      const nextReviews = userReview
+        ? existingReviews.map((review) => (review.id === persistedReview.id ? persistedReview : review))
+        : [persistedReview, ...existingReviews];
+
+      updateProductReviews(nextReviews);
+
+      if (!userReview) {
+        const reviewerDisplayName =
+          profile?.full_name ||
+          user?.user_metadata?.full_name ||
+          user?.email?.split('@')[0] ||
+          t('productDetail.anonymousUser');
+
+        const notificationMessage = t('productDetail.reviews.notificationMessage', {
+          name: reviewerDisplayName,
+          item: product.title
+        });
+
+        try {
+          await supabase.from('review_notifications').insert({
+            recipient_id: product.user.id,
+            reviewer_id: user.id,
+            review_id: persistedReview.id,
+            message: notificationMessage
+          });
+        } catch (notificationError) {
+          console.error('Error creating review notification:', notificationError);
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      setReviewError(t('productDetail.reviews.submitError'));
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    if (!product || !user || !userReview) return;
+
+    const confirmed = window.confirm(t('productDetail.reviews.confirmDelete'));
+    if (!confirmed) return;
+
+    setDeletingReview(true);
+    setReviewError(null);
+
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', userReview.id)
+        .eq('reviewer_id', user.id);
+
+      if (error) throw error;
+
+      const remainingReviews = (product.reviews || []).filter((review) => review.id !== userReview.id);
+      updateProductReviews(remainingReviews);
+
+      setUserReview(null);
+      setReviewRating(0);
+      setReviewComment('');
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      setReviewError(t('productDetail.reviews.deleteError'));
+    } finally {
+      setDeletingReview(false);
     }
   };
 
@@ -700,71 +895,182 @@ export default function ProductDetail() {
           </div>
 
           {/* Reviews Section */}
-          {product.reviews && product.reviews.length > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-8">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-8 space-y-8">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 {t('productDetail.sections.reviews')}
               </h3>
-              <div className="space-y-6">
-                {product.reviews.map((review) => (
-                  <div 
-                    key={review.id}
-                    className="flex space-x-4"
-                  >
-                    {review.profiles.avatar_url ? (
-                      <img
-                        src={review.profiles.avatar_url}
-                        alt={review.profiles.full_name || t('productDetail.anonymousUser')}
-                        loading="lazy"
-                        className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                        <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-900 dark:text-white">
-                            {review.profiles.full_name || t('productDetail.anonymousUser')}
-                          </h4>
-                          <div className="flex items-center mt-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < review.rating
-                                    ? 'text-yellow-400'
-                                    : 'text-gray-300 dark:text-gray-600'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          {formatDate(review.created_at)}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-gray-600 dark:text-gray-300">
-                        {review.comment}
-                      </p>
-                      <div className="mt-3 flex items-center space-x-4">
-                        <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                          <ThumbsUp className="w-4 h-4 mr-1" />
-                          {t('productDetail.reviews.helpful')}
-                        </button>
-                        <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                          <ThumbsDown className="w-4 h-4 mr-1" />
-                          {t('productDetail.reviews.notHelpful')}
-                        </button>
+              <div className="bg-gray-50 dark:bg-gray-800/60 rounded-lg p-6">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  {t('productDetail.reviews.leaveReview')}
+                </p>
+                {!user ? (
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-gray-900/40 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {t('productDetail.reviews.loginToReview')}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/login')}
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
+                    >
+                      {t('productDetail.reviews.signInCta')}
+                    </button>
+                  </div>
+                ) : user.id === product.user.id ? (
+                  <div className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-900/40 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-4">
+                    {t('productDetail.reviews.cannotReviewOwn')}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        {t('productDetail.reviews.ratingLabel')}
+                      </label>
+                      <div className="flex items-center space-x-1">
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => {
+                              setReviewRating(value);
+                              setReviewError(null);
+                            }}
+                            disabled={submittingReview}
+                            className="p-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                            aria-label={`Rate ${value} star${value > 1 ? 's' : ''}`}
+                          >
+                            <Star
+                              className={`w-7 h-7 ${
+                                value <= reviewRating
+                                  ? 'text-yellow-400 fill-yellow-400'
+                                  : 'text-gray-300 dark:text-gray-600'
+                              }`}
+                            />
+                          </button>
+                        ))}
                       </div>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        {t('productDetail.reviews.commentLabel')}
+                      </label>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(event) => {
+                          setReviewComment(event.target.value);
+                          setReviewError(null);
+                        }}
+                        maxLength={600}
+                        rows={4}
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder={t('productDetail.reviews.commentPlaceholder')}
+                        disabled={submittingReview}
+                      />
+                    </div>
+                    {reviewError && (
+                      <p className="text-sm text-red-600 dark:text-red-400">{reviewError}</p>
+                    )}
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={handleReviewSubmit}
+                        disabled={submittingReview || deletingReview}
+                        className="inline-flex items-center justify-center px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {submittingReview
+                          ? t('productDetail.reviews.submitting')
+                          : userReview
+                          ? t('productDetail.reviews.update')
+                          : t('productDetail.reviews.submit')}
+                      </button>
+                      {userReview && (
+                        <button
+                          type="button"
+                          onClick={handleDeleteReview}
+                          disabled={deletingReview || submittingReview}
+                          className="inline-flex items-center justify-center px-5 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {deletingReview
+                            ? t('productDetail.reviews.deleting')
+                            : t('productDetail.reviews.delete')}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
-          )}
+
+            <div>
+              {product.reviews && product.reviews.length > 0 ? (
+                <div className="space-y-6">
+                  {product.reviews.map((review) => (
+                    <div 
+                      key={review.id}
+                      className="flex space-x-4"
+                    >
+                      {review.profiles?.avatar_url ? (
+                        <img
+                          src={review.profiles.avatar_url}
+                          alt={review.profiles.full_name || t('productDetail.anonymousUser')}
+                          loading="lazy"
+                          className="w-10 h-10 rounded-full object-cover ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                          <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              {review.profiles?.full_name || t('productDetail.anonymousUser')}
+                            </h4>
+                            <div className="flex items-center mt-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-4 h-4 ${
+                                    i < review.rating
+                                      ? 'text-yellow-400'
+                                      : 'text-gray-300 dark:text-gray-600'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {formatDate(review.created_at)}
+                          </span>
+                        </div>
+                        {review.comment && (
+                          <p className="mt-2 text-gray-600 dark:text-gray-300">
+                            {review.comment}
+                          </p>
+                        )}
+                        <div className="mt-3 flex items-center space-x-4">
+                          <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <ThumbsUp className="w-4 h-4 mr-1" />
+                            {t('productDetail.reviews.helpful')}
+                          </button>
+                          <button className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                            <ThumbsDown className="w-4 h-4 mr-1" />
+                            {t('productDetail.reviews.notHelpful')}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 dark:text-gray-400 py-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                  {t('productDetail.reviews.noReviews')}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Related Items */}
           {product.related_items && product.related_items.length > 0 && (

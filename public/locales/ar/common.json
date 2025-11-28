@@ -412,13 +412,42 @@
       "notHelpful": "غير مفيد",
       "reviewsCount": "{{count}} مراجعة",
       "reviewsCount_one": "{{count}} مراجعة",
-      "reviewsCount_other": "{{count}} مراجعات"
+      "reviewsCount_other": "{{count}} مراجعات",
+      "leaveReview": "شارك تجربتك مع هذا المتبرع",
+      "loginToReview": "سجّل الدخول لترك مراجعة ومساعدة الآخرين على معرفة ما يمكن توقعه.",
+      "signInCta": "تسجيل الدخول",
+      "cannotReviewOwn": "لا يمكنك مراجعة قائمتك الخاصة.",
+      "ratingLabel": "التقييم العام",
+      "ratingRequired": "يرجى اختيار تقييم قبل الإرسال.",
+      "commentLabel": "تعليق",
+      "commentPlaceholder": "أخبر الآخرين عن تجربة الاستلام أو كيف ساعدك المتبرع.",
+      "submit": "إرسال المراجعة",
+      "submitting": "جارٍ الإرسال...",
+      "update": "تحديث المراجعة",
+      "delete": "حذف المراجعة",
+      "deleting": "جارٍ الحذف...",
+      "confirmDelete": "حذف مراجعتك؟",
+      "submitError": "فشل إرسال المراجعة. يرجى المحاولة مرة أخرى.",
+      "deleteError": "فشل حذف المراجعة. يرجى المحاولة مرة أخرى.",
+      "noReviews": "لا توجد مراجعات بعد. كن أول من يشارك تجربته!",
+      "notificationMessage": "{{name}} كتب مراجعة جديدة عن {{item}}"
     },
     "givenAway": {
       "title": "تم التبرع بهذا العنصر بالفعل",
       "description": "المتبرع لم يعد يقبل الطلبات لهذا العنصر."
     },
     "anonymousUser": "مستخدم مجهول"
+  },
+  "notifications": {
+    "reviews": {
+      "title": "تنبيهات المراجعات",
+      "subtitle": "ابقَ على اطلاع بآراء المستفيدين",
+      "markAll": "تمييز الكل كمقروء",
+      "loading": "جارٍ تحميل التنبيهات...",
+      "empty": "لا توجد تنبيهات مراجعات حالياً.",
+      "newReview": "{{name}} ترك مراجعة جديدة",
+      "viewAll": "عرض سجل المراجعات"
+    }
   },
   "login": {
     "title": "مرحباً بعودتك",

@@ -8,7 +8,7 @@ import {
   X,
   LayoutDashboard,
   User,
-  Bell,
+  BellRing,
   Home
 } from 'lucide-react';
 import { useStore } from '../lib/store';
@@ -20,6 +20,20 @@ import LogoutModal from './LogoutModal';
 import { useTranslation } from 'react-i18next';
 import SeedBalance from './seeds/SeedBalance';
 import OptimizedImage from './OptimizedImage';
+import chatIcon from '../assets/chat.png';
+
+interface ReviewNotificationItem {
+  id: string;
+  message: string | null;
+  read: boolean;
+  created_at: string;
+  reviewer_id: string;
+  review_id: string;
+  reviewer?: {
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
+}
 
 declare global {
   interface Window {
@@ -34,6 +48,9 @@ export default function Layout() {
   const [isProfileOpen, setIsProfileOpen] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const [isReviewDropdownOpen, setIsReviewDropdownOpen] = React.useState(false);
+  const [isReviewNotificationLoading, setIsReviewNotificationLoading] = React.useState(false);
+  const [reviewNotifications, setReviewNotifications] = React.useState<ReviewNotificationItem[]>([]);
   const user = useStore((state) => state.user);
   const profile = useStore((state) => state.profile);
   const setUser = useStore((state) => state.setUser);
@@ -44,13 +61,21 @@ export default function Layout() {
   const setUnreadMessagesCount = useStore((state) => state.setUnreadMessagesCount);
   const navigate = useNavigate();
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const reviewDropdownRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation('common');
   const location = useLocation();
+  const unreadReviewNotifications = React.useMemo(
+    () => reviewNotifications.filter((notification) => !notification.read).length,
+    [reviewNotifications]
+  );
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
+      }
+      if (reviewDropdownRef.current && !reviewDropdownRef.current.contains(event.target as Node)) {
+        setIsReviewDropdownOpen(false);
       }
     };
 
@@ -114,7 +139,7 @@ export default function Layout() {
         
         if (event === 'SIGNED_IN' && session?.user) {
           // Check if profile exists for OAuth users
-          const { data: profile, error: profileError } = await supabase
+          const { data: profile, error: _profileError } = await supabase
             .from('profiles')
             .select('id')
             .eq('id', session.user.id)
@@ -285,6 +310,140 @@ export default function Layout() {
     setShowLogoutModal(true);
   };
 
+  const fetchReviewNotifications = React.useCallback(async () => {
+    if (!user?.id) {
+      setReviewNotifications([]);
+      return;
+    }
+
+    setIsReviewNotificationLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('review_notifications')
+        .select(`
+          id,
+          read,
+          message,
+          created_at,
+          reviewer_id,
+          review_id,
+          reviewer:profiles!reviewer_id (
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('recipient_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        throw error;
+      }
+
+      const normalizedData = (data || []).map((notification: any) => ({
+        ...notification,
+        reviewer: Array.isArray(notification.reviewer)
+          ? notification.reviewer[0] || null
+          : notification.reviewer
+      }));
+
+      setReviewNotifications(normalizedData as ReviewNotificationItem[]);
+    } catch (notificationError) {
+      console.error('Error fetching review notifications:', notificationError);
+    } finally {
+      setIsReviewNotificationLoading(false);
+    }
+  }, [user?.id]);
+
+  React.useEffect(() => {
+    if (!user?.id) {
+      setReviewNotifications([]);
+      setIsReviewDropdownOpen(false);
+      return;
+    }
+
+    fetchReviewNotifications();
+
+    const channel = supabase
+      .channel(`review-notifications-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'review_notifications',
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        () => {
+          fetchReviewNotifications();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, fetchReviewNotifications]);
+
+  const formatNotificationTimestamp = (value: string) => {
+    try {
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(new Date(value));
+    } catch {
+      return value;
+    }
+  };
+
+  const markReviewNotificationAsRead = async (notificationId: string) => {
+    try {
+      await supabase
+        .from('review_notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+
+      setReviewNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === notificationId ? { ...notification, read: true } : notification
+        )
+      );
+    } catch (error) {
+      console.error('Error updating review notification:', error);
+    }
+  };
+
+  const markAllReviewNotificationsAsRead = async () => {
+    if (!user?.id || unreadReviewNotifications === 0) {
+      return;
+    }
+
+    try {
+      await supabase
+        .from('review_notifications')
+        .update({ read: true })
+        .eq('recipient_id', user.id)
+        .eq('read', false);
+
+      setReviewNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })));
+    } catch (error) {
+      console.error('Error marking review notifications as read:', error);
+    }
+  };
+
+  const handleReviewNotificationClick = async (notification: ReviewNotificationItem) => {
+    if (!user?.id) {
+      return;
+    }
+
+    if (!notification.read) {
+      await markReviewNotificationAsRead(notification.id);
+    }
+
+    setIsReviewDropdownOpen(false);
+    navigate(`/donor/${user.id}`);
+  };
+
   const handleConfirmLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -377,13 +536,118 @@ export default function Layout() {
                       onClick={() => navigate('/messages')}
                       className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
                     >
-                      <Bell className="w-5 h-5" />
+                      <img src={chatIcon} alt="Messages" className="w-5 h-5" />
                       {unreadMessagesCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
                           {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                         </span>
                       )}
                     </button>
+                  </div>
+                  
+                  {/* Review Notifications */}
+                  <div className="relative" ref={reviewDropdownRef}>
+                    <button
+                      onClick={() => setIsReviewDropdownOpen((prev) => !prev)}
+                      className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                    >
+                      <BellRing className="w-5 h-5" />
+                      {unreadReviewNotifications > 0 && (
+                        <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-orange-500 text-white text-xs font-bold rounded-full">
+                          {unreadReviewNotifications > 9 ? '9+' : unreadReviewNotifications}
+                        </span>
+                      )}
+                    </button>
+
+                    {isReviewDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-40">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {t('notifications.reviews.title')}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {t('notifications.reviews.subtitle')}
+                            </p>
+                          </div>
+                          <button
+                            onClick={markAllReviewNotificationsAsRead}
+                            className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+                            disabled={unreadReviewNotifications === 0}
+                          >
+                            {t('notifications.reviews.markAll')}
+                          </button>
+                        </div>
+                        <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+                          {isReviewNotificationLoading ? (
+                            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
+                              {t('notifications.reviews.loading')}
+                            </div>
+                          ) : reviewNotifications.length === 0 ? (
+                            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
+                              {t('notifications.reviews.empty')}
+                            </div>
+                          ) : (
+                            reviewNotifications.map((notification) => {
+                              const reviewerName =
+                                notification.reviewer?.full_name || t('productDetail.anonymousUser');
+                              const message =
+                                notification.message ||
+                                t('notifications.reviews.newReview', { name: reviewerName });
+
+                              return (
+                                <button
+                                  key={notification.id}
+                                  onClick={() => handleReviewNotificationClick(notification)}
+                                  className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                                    notification.read ? 'opacity-80' : ''
+                                  }`}
+                                >
+                                  <div className="flex-shrink-0">
+                                    {notification.reviewer?.avatar_url ? (
+                                      <img
+                                        src={notification.reviewer.avatar_url}
+                                        alt={reviewerName || 'Reviewer'}
+                                        className="w-10 h-10 rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                                        <User className="w-5 h-5 text-gray-500 dark:text-gray-300" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                      {message}
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                      {formatNotificationTimestamp(notification.created_at)}
+                                    </p>
+                                  </div>
+                                  {!notification.read && (
+                                    <span className="w-2 h-2 rounded-full bg-blue-500 mt-2"></span>
+                                  )}
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                        <div className="p-3 border-t border-gray-100 dark:border-gray-700">
+                          <button
+                            onClick={() => {
+                              markAllReviewNotificationsAsRead();
+                              setIsReviewDropdownOpen(false);
+                              if (user?.id) {
+                                navigate(`/donor/${user.id}`);
+                              }
+                            }}
+                            className="w-full text-sm font-semibold text-orange-600 dark:text-orange-400 hover:underline"
+                          >
+                            {t('notifications.reviews.viewAll')}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Profile Dropdown */}
@@ -458,7 +722,7 @@ export default function Layout() {
                           onClick={() => setIsProfileOpen(false)}
                         >
                           <div className="flex items-center space-x-2">
-                            <Bell className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            <img src={chatIcon} alt="Messages" className="w-4 h-4" />
                             <span>Messages</span>
                           </div>
                           <div className="flex items-center space-x-1">
@@ -604,13 +868,36 @@ export default function Layout() {
                   className="flex items-center justify-between px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <span>Messages</span>
+                  <div className="flex items-center space-x-2">
+                    <img src={chatIcon} alt="Messages" className="w-4 h-4" />
+                    <span>Messages</span>
+                  </div>
                   {unreadMessagesCount > 0 && (
                     <span className="flex items-center justify-center w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full">
                       {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                     </span>
                   )}
                 </Link>
+                <button
+                  onClick={() => {
+                    markAllReviewNotificationsAsRead();
+                    setIsMobileMenuOpen(false);
+                    if (user?.id) {
+                      navigate(`/donor/${user.id}`);
+                    }
+                  }}
+                  className="flex w-full items-center justify-between px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-md"
+                >
+                  <div className="flex items-center space-x-2">
+                    <BellRing className="w-4 h-4" />
+                    <span>{t('notifications.reviews.title')}</span>
+                  </div>
+                  {unreadReviewNotifications > 0 && (
+                    <span className="flex items-center justify-center w-6 h-6 bg-orange-500 text-white text-xs font-bold rounded-full">
+                      {unreadReviewNotifications > 9 ? '9+' : unreadReviewNotifications}
+                    </span>
+                  )}
+                </button>
                 <button
                   onClick={handleSignOut}
                   className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
