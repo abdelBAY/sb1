@@ -375,6 +375,7 @@
       "categoryRequired": "Category is required",
       "descriptionRequired": "Description is required",
       "locationRequired": "Location is required",
+      "photosRequired": "At least one image is required",
       "maxPhotos": "Maximum 5 photos allowed",
       "maxTags": "Maximum 5 tags allowed",
       "invalidFiles": "Some files were skipped. Please ensure all files are images under 5MB.",
@@ -551,6 +552,8 @@
     "items": "Items",
     "noItems": "No Items Yet",
     "noItemsDesc": "This donor has not posted any items yet.",
+    "showAll": "Show All",
+    "showLess": "Show Less",
     "errors": {
       "notFound": "Donor profile not found",
       "notFoundDesc": "The donor profile you are looking for does not exist.",

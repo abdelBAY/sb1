@@ -2,14 +2,15 @@ import { useEffect, useState, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
   Clock,
   Megaphone,
   ChevronRight,
   User as UserIcon,
-  Camera
+  Camera,
+  Star
 } from 'lucide-react';
 import SeedBalance from '../components/seeds/SeedBalance';
 import OptimizedImage from '../components/OptimizedImage';
@@ -55,6 +56,8 @@ export default function Profile() {
     gender: '',
     email: ''
   });
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   // Check store user authentication first (wait for auth initialization)
   useEffect(() => {
@@ -72,6 +75,12 @@ export default function Profile() {
   useEffect(() => {
     getProfile();
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchReviews();
+    }
+  }, [user?.id]);
 
   async function getProfile() {
     try {
@@ -282,6 +291,45 @@ export default function Profile() {
     fileInputRef.current?.click();
   };
 
+  const fetchReviews = async () => {
+    if (!user?.id) return;
+    
+    setReviewsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          id,
+          reviewer_id,
+          rating,
+          comment,
+          created_at,
+          profiles!reviewer_id (
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('reviewed_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setReviews(data || []);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(new Date(dateString));
+  };
+
   // Show loading while checking authentication or while auth is initializing
   if (loading || isLoading) {
     return (
@@ -342,10 +390,67 @@ export default function Profile() {
               {/* Reviews Section */}
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('profile.reviews')}</h3>
-                <div className="text-sm text-gray-600 dark:text-gray-300">{t('profile.noReviews')}</div>
-                <div className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
-                  {t('profile.seeAll')} <ChevronRight className="inline w-4 h-4" />
-                </div>
+                {reviewsLoading ? (
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Loading reviews...</div>
+                ) : reviews.length === 0 ? (
+                  <div className="text-sm text-gray-600 dark:text-gray-300">{t('profile.noReviews')}</div>
+                ) : (
+                  <div className="space-y-3">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-3 last:border-0">
+                        <div className="flex items-start gap-3">
+                          <Link
+                            to={`/donor/${review.reviewer_id}`}
+                            className="flex-shrink-0 group"
+                          >
+                            {review.profiles?.avatar_url ? (
+                              <img
+                                src={review.profiles.avatar_url}
+                                alt={review.profiles.full_name || 'Reviewer'}
+                                className="w-8 h-8 rounded-full object-cover ring-2 ring-transparent group-hover:ring-blue-500 transition-all"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors">
+                                <UserIcon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                              </div>
+                            )}
+                          </Link>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Link
+                                to={`/donor/${review.reviewer_id}`}
+                                className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 group"
+                              >
+                                {review.profiles?.full_name || t('productDetail.anonymousUser')}
+                                <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </Link>
+                              <div className="flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-3 h-3 ${
+                                      i < review.rating
+                                        ? 'text-yellow-400 fill-current'
+                                        : 'text-gray-300 dark:text-gray-600'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            {review.comment && (
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+                                {review.comment}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {formatDate(review.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -329,6 +329,9 @@ export default function Search() {
         queryBuilder = queryBuilder.eq('condition', selectedCondition);
       }
 
+      // Always exclude GIVEN_AWAY items from search results
+      queryBuilder = queryBuilder.neq('status', 'GIVEN_AWAY');
+
       if (pendingOnly) {
         queryBuilder = queryBuilder.eq('status', 'PENDING');
       }
@@ -400,6 +403,9 @@ export default function Search() {
         filteredData = [...filteredWithCoords, ...filteredWithoutCoords];
         console.log('Filtered results:', filteredData.length);
       }
+
+      // Ensure no GIVEN_AWAY items are displayed (safety filter)
+      filteredData = filteredData.filter((item: any) => item.status !== 'GIVEN_AWAY');
 
       setResults(filteredData);
       setTotalResults(filteredData.length);

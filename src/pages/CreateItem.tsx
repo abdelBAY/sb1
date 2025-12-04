@@ -413,6 +413,9 @@ export default function CreateItem() {
     if (!formData.location.trim()) {
       throw new Error(t('createItem.errors.locationRequired'));
     }
+    if (formData.photos.length === 0) {
+      throw new Error(t('createItem.errors.photosRequired'));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -622,7 +625,7 @@ export default function CreateItem() {
               {/* Photos */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  {t('createItem.fields.photos')}
+                  {t('createItem.fields.photos')} <span className="text-red-500">{t('createItem.required')}</span>
                   <span className="text-gray-500 dark:text-gray-400 text-xs ml-2 font-normal">
                     ({t('createItem.fields.photosHint')})
                   </span>

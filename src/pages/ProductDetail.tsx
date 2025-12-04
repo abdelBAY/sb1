@@ -817,24 +817,27 @@ export default function ProductDetail() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   {t('productDetail.sections.aboutDonor')}
                 </h3>
-                <div className="flex items-center space-x-4">
+                <Link
+                  to={`/donor/${product.user.id}`}
+                  className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group"
+                >
                   {product.user.avatar_url ? (
                     <OptimizedImage
                       src={product.user.avatar_url}
                       alt={product.user.full_name || t('productDetail.anonymousUser')}
-                      className="w-12 h-12 rounded-full ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)]"
+                      className="w-12 h-12 rounded-full ring-4 ring-orange-500/50 shadow-[0_0_20px_rgba(249,115,22,0.6)] group-hover:ring-orange-400 transition-all"
                       width={48}
                       height={48}
                       priority={false}
                       placeholder="blur"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors">
                       <User className="w-6 h-6 text-gray-400 dark:text-gray-500" />
                     </div>
                   )}
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-900 dark:text-white">
+                  <div className="flex-1">
+                    <h4 className="text-lg font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {product.user.full_name || t('productDetail.anonymousUser')}
                     </h4>
                     {product.user.rating > 0 && (
@@ -851,7 +854,8 @@ export default function ProductDetail() {
                       </div>
                     )}
                   </div>
-                </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                </Link>
               </div>
 
               {/* Request Status or Action Buttons */}

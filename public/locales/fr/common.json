@@ -356,6 +356,7 @@
       "categoryRequired": "La catégorie est requise",
       "descriptionRequired": "La description est requise",
       "locationRequired": "L'emplacement est requis",
+      "photosRequired": "Au moins une image est requise",
       "maxPhotos": "Maximum 5 photos autorisées",
       "maxTags": "Maximum 5 tags autorisés",
       "invalidFiles": "Certains fichiers ont été ignorés. Veuillez vous assurer que tous les fichiers sont des images de moins de 5 Mo.",
@@ -532,6 +533,8 @@
     "items": "Articles",
     "noItems": "Aucun article pour le moment",
     "noItemsDesc": "Ce donneur n'a pas encore publié d'articles.",
+    "showAll": "Afficher tout",
+    "showLess": "Afficher moins",
     "errors": {
       "notFound": "Profil du donneur introuvable",
       "notFoundDesc": "Le profil du donneur que vous recherchez n'existe pas.",

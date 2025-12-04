@@ -10,7 +10,8 @@ import {
   ArrowLeft,
   Grid,
   List,
-  AlertCircle
+  AlertCircle,
+  ChevronRight
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import OptimizedImage from '../components/OptimizedImage';
@@ -48,6 +49,8 @@ export default function DonorProfile() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [rating, setRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -86,17 +89,29 @@ export default function DonorProfile() {
       setItems(announcements || []);
 
       // Fetch reviews and calculate rating
-      const { data: reviews, error: reviewsError } = await supabase
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
-        .select('rating')
-        .eq('reviewed_id', id);
+        .select(`
+          id,
+          reviewer_id,
+          rating,
+          comment,
+          created_at,
+          profiles!reviewer_id (
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('reviewed_id', id)
+        .order('created_at', { ascending: false });
 
       if (reviewsError) {
         console.error('Error fetching reviews:', reviewsError);
-      } else if (reviews && reviews.length > 0) {
-        const avgRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+      } else if (reviewsData && reviewsData.length > 0) {
+        const avgRating = reviewsData.reduce((acc, review) => acc + review.rating, 0) / reviewsData.length;
         setRating(avgRating);
-        setReviewCount(reviews.length);
+        setReviewCount(reviewsData.length);
+        setReviews(reviewsData);
       }
     } catch (error) {
       console.error('Error loading donor profile:', error);
@@ -356,6 +371,80 @@ export default function DonorProfile() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Reviews Section */}
+        {reviews.length > 0 && (
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {t('productDetail.sections.reviews')} ({reviewCount})
+              </h2>
+              {reviews.length > 5 && (
+                <button
+                  onClick={() => setShowAllReviews(!showAllReviews)}
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {showAllReviews ? t('donorProfile.showLess', 'Show Less') : t('donorProfile.showAll', 'Show All')}
+                </button>
+              )}
+            </div>
+            <div className="space-y-6">
+              {(showAllReviews ? reviews : reviews.slice(0, 5)).map((review) => (
+                <div key={review.id} className="flex space-x-4">
+                  <Link
+                    to={`/donor/${review.reviewer_id}`}
+                    className="flex-shrink-0 group"
+                  >
+                    {review.profiles?.avatar_url ? (
+                      <img
+                        src={review.profiles.avatar_url}
+                        alt={review.profiles.full_name || t('productDetail.anonymousUser')}
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-transparent group-hover:ring-blue-500 transition-all"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-gray-300 dark:group-hover:bg-gray-600 transition-colors">
+                        <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      </div>
+                    )}
+                  </Link>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Link
+                          to={`/donor/${review.reviewer_id}`}
+                          className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 group"
+                        >
+                          {review.profiles?.full_name || t('productDetail.anonymousUser')}
+                          <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                        <div className="flex items-center mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${
+                                i < review.rating
+                                  ? 'text-yellow-400 fill-current'
+                                  : 'text-gray-300 dark:text-gray-600'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(review.created_at)}
+                      </span>
+                    </div>
+                    {review.comment && (
+                      <p className="mt-2 text-gray-600 dark:text-gray-300">
+                        {review.comment}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
