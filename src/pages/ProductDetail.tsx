@@ -34,6 +34,7 @@ interface ProductReview {
   rating: number;
   comment: string | null;
   reviewer_id: string;
+  announcement_id?: string;
   created_at: string;
   profiles: ReviewProfile | null;
 }
@@ -137,7 +138,10 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (product && user) {
-      const existing = product.reviews?.find((review) => review.reviewer_id === user.id) || null;
+      // Check for existing review for this specific item
+      const existing = product.reviews?.find(
+        (review) => review.reviewer_id === user.id && review.announcement_id === product.id
+      ) || null;
       setUserReview(existing || null);
 
       if (existing) {
@@ -188,12 +192,13 @@ export default function ProductDetail() {
         avatar_url: null
       };
 
-      // Fetch user reviews
+      // Fetch user reviews for this specific item
       const { data: reviews = [], error: reviewsError } = await supabase
         .from('reviews')
         .select(`
           id,
           reviewer_id,
+          announcement_id,
           rating,
           comment,
           created_at,
@@ -202,7 +207,7 @@ export default function ProductDetail() {
             avatar_url
           )
         `)
-        .eq('reviewed_id', announcement.user_id)
+        .eq('announcement_id', announcement.id)
         .order('created_at', { ascending: false });
 
       if (reviewsError) throw reviewsError;
@@ -275,6 +280,7 @@ export default function ProductDetail() {
   const reviewSelect = `
     id,
     reviewer_id,
+    announcement_id,
     rating,
     comment,
     created_at,
@@ -314,22 +320,37 @@ export default function ProductDetail() {
       let persistedReview: ProductReview | null = null;
 
       if (userReview) {
+        // Update existing review
         const { data, error } = await supabase
           .from('reviews')
           .update(payload)
           .eq('id', userReview.id)
           .eq('reviewer_id', user.id)
+          .eq('announcement_id', product.id)
           .select(reviewSelect)
           .maybeSingle();
 
         if (error) throw error;
         persistedReview = data;
       } else {
+        // Check if user already has a review for this item
+        const { data: existingReview } = await supabase
+          .from('reviews')
+          .select('id')
+          .eq('reviewer_id', user.id)
+          .eq('announcement_id', product.id)
+          .maybeSingle();
+
+        if (existingReview) {
+          throw new Error(t('productDetail.reviews.alreadyReviewed'));
+        }
+
         const { data, error } = await supabase
           .from('reviews')
           .insert({
             reviewer_id: user.id,
             reviewed_id: product.user.id,
+            announcement_id: product.id,
             rating: reviewRating,
             comment: reviewComment.trim() || null
           })

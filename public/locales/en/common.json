@@ -429,6 +429,7 @@
       "loginToReview": "Sign in to leave a review and help others know what to expect.",
       "signInCta": "Sign In",
       "cannotReviewOwn": "You cannot review your own listing.",
+      "alreadyReviewed": "You have already reviewed this item. You can edit your existing review.",
       "ratingLabel": "Overall rating",
       "ratingRequired": "Please select a rating before submitting.",
       "commentLabel": "Comment",
