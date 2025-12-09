@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const ContactUs: React.FC = () => {
+  const { t } = useTranslation('common');
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -32,10 +34,10 @@ const ContactUs: React.FC = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Get in Touch
+            {t('contact.title')}
           </h1>
           <p className="text-xl text-blue-100 leading-relaxed max-w-2xl mx-auto">
-            We're here to help. Whether you have questions, feedback, or need support, our team is ready to assist you.
+            {t('contact.subtitle')}
           </p>
         </div>
       </div>
@@ -49,16 +51,16 @@ const ContactUs: React.FC = () => {
             <div className="lg:col-span-2">
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 md:p-12">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                  Send Us a Message
+                  {t('contact.sendMessage.title')}
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-8">
-                  Fill out the form below and we'll get back to you within 24 hours. For urgent matters, please use the phone number provided.
+                  {t('contact.sendMessage.description')}
                 </p>
 
                 {submitted && (
                   <div className="mb-6 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 rounded-lg">
                     <p className="text-green-800 dark:text-green-200 font-semibold">
-                      ✓ Message sent successfully! We'll respond within 24 hours.
+                      {t('contact.sendMessage.success')}
                     </p>
                   </div>
                 )}
@@ -66,7 +68,7 @@ const ContactUs: React.FC = () => {
                 <div className="space-y-6">
                   <div>
                     <label htmlFor="name" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                      Full Name *
+                      {t('contact.sendMessage.fullName')}
                     </label>
                     <input
                       type="text"
@@ -75,13 +77,13 @@ const ContactUs: React.FC = () => {
                       value={formData.name}
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Your full name"
+                      placeholder={t('contact.sendMessage.fullNamePlaceholder')}
                     />
                   </div>
 
                   <div>
                     <label htmlFor="email" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                      Email Address *
+                      {t('contact.sendMessage.email')}
                     </label>
                     <input
                       type="email"
@@ -90,13 +92,13 @@ const ContactUs: React.FC = () => {
                       value={formData.email}
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="your.email@example.com"
+                      placeholder={t('contact.sendMessage.emailPlaceholder')}
                     />
                   </div>
 
                   <div>
                     <label htmlFor="subject" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                      Subject *
+                      {t('contact.sendMessage.subject')}
                     </label>
                     <select
                       id="subject"
@@ -105,21 +107,21 @@ const ContactUs: React.FC = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
-                      <option value="">Select a topic</option>
-                      <option value="general">General Inquiry</option>
-                      <option value="support">Technical Support</option>
-                      <option value="donation">Donation Question</option>
-                      <option value="account">Account Issue</option>
-                      <option value="partnership">Partnership Opportunity</option>
-                      <option value="feedback">Feedback & Suggestions</option>
-                      <option value="report">Report an Issue</option>
-                      <option value="other">Other</option>
+                      <option value="">{t('contact.sendMessage.selectTopic')}</option>
+                      <option value="general">{t('contact.sendMessage.general')}</option>
+                      <option value="support">{t('contact.sendMessage.support')}</option>
+                      <option value="donation">{t('contact.sendMessage.donation')}</option>
+                      <option value="account">{t('contact.sendMessage.account')}</option>
+                      <option value="partnership">{t('contact.sendMessage.partnership')}</option>
+                      <option value="feedback">{t('contact.sendMessage.feedback')}</option>
+                      <option value="report">{t('contact.sendMessage.report')}</option>
+                      <option value="other">{t('contact.sendMessage.other')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label htmlFor="message" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                      Message *
+                      {t('contact.sendMessage.message')}
                     </label>
                     <textarea
                       id="message"
@@ -128,7 +130,7 @@ const ContactUs: React.FC = () => {
                       onChange={handleChange}
                       rows={6}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                      placeholder="Tell us how we can help you..."
+                      placeholder={t('contact.sendMessage.messagePlaceholder')}
                     />
                   </div>
 
@@ -136,11 +138,11 @@ const ContactUs: React.FC = () => {
                     onClick={handleSubmit}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
                   >
-                    Send Message
+                    {t('contact.sendMessage.sendButton')}
                   </button>
 
                   <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                    * Required fields
+                    {t('contact.sendMessage.requiredFields')}
                   </p>
                 </div>
               </div>
@@ -152,7 +154,7 @@ const ContactUs: React.FC = () => {
               {/* Quick Contact Card */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  Contact Information
+                  {t('contact.contactInfo.title')}
                 </h3>
                 
                 <div className="space-y-6">
@@ -163,7 +165,7 @@ const ContactUs: React.FC = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">Email</p>
+                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('contact.contactInfo.email')}</p>
                       <a href="mailto:support@givea.ma" className="text-blue-600 dark:text-blue-400 hover:underline break-all">
                         support@givea.netlify.app
                       </a>
@@ -177,7 +179,7 @@ const ContactUs: React.FC = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">Phone</p>
+                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('contact.contactInfo.phone')}</p>
                       <a href="tel:+212600000000" className="text-blue-600 dark:text-blue-400 hover:underline">
                         +212 707 462 872
                       </a>
@@ -192,7 +194,7 @@ const ContactUs: React.FC = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">Location</p>
+                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('contact.contactInfo.location')}</p>
                       <p className="text-gray-600 dark:text-gray-400">
                         Rabat, Morocco
                       </p>
@@ -206,10 +208,9 @@ const ContactUs: React.FC = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">Business Hours</p>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        Monday - Friday<br />
-                        9:00 AM - 6:00 PM (GMT+1)
+                      <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('contact.contactInfo.businessHours')}</p>
+                      <p className="text-gray-600 dark:text-gray-400 whitespace-pre-line">
+                        {t('contact.contactInfo.hours')}
                       </p>
                     </div>
                   </div>
@@ -219,10 +220,10 @@ const ContactUs: React.FC = () => {
               {/* FAQ Quick Links */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                  Quick Help
+                  {t('contact.quickHelp.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  Looking for quick answers? Check out our frequently asked questions:
+                  {t('contact.quickHelp.description')}
                 </p>
                 <ul className="space-y-3">
                   <li>
@@ -230,7 +231,7 @@ const ContactUs: React.FC = () => {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                      How to create a donation listing
+                      {t('contact.quickHelp.createListing')}
                     </a>
                   </li>
                   <li>
@@ -238,7 +239,7 @@ const ContactUs: React.FC = () => {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                      Account security tips
+                      {t('contact.quickHelp.securityTips')}
                     </a>
                   </li>
                   <li>
@@ -246,7 +247,7 @@ const ContactUs: React.FC = () => {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                      How matching works
+                      {t('contact.quickHelp.matchingWorks')}
                     </a>
                   </li>
                   <li>
@@ -254,7 +255,7 @@ const ContactUs: React.FC = () => {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
-                      Community guidelines
+                      {t('contact.quickHelp.guidelines')}
                     </a>
                   </li>
                 </ul>
@@ -263,10 +264,10 @@ const ContactUs: React.FC = () => {
               {/* Social Media */}
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl shadow-2xl p-8 text-center">
                 <h3 className="text-2xl font-bold text-white mb-4">
-                  Follow Us
+                  {t('contact.followUs.title')}
                 </h3>
                 <p className="text-blue-100 mb-6">
-                  Stay connected with our community on social media
+                  {t('contact.followUs.subtitle')}
                 </p>
                 <div className="flex justify-center space-x-4">
                   <a href="#" className="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
@@ -292,7 +293,7 @@ const ContactUs: React.FC = () => {
           {/* Additional Info Section */}
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 md:p-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              What to Expect
+              {t('contact.whatToExpect.title')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
@@ -302,10 +303,10 @@ const ContactUs: React.FC = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Quick Response
+                  {t('contact.whatToExpect.quickResponse.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  We aim to respond to all inquiries within 24 hours during business days
+                  {t('contact.whatToExpect.quickResponse.description')}
                 </p>
               </div>
               <div className="text-center">
@@ -315,10 +316,10 @@ const ContactUs: React.FC = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Helpful Support
+                  {t('contact.whatToExpect.helpfulSupport.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Our team provides detailed, personalized assistance for every query
+                  {t('contact.whatToExpect.helpfulSupport.description')}
                 </p>
               </div>
               <div className="text-center">
@@ -328,10 +329,10 @@ const ContactUs: React.FC = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Secure & Private
+                  {t('contact.whatToExpect.securePrivate.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Your information is protected and never shared with third parties
+                  {t('contact.whatToExpect.securePrivate.description')}
                 </p>
               </div>
             </div>
@@ -340,7 +341,7 @@ const ContactUs: React.FC = () => {
           {/* Footer */}
           <div className="text-center py-8">
             <p className="text-blue-100 text-sm">
-              Made with ❤️ in Morocco by the Givea team
+              {t('contact.footer')}
             </p>
           </div>
         </div>

@@ -112,16 +112,16 @@ function App() {
         <div className="absolute inset-0 w-full h-full">
           <picture>
             <source srcSet={ctaImageWebp} type="image/webp" />
-            <img
+          <img
               src={ctaImageFallback}
-              alt="Community helping"
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement;
-                target.src = "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop";
-              }}
-            />
+            alt="Community helping"
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.src = "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop";
+            }}
+          />
           </picture>
           {/* Darkened overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 via-blue-700/80 to-blue-600/80 dark:from-blue-900/80 dark:via-blue-800/80 dark:to-blue-900/80"></div>

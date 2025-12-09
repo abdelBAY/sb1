@@ -65,9 +65,7 @@ export default function Search() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedCondition, setSelectedCondition] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('created_at-desc');
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [showCompareModal, setShowCompareModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
   const [pendingOnly, setPendingOnly] = useState<boolean>(false);
@@ -422,14 +420,6 @@ export default function Search() {
     return () => debouncedSearch.cancel();
   }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly, searchCoordinates, distanceRadius]);
 
-  const toggleItemSelection = (itemId: string) => {
-    setSelectedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
-
   const toggleFavorite = (itemId: string) => {
     setFavorites(prev => 
       prev.includes(itemId)
@@ -648,29 +638,6 @@ export default function Search() {
           )}
         </div>
 
-        {selectedItems.length > 0 && (
-          <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-gray-700 dark:text-gray-300">
-                {t('search.itemsSelected', { count: selectedItems.length })}
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowCompareModal(true)}
-                className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
-              >
-                {t('search.compareSelected')}
-              </button>
-              <button
-                onClick={() => setSelectedItems([])}
-                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-              >
-                {t('search.clearSelection')}
-              </button>
-            </div>
-          </div>
-        )}
 
         {loading ? (
           <div className="flex justify-center py-12">
@@ -725,12 +692,6 @@ export default function Search() {
                           {item.category && categoryMap[item.category] ? t(`search.categories.${categoryMap[item.category]}`) : item.category}
                         </span>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(item.id)}
-                        onChange={() => toggleItemSelection(item.id)}
-                        className="h-4 w-4 text-blue-600 dark:text-blue-400 rounded border-gray-300 dark:border-gray-600"
-                      />
                     </div>
 
                     <p className="mt-2 text-gray-600 dark:text-gray-300 text-sm line-clamp-2">

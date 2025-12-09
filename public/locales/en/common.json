@@ -622,5 +622,401 @@
       "checkBalance": "Keep an eye on your seed balance - it's displayed in your navigation bar"
     },
     "footer": "Made with ❤️ by the Givea team"
+  },
+  "about": {
+    "title": "About Givea",
+    "subtitle": "We're building a community where giving meets receiving. A platform that transforms unused items into meaningful impact, connecting generous hearts with those who need support most.",
+    "ourStory": {
+      "title": "Our Story",
+      "paragraph1": "Givea was born from a simple observation: countless people have items they no longer need, while others desperately search for those same items. We saw furniture left on sidewalks, clothes piling up in closets, and electronics gathering dust—all while families struggled to afford basic necessities.",
+      "paragraph2": "In 2025, we decided to bridge this gap. Starting in Morocco, we created a platform that makes giving as easy as posting a photo and receiving as simple as sending a message. No complicated processes, no barriers—just human connection and generosity.",
+      "paragraph3": "Today, Givea is more than a platform. It's a movement of people who believe in the power of community, the value of sustainability, and the joy of helping others. Every donation tells a story, and we're honored to facilitate thousands of these stories every day."
+    },
+    "ourMission": {
+      "title": "Our Mission",
+      "paragraph1": "We exist to make generosity accessible and impactful. Our mission is to create a world where resources flow freely to those who need them, where nothing useful goes to waste, and where communities grow stronger through acts of kindness.",
+      "paragraph2": "We believe that technology should serve humanity's best instincts. That's why we've built Givea to be intuitive, secure, and focused entirely on facilitating meaningful connections between donors and beneficiaries. We're not here to profit from charity—we're here to amplify it."
+    },
+    "ourValues": {
+      "title": "Our Values",
+      "communityFirst": {
+        "title": "Community First",
+        "description": "Every decision we make prioritizes the people who use Givea. We listen to your feedback, adapt to your needs, and build features that genuinely serve our community. You're not users to us—you're partners in creating positive change."
+      },
+      "transparency": {
+        "title": "Transparency & Trust",
+        "description": "We operate with complete openness. Your data is yours, your privacy is sacred, and our practices are clear. We build trust not through marketing promises but through consistent, honest action. No hidden agendas, no data selling, no compromises on integrity."
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "Every item donated through Givea is one less item in a landfill. We're committed to environmental responsibility through circular economy principles. By extending the life of products and reducing waste, we're contributing to a healthier planet for everyone."
+      },
+      "dignity": {
+        "title": "Dignity in Giving and Receiving",
+        "description": "We've designed Givea to preserve dignity on both sides of every transaction. Donors give with generosity, not pity. Recipients receive with gratitude, not shame. Our platform facilitates peer-to-peer connections that recognize the humanity in everyone."
+      },
+      "innovation": {
+        "title": "Innovation for Good",
+        "description": "Technology should solve real problems. We continuously innovate to make giving easier, matching smarter, and connections more meaningful. From smart notifications to location-based matching, every feature we build serves our mission of maximizing impact."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": {
+        "title": "Create Your Listing",
+        "description": "Donors snap a photo of items they want to give away, add a quick description, and post. It takes less than 2 minutes. No complicated forms, no verification hassles."
+      },
+      "step2": {
+        "title": "Smart Matching",
+        "description": "Our system notifies nearby users who might need these items. Recipients can browse available donations, filter by category and location, and find exactly what they're looking for."
+      },
+      "step3": {
+        "title": "Direct Communication",
+        "description": "Once matched, donors and recipients chat directly through our secure messaging system to coordinate pickup times, locations, and any other details. Simple, direct, personal."
+      },
+      "step4": {
+        "title": "Make the Connection",
+        "description": "Items change hands, lives get a little better, and nothing useful goes to waste. That's the Givea way—straightforward, impactful, and deeply human."
+      }
+    },
+    "ourImpact": {
+      "title": "Our Impact",
+      "paragraph1": "Since launching, Givea has facilitated thousands of successful donations across Morocco. We've helped families furnish their homes, students get school supplies, and communities reduce waste. But numbers only tell part of the story.",
+      "paragraph2": "The real impact is in the connections made, the gratitude expressed, and the culture of generosity we're building together. Every time someone chooses to give through Givea instead of throwing something away, they're voting for a more compassionate, sustainable world.",
+      "itemsDonated": "Items Donated",
+      "activeUsers": "Active Users",
+      "citiesCovered": "Cities Covered"
+    },
+    "theTeam": {
+      "title": "The Team",
+      "paragraph1": "Givea is built by a small, passionate team based in Morocco who believe technology can be a force for good. We're developers, designers, and community builders united by a shared vision: making generosity effortless and impact measurable.",
+      "paragraph2": "We're not venture-backed, we're not chasing explosive growth, and we're not building features for investors. We're building for you—the donors who want to make a difference and the recipients who need support. Every line of code we write serves that mission.",
+      "paragraph3": "We work closely with our community, respond to feedback quickly, and continuously improve Givea based on real user needs. This isn't just our platform—it's ours together."
+    },
+    "joinUs": {
+      "title": "Join Our Community",
+      "subtitle": "Whether you have items to give or needs to fulfill, Givea is here for you. Join thousands of others who are already making their communities better, one donation at a time.",
+      "startDonating": "Start Donating",
+      "browseItems": "Browse Items"
+    },
+    "contact": {
+      "title": "Get in Touch",
+      "description": "We love hearing from our community. Whether you have questions, suggestions, partnership ideas, or just want to share your Givea story, we're all ears.",
+      "email": "Email:",
+      "support": "Support:",
+      "location": "Location:"
+    },
+    "footer": "Made with ❤️ in Morocco by the Givea team"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We're here to help. Whether you have questions, feedback, or need support, our team is ready to assist you.",
+    "sendMessage": {
+      "title": "Send Us a Message",
+      "description": "Fill out the form below and we'll get back to you within 24 hours. For urgent matters, please use the phone number provided.",
+      "success": "✓ Message sent successfully! We'll respond within 24 hours.",
+      "fullName": "Full Name *",
+      "fullNamePlaceholder": "Your full name",
+      "email": "Email Address *",
+      "emailPlaceholder": "your.email@example.com",
+      "subject": "Subject *",
+      "selectTopic": "Select a topic",
+      "general": "General Inquiry",
+      "support": "Technical Support",
+      "donation": "Donation Question",
+      "account": "Account Issue",
+      "partnership": "Partnership Opportunity",
+      "feedback": "Feedback & Suggestions",
+      "report": "Report an Issue",
+      "other": "Other",
+      "message": "Message *",
+      "messagePlaceholder": "Tell us how we can help you...",
+      "sendButton": "Send Message",
+      "requiredFields": "* Required fields"
+    },
+    "contactInfo": {
+      "title": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "businessHours": "Business Hours",
+      "hours": "Monday - Friday\n9:00 AM - 6:00 PM (GMT+1)"
+    },
+    "quickHelp": {
+      "title": "Quick Help",
+      "description": "Looking for quick answers? Check out our frequently asked questions:",
+      "createListing": "How to create a donation listing",
+      "securityTips": "Account security tips",
+      "matchingWorks": "How matching works",
+      "guidelines": "Community guidelines"
+    },
+    "followUs": {
+      "title": "Follow Us",
+      "subtitle": "Stay connected with our community on social media"
+    },
+    "whatToExpect": {
+      "title": "What to Expect",
+      "quickResponse": {
+        "title": "Quick Response",
+        "description": "We aim to respond to all inquiries within 24 hours during business days"
+      },
+      "helpfulSupport": {
+        "title": "Helpful Support",
+        "description": "Our team provides detailed, personalized assistance for every query"
+      },
+      "securePrivate": {
+        "title": "Secure & Private",
+        "description": "Your information is protected and never shared with third parties"
+      }
+    },
+    "footer": "Made with ❤️ in Morocco by the Givea team"
+  },
+  "resources": {
+    "title": "Resources",
+    "subtitle": "Helpful guides, documentation, and support resources",
+    "description": "Everything you need to make the most of Givea and connect with our community.",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "donateItems": {
+        "title": "How to Donate Items",
+        "description": "Learn how to list items for donation, set up pickup instructions, and connect with recipients in your community."
+      },
+      "requestItems": {
+        "title": "How to Request Items",
+        "description": "Discover how to browse available items, send requests to donors, and coordinate pickups safely."
+      },
+      "understandingSeeds": {
+        "title": "Understanding Seeds",
+        "description": "Get familiar with our seed reward system: how to earn seeds, how to use them, and how they help grow our community."
+      }
+    },
+    "legalPolicies": {
+      "title": "Legal & Policies",
+      "terms": "Terms & Conditions",
+      "privacy": "Privacy Policy"
+    },
+    "supportHelp": {
+      "title": "Support & Help",
+      "contactUs": {
+        "title": "Contact Us",
+        "description": "Get in touch with our support team"
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "description": "Find answers to common questions about using Givea, managing your account, and participating in the community.",
+        "updateProfile": "How do I update my profile information?",
+        "whatItems": "What items can I donate on Givea?",
+        "reportContent": "How do I report inappropriate content?",
+        "cancelRequest": "Can I cancel a donation request?",
+        "seedsCalculated": "How are seeds calculated and awarded?"
+      }
+    },
+    "communityGuidelines": {
+      "title": "Community Guidelines",
+      "bestPractices": {
+        "title": "Best Practices",
+        "accurateDescriptions": "Provide accurate descriptions and photos of items",
+        "respondPromptly": "Respond promptly to messages and requests",
+        "beRespectful": "Be respectful and courteous in all communications",
+        "safeLocations": "Coordinate safe and convenient pickup locations",
+        "updateStatus": "Update item status promptly after completion"
+      },
+      "safetyTips": {
+        "title": "Safety Tips",
+        "publicPlaces": "Meet in public places for item exchanges",
+        "inspectItems": "Inspect items before accepting them",
+        "trustInstincts": "Trust your instincts and report suspicious behavior",
+        "noFinancialInfo": "Never share personal financial information"
+      }
+    },
+    "footer": {
+      "needHelp": "Need more help?",
+      "contactSupport": "Contact our support team",
+      "madeWith": "Made with ❤️ in Morocco by the Givea team"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated:",
+    "subtitle": "At Givea, we're committed to protecting your privacy and ensuring transparency about how we handle your information. This policy explains our practices in detail.",
+    "introduction": {
+      "title": "1. Introduction",
+      "paragraph1": "Welcome to Givea. This Privacy Policy describes how Givea (\"we,\" \"our,\" or \"us\") collects, uses, shares, and protects your personal information when you use our platform. By accessing or using Givea, you agree to this Privacy Policy.",
+      "paragraph2": "We operate a community-driven platform where users can donate items they no longer need to those who need them most. Your trust is essential to our mission, and we take your privacy seriously."
+    },
+    "informationWeCollect": {
+      "title": "2. Information We Collect",
+      "youProvide": {
+        "title": "2.1 Information You Provide",
+        "description": "When you create an account, list items for donation, or communicate with other users, you provide us with information including your name, email address, phone number, profile photo, location, and any content you post such as item descriptions and photos."
+      },
+      "automaticallyCollected": {
+        "title": "2.2 Automatically Collected Information",
+        "description": "We automatically collect certain information when you use Givea, including your IP address, browser type, device information, operating system, pages visited, time spent on pages, links clicked, and the referring URL. We use cookies and similar tracking technologies to collect this data."
+      },
+      "locationInformation": {
+        "title": "2.3 Location Information",
+        "description": "With your permission, we collect precise location data to help match donors with nearby beneficiaries. You can control location permissions through your device settings at any time."
+      }
+    },
+    "howWeUse": {
+      "title": "3. How We Use Your Information",
+      "paragraph1": "We use the information we collect to provide and improve Givea's services, including facilitating donations between users, personalizing your experience, sending notifications about matching items and messages, preventing fraud and abuse, analyzing platform usage to improve functionality, and communicating with you about updates and features.",
+      "paragraph2": "We do not sell your personal information to third parties. Your data is used solely to operate our platform and enhance your experience as part of our charitable community."
+    },
+    "informationSharing": {
+      "title": "4. Information Sharing and Disclosure",
+      "withOtherUsers": {
+        "title": "4.1 With Other Users",
+        "description": "When you list items for donation or request items, your profile information and item listings are visible to other Givea users. Direct communication features allow you to exchange messages with matched users to coordinate donations."
+      },
+      "serviceProviders": {
+        "title": "4.2 Service Providers",
+        "description": "We share information with trusted third-party service providers who help us operate our platform, such as hosting providers, analytics services, and communication tools. These providers are contractually obligated to protect your data and use it only for specified purposes."
+      },
+      "legalRequirements": {
+        "title": "4.3 Legal Requirements",
+        "description": "We may disclose your information if required by law, in response to valid legal processes, to protect the rights and safety of Givea and its users, or to prevent fraud and abuse of our platform."
+      }
+    },
+    "dataSecurity": {
+      "title": "5. Data Security",
+      "paragraph1": "We implement industry-standard security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. These measures include encryption of data in transit and at rest, secure authentication mechanisms, regular security audits, and restricted access to personal data.",
+      "paragraph2": "However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security."
+    },
+    "yourRights": {
+      "title": "6. Your Rights and Choices",
+      "paragraph1": "You have the right to access, update, or delete your personal information at any time through your account settings. You can opt out of promotional communications while still receiving essential service-related messages. You may disable cookies through your browser settings, though this may affect platform functionality. You can request a copy of your data or account deletion by contacting us.",
+      "paragraph2": "For users in Morocco and the EU, you have additional rights under applicable data protection laws, including the right to data portability and the right to object to certain processing activities."
+    },
+    "childrensPrivacy": {
+      "title": "7. Children's Privacy",
+      "description": "Givea is not intended for users under the age of 16. We do not knowingly collect personal information from children. If we discover that we have inadvertently collected data from a child, we will delete it promptly. Parents or guardians who believe their child has provided us with information should contact us immediately."
+    },
+    "cookies": {
+      "title": "8. Cookies and Tracking Technologies",
+      "paragraph1": "We use cookies, web beacons, and similar technologies to enhance your experience, remember your preferences, understand how you use our platform, and analyze traffic patterns. You can control cookie preferences through your browser settings.",
+      "paragraph2": "We use essential cookies for platform functionality, analytics cookies to understand usage patterns, and preference cookies to remember your settings and choices."
+    },
+    "internationalTransfers": {
+      "title": "9. International Data Transfers",
+      "description": "Givea is based in Morocco. If you access our platform from outside Morocco, your information may be transferred to, stored, and processed in Morocco or other countries where our service providers operate. By using Givea, you consent to the transfer of your information to countries that may have different data protection laws than your country of residence."
+    },
+    "changesToPolicy": {
+      "title": "10. Changes to This Privacy Policy",
+      "description": "We may update this Privacy Policy periodically to reflect changes in our practices or legal requirements. We will notify you of significant changes by posting a notice on our platform or sending you an email. The \"Last Updated\" date at the top of this policy indicates when it was most recently revised. Your continued use of Givea after changes become effective constitutes acceptance of the updated policy."
+    },
+    "contact": {
+      "title": "11. Contact Us",
+      "description": "If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:",
+      "email": "Email:",
+      "address": "Address:",
+      "responseTime": "Response Time:",
+      "responseTimeValue": "We aim to respond to all inquiries within 72 hours."
+    },
+    "footer": "Made with ❤️ in Morocco by the Givea team"
+  },
+  "termsAndConditions": {
+    "title": "Terms & Conditions",
+    "lastUpdated": "Last Updated:",
+    "subtitle": "Please read these Terms and Conditions carefully before using Givea. By accessing or using our platform, you agree to be bound by these terms.",
+    "acceptance": {
+      "title": "1. Acceptance of Terms",
+      "paragraph1": "Welcome to Givea. These Terms and Conditions (\"Terms\") govern your access to and use of the Givea platform, including our website, mobile applications, and services (collectively, the \"Service\"). By accessing or using Givea, you agree to comply with and be bound by these Terms.",
+      "paragraph2": "If you do not agree to these Terms, please do not use our Service. We reserve the right to modify these Terms at any time, and such modifications will be effective immediately upon posting."
+    },
+    "descriptionOfService": {
+      "title": "2. Description of Service",
+      "paragraph1": "Givea is a community-driven platform that facilitates the donation of items between users. Our Service allows users to:",
+      "listItem1": "List items they wish to donate",
+      "listItem2": "Browse and request items available for donation",
+      "listItem3": "Communicate with other users to coordinate donations",
+      "listItem4": "Track their donation and adoption history",
+      "listItem5": "Earn and use seeds as part of our reward system",
+      "paragraph2": "Givea acts solely as an intermediary platform. We do not take ownership of items, guarantee the condition or quality of items, or assume responsibility for transactions between users."
+    },
+    "userAccounts": {
+      "title": "3. User Accounts and Registration",
+      "accountCreation": {
+        "title": "3.1 Account Creation",
+        "description": "To use certain features of Givea, you must create an account. You agree to provide accurate, current, and complete information during registration and to update such information to keep it accurate, current, and complete."
+      },
+      "accountSecurity": {
+        "title": "3.2 Account Security",
+        "description": "You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account."
+      },
+      "ageRequirement": {
+        "title": "3.3 Age Requirement",
+        "description": "You must be at least 16 years old to use Givea. By using our Service, you represent and warrant that you meet this age requirement."
+      }
+    },
+    "userConduct": {
+      "title": "4. User Conduct and Responsibilities",
+      "acceptableUse": {
+        "title": "4.1 Acceptable Use",
+        "paragraph1": "You agree to use Givea only for lawful purposes and in accordance with these Terms. You agree not to:",
+        "listItem1": "Post false, misleading, or fraudulent information",
+        "listItem2": "List items that are illegal, stolen, or prohibited",
+        "listItem3": "Harass, abuse, or harm other users",
+        "listItem4": "Use the Service for commercial purposes without authorization",
+        "listItem5": "Attempt to manipulate the seed reward system",
+        "listItem6": "Interfere with or disrupt the Service or servers",
+        "listItem7": "Violate any applicable laws or regulations"
+      },
+      "itemListings": {
+        "title": "4.2 Item Listings",
+        "paragraph1": "When listing items for donation, you agree to provide accurate descriptions, including the condition of items. You are responsible for ensuring that items are safe, legal to transfer, and accurately represented in your listings.",
+        "paragraph2": "You retain ownership of items until they are successfully transferred to a recipient. Givea does not take ownership of any items listed on the platform."
+      }
+    },
+    "seedRewardSystem": {
+      "title": "5. Seed Reward System",
+      "paragraph1": "Givea operates a seed-based reward system to encourage community participation:",
+      "listItem1": "New users receive 10 free seeds upon registration",
+      "listItem2": "Seeds are deducted when you contact other users or request items (1 seed per action)",
+      "listItem3": "Seeds are awarded when you successfully complete donations (+2 seeds)",
+      "listItem4": "Seeds have no monetary value and cannot be transferred, sold, or exchanged",
+      "listItem5": "Givea reserves the right to adjust seed balances in cases of abuse or system errors",
+      "paragraph2": "Attempting to manipulate, hack, or exploit the seed system is strictly prohibited and may result in account suspension or termination."
+    },
+    "transactions": {
+      "title": "6. Transactions and Disputes",
+      "transactionResponsibility": {
+        "title": "6.1 Transaction Responsibility",
+        "paragraph1": "All transactions are conducted directly between users. Givea is not a party to any transaction and does not guarantee the quality, safety, or legality of items. Users are solely responsible for:",
+        "listItem1": "Verifying the condition and suitability of items",
+        "listItem2": "Coordinating pickup or delivery arrangements",
+        "listItem3": "Ensuring safe and legal transfer of items",
+        "listItem4": "Resolving disputes between parties"
+      },
+      "disputeResolution": {
+        "title": "6.2 Dispute Resolution",
+        "description": "In the event of a dispute between users, Givea may provide assistance in facilitating communication, but we are not obligated to resolve disputes or provide refunds. Users are encouraged to resolve issues amicably and in good faith."
+      }
+    },
+    "intellectualProperty": {
+      "title": "7. Intellectual Property",
+      "paragraph1": "The Givea platform, including its design, logos, text, graphics, and software, is owned by Givea and protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.",
+      "paragraph2": "By posting content on Givea, you grant us a non-exclusive, worldwide, royalty-free license to use, display, and distribute your content on our platform. You retain ownership of your content and can remove it at any time."
+    },
+    "limitationOfLiability": {
+      "title": "8. Limitation of Liability",
+      "paragraph1": "TO THE MAXIMUM EXTENT PERMITTED BY LAW, GIVEA SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.",
+      "paragraph2": "Givea provides the Service \"as is\" and \"as available\" without warranties of any kind, either express or implied. We do not guarantee that the Service will be uninterrupted, secure, or error-free."
+    },
+    "termination": {
+      "title": "9. Termination",
+      "paragraph1": "You may terminate your account at any time by contacting us or using account deletion features. We reserve the right to suspend or terminate your account immediately, without prior notice, if you violate these Terms or engage in fraudulent, abusive, or illegal activity.",
+      "paragraph2": "Upon termination, your right to use the Service will cease immediately. We may delete your account information and content, subject to our Privacy Policy and applicable data retention requirements."
+    },
+    "governingLaw": {
+      "title": "10. Governing Law and Jurisdiction",
+      "description": "These Terms shall be governed by and construed in accordance with the laws of Morocco, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of Givea shall be subject to the exclusive jurisdiction of the courts of Rabat, Morocco."
+    },
+    "changesToTerms": {
+      "title": "11. Changes to Terms",
+      "description": "We reserve the right to modify these Terms at any time. We will notify users of significant changes by posting a notice on our platform or sending an email notification. Your continued use of Givea after changes become effective constitutes acceptance of the updated Terms. The \"Last Updated\" date at the top of this page indicates when these Terms were most recently revised."
+    },
+    "footer": "Made with ❤️ in Morocco by the Givea team"
   }
 }

@@ -1,21 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { BookOpen, FileText, HelpCircle, Shield, Mail, ExternalLink } from "lucide-react";
 
 const Resources: React.FC = () => {
+  const { t } = useTranslation('common');
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
-            Resources
+            {t('resources.title')}
           </h1>
           <p className="text-blue-100 text-center text-lg mb-2">
-            Helpful guides, documentation, and support resources
+            {t('resources.subtitle')}
           </p>
           <p className="text-blue-100 text-center max-w-2xl mx-auto">
-            Everything you need to make the most of Givea and connect with our community.
+            {t('resources.description')}
           </p>
         </div>
       </div>
@@ -31,32 +34,32 @@ const Resources: React.FC = () => {
                 <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Getting Started
+                {t('resources.gettingStarted.title')}
               </h2>
             </div>
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  How to Donate Items
+                  {t('resources.gettingStarted.donateItems.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  Learn how to list items for donation, set up pickup instructions, and connect with recipients in your community.
+                  {t('resources.gettingStarted.donateItems.description')}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  How to Request Items
+                  {t('resources.gettingStarted.requestItems.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  Discover how to browse available items, send requests to donors, and coordinate pickups safely.
+                  {t('resources.gettingStarted.requestItems.description')}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Understanding Seeds
+                  {t('resources.gettingStarted.understandingSeeds.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                  Get familiar with our seed reward system: how to earn seeds, how to use them, and how they help grow our community.
+                  {t('resources.gettingStarted.understandingSeeds.description')}
                 </p>
               </div>
             </div>
@@ -69,7 +72,7 @@ const Resources: React.FC = () => {
                 <Shield className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Legal & Policies
+                {t('resources.legalPolicies.title')}
               </h2>
             </div>
             <div className="space-y-4">
@@ -80,7 +83,7 @@ const Resources: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <span className="font-medium text-gray-900 dark:text-white">
-                    Terms & Conditions
+                    {t('resources.legalPolicies.terms')}
                   </span>
                 </div>
                 <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
@@ -92,7 +95,7 @@ const Resources: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <span className="font-medium text-gray-900 dark:text-white">
-                    Privacy Policy
+                    {t('resources.legalPolicies.privacy')}
                   </span>
                 </div>
                 <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
@@ -107,7 +110,7 @@ const Resources: React.FC = () => {
                 <HelpCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Support & Help
+                {t('resources.supportHelp.title')}
               </h2>
             </div>
             <div className="space-y-4">
@@ -119,10 +122,10 @@ const Resources: React.FC = () => {
                   <Mail className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <div>
                     <span className="font-medium text-gray-900 dark:text-white block">
-                      Contact Us
+                      {t('resources.supportHelp.contactUs.title')}
                     </span>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Get in touch with our support team
+                      {t('resources.supportHelp.contactUs.description')}
                     </span>
                   </div>
                 </div>
@@ -130,17 +133,17 @@ const Resources: React.FC = () => {
               </Link>
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  Frequently Asked Questions
+                  {t('resources.supportHelp.faq.title')}
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-3">
-                  Find answers to common questions about using Givea, managing your account, and participating in the community.
+                  {t('resources.supportHelp.faq.description')}
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>• How do I update my profile information?</li>
-                  <li>• What items can I donate on Givea?</li>
-                  <li>• How do I report inappropriate content?</li>
-                  <li>• Can I cancel a donation request?</li>
-                  <li>• How are seeds calculated and awarded?</li>
+                  <li>• {t('resources.supportHelp.faq.updateProfile')}</li>
+                  <li>• {t('resources.supportHelp.faq.whatItems')}</li>
+                  <li>• {t('resources.supportHelp.faq.reportContent')}</li>
+                  <li>• {t('resources.supportHelp.faq.cancelRequest')}</li>
+                  <li>• {t('resources.supportHelp.faq.seedsCalculated')}</li>
                 </ul>
               </div>
             </div>
@@ -153,57 +156,57 @@ const Resources: React.FC = () => {
                 <BookOpen className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Community Guidelines
+                {t('resources.communityGuidelines.title')}
               </h2>
             </div>
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-                  Best Practices
+                  {t('resources.communityGuidelines.bestPractices.title')}
                 </h3>
                 <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 dark:text-blue-400 mt-1">✓</span>
-                    <span>Provide accurate descriptions and photos of items</span>
+                    <span>{t('resources.communityGuidelines.bestPractices.accurateDescriptions')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 dark:text-blue-400 mt-1">✓</span>
-                    <span>Respond promptly to messages and requests</span>
+                    <span>{t('resources.communityGuidelines.bestPractices.respondPromptly')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 dark:text-blue-400 mt-1">✓</span>
-                    <span>Be respectful and courteous in all communications</span>
+                    <span>{t('resources.communityGuidelines.bestPractices.beRespectful')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 dark:text-blue-400 mt-1">✓</span>
-                    <span>Coordinate safe and convenient pickup locations</span>
+                    <span>{t('resources.communityGuidelines.bestPractices.safeLocations')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 dark:text-blue-400 mt-1">✓</span>
-                    <span>Update item status promptly after completion</span>
+                    <span>{t('resources.communityGuidelines.bestPractices.updateStatus')}</span>
                   </li>
                 </ul>
               </div>
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-                  Safety Tips
+                  {t('resources.communityGuidelines.safetyTips.title')}
                 </h3>
                 <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                   <li className="flex items-start gap-2">
                     <span className="text-orange-600 dark:text-orange-400 mt-1">⚠</span>
-                    <span>Meet in public places for item exchanges</span>
+                    <span>{t('resources.communityGuidelines.safetyTips.publicPlaces')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-orange-600 dark:text-orange-400 mt-1">⚠</span>
-                    <span>Inspect items before accepting them</span>
+                    <span>{t('resources.communityGuidelines.safetyTips.inspectItems')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-orange-600 dark:text-orange-400 mt-1">⚠</span>
-                    <span>Trust your instincts and report suspicious behavior</span>
+                    <span>{t('resources.communityGuidelines.safetyTips.trustInstincts')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-orange-600 dark:text-orange-400 mt-1">⚠</span>
-                    <span>Never share personal financial information</span>
+                    <span>{t('resources.communityGuidelines.safetyTips.noFinancialInfo')}</span>
                   </li>
                 </ul>
               </div>
@@ -213,10 +216,10 @@ const Resources: React.FC = () => {
           {/* Footer Note */}
           <div className="text-center pt-8">
             <p className="text-blue-100 text-sm">
-              Need more help? <Link to="/contact" className="underline hover:text-white">Contact our support team</Link>
+              {t('resources.footer.needHelp')} <Link to="/contact" className="underline hover:text-white">{t('resources.footer.contactSupport')}</Link>
             </p>
             <p className="text-blue-200 text-xs mt-2">
-              Made with ❤️ in Morocco by the Givea team
+              {t('resources.footer.madeWith')}
             </p>
           </div>
         </div>
