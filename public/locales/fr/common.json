@@ -141,7 +141,13 @@
     "selectChatSubtitle": "Choisissez parmi vos conversations existantes ou créez-en une nouvelle",
     "startConversation": "Commencer une conversation !",
     "startConversationDesc": "Connectez-vous avec d'autres utilisateurs, donateurs ou la communauté Give. Sélectionnez une conversation existante à gauche ou cliquez sur 'Nouveau message' pour commencer.",
-    "newMessage": "NOUVEAU MESSAGE"
+    "newMessage": "NOUVEAU MESSAGE",
+    "donations": "Dons",
+    "requests": "Demandes",
+    "emptyDonations": "Aucune conversation de don pour le moment",
+    "emptyRequests": "Aucune conversation de demande pour le moment",
+    "sellerProfile": "Profil du donateur",
+    "selectChatToViewItem": "Sélectionnez une conversation pour voir les détails de l'article"
   },
   "seeds": {
     "zeroMessage": "Vous avez utilisé toutes vos graines. Faites un don pour en gagner davantage et continuer à grandir !",
@@ -560,5 +566,61 @@
       "notFoundDesc": "Le profil du donneur que vous recherchez n'existe pas.",
       "loadData": "Erreur lors du chargement du profil du donneur"
     }
+  },
+  "seedsInfo": {
+    "back": "Retour",
+    "title": "Système de Récompense par Graines",
+    "subtitle": "Découvrez comment fonctionnent les graines et comment en gagner plus",
+    "whatAreSeeds": {
+      "title": "Qu'est-ce que les Graines?",
+      "description": "Les graines sont la monnaie de récompense de Givea qui encourage la participation communautaire et aide à maintenir un écosystème de don sain. Elles représentent votre contribution à la communauté et vous permettent de vous connecter avec d'autres membres."
+    },
+    "howItWorks": {
+      "title": "Comment Fonctionnent les Graines"
+    },
+    "earning": {
+      "title": "Gagner des Graines",
+      "welcomeBonus": "Bonus de Bienvenue:",
+      "welcomeBonusDesc": "Les nouveaux utilisateurs reçoivent 10 graines gratuites lors de l'inscription",
+      "donationReward": "Récompense de Don:",
+      "donationRewardDesc": "Gagnez +2 graines lorsque vous terminez avec succès un don"
+    },
+    "spending": {
+      "title": "Dépenser des Graines",
+      "contact": "Contacter des Utilisateurs:",
+      "contactDesc": "1 graine est déduite lorsque vous envoyez votre premier message à un autre utilisateur",
+      "request": "Demander des Articles:",
+      "requestDesc": "1 graine est déduite lorsque vous demandez un article à un donneur"
+    },
+    "balanceIndicators": {
+      "title": "Comprendre Votre Solde de Graines",
+      "low": {
+        "title": "Faible (0-3 graines)",
+        "description": "Vous manquez de graines. Pensez à donner des articles pour en gagner plus!"
+      },
+      "medium": {
+        "title": "Moyen (4-10 graines)",
+        "description": "Vous avez un solde de graines modéré. Continuez à participer pour le maintenir!"
+      },
+      "high": {
+        "title": "Élevé (11+ graines)",
+        "description": "Excellent! Vous avez beaucoup de graines. Continuez comme ça!"
+      }
+    },
+    "importantNotes": {
+      "title": "Notes Importantes",
+      "noValue": "Les graines n'ont aucune valeur monétaire et ne peuvent pas être transférées, vendues ou échangées",
+      "noManipulation": "Tenter de manipuler ou d'exploiter le système de graines est strictement interdit et peut entraîner la suspension du compte",
+      "adjustments": "Givea se réserve le droit d'ajuster les soldes de graines en cas d'abus ou d'erreurs système",
+      "purpose": "Le système de graines est conçu pour encourager une participation communautaire authentique et maintenir un écosystème de don sain"
+    },
+    "tips": {
+      "title": "Conseils pour Gérer Vos Graines",
+      "donate": "Donnez régulièrement des articles pour gagner des graines et aider les autres dans votre communauté",
+      "useWisely": "Utilisez les graines judicieusement - ne contactez que les utilisateurs ou ne demandez que les articles qui vous intéressent vraiment",
+      "completeDonations": "Terminez vos dons avec succès pour gagner des graines de récompense",
+      "checkBalance": "Surveillez votre solde de graines - il est affiché dans votre barre de navigation"
+    },
+    "footer": "Fait avec ❤️ par l'équipe Givea"
   }
 }

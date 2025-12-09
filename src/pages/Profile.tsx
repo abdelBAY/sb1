@@ -372,6 +372,7 @@ export default function Profile() {
                 label={t('seeds.label', 'Seeds')}
                 showEmptyMessage
                 emptyMessage={seedsEmptyMessage}
+                onClick={() => navigate('/seeds-info')}
               />
 
               {/* Membership Info */}

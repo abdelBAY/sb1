@@ -518,6 +518,7 @@ export default function Layout() {
                     variant="nav"
                     showLabel={false}
                     className="hidden lg:flex"
+                    onClick={() => navigate('/seeds-info')}
                   />
                   {/* Donate Now Button */}
                   <Link

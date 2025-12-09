@@ -17,6 +17,7 @@ import ContactUs from './pages/ContactUs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Resources from './pages/Resources';
+import SeedsInfo from './pages/SeedsInfo';
 import NotFound from './pages/NotFound';
 
 export const routes: RouteObject[] = [
@@ -40,6 +41,7 @@ export const routes: RouteObject[] = [
       { path: 'privacy', element: <PrivacyPolicy /> },
       { path: 'terms', element: <TermsAndConditions /> },
       { path: 'resources', element: <Resources /> },
+      { path: 'seeds-info', element: <SeedsInfo /> },
       { path: 'contact', element: <ContactUs /> },
       { path: 'about', element: <About /> },
       { path: '*', element: <NotFound /> },

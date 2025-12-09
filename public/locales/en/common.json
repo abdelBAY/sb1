@@ -141,7 +141,13 @@
     "selectChatSubtitle": "Choose from your existing conversations or start a new one",
     "startConversation": "Start Conversation!",
     "startConversationDesc": "Connect with fellow users, donors, or the Give community. Select an existing chats on the left or click 'New Message' to begin.",
-    "newMessage": "NEW MESSAGE"
+    "newMessage": "NEW MESSAGE",
+    "donations": "Donations",
+    "requests": "Requests",
+    "emptyDonations": "No donation conversations yet",
+    "emptyRequests": "No request conversations yet",
+    "sellerProfile": "Donor Profile",
+    "selectChatToViewItem": "Select a conversation to view item details"
   },
   "seeds": {
     "zeroMessage": "You've used all your seeds. Give something to earn more and keep growing!",
@@ -560,5 +566,61 @@
       "notFoundDesc": "The donor profile you are looking for does not exist.",
       "loadData": "Error loading donor profile"
     }
+  },
+  "seedsInfo": {
+    "back": "Back",
+    "title": "Seed Reward System",
+    "subtitle": "Learn how seeds work and how to earn more",
+    "whatAreSeeds": {
+      "title": "What are Seeds?",
+      "description": "Seeds are Givea's reward currency that encourages community participation and helps maintain a healthy giving ecosystem. They represent your contribution to the community and enable you to connect with other members."
+    },
+    "howItWorks": {
+      "title": "How Seeds Work"
+    },
+    "earning": {
+      "title": "Earning Seeds",
+      "welcomeBonus": "Welcome Bonus:",
+      "welcomeBonusDesc": "New users receive 10 free seeds when they register",
+      "donationReward": "Donation Reward:",
+      "donationRewardDesc": "Earn +2 seeds when you successfully complete a donation"
+    },
+    "spending": {
+      "title": "Spending Seeds",
+      "contact": "Contacting Users:",
+      "contactDesc": "1 seed is deducted when you send your first message to another user",
+      "request": "Requesting Items:",
+      "requestDesc": "1 seed is deducted when you request an item from a donor"
+    },
+    "balanceIndicators": {
+      "title": "Understanding Your Seed Balance",
+      "low": {
+        "title": "Low (0-3 seeds)",
+        "description": "You're running low on seeds. Consider donating items to earn more!"
+      },
+      "medium": {
+        "title": "Medium (4-10 seeds)",
+        "description": "You have a moderate seed balance. Keep participating to maintain it!"
+      },
+      "high": {
+        "title": "High (11+ seeds)",
+        "description": "Great! You have plenty of seeds. Keep up the good work!"
+      }
+    },
+    "importantNotes": {
+      "title": "Important Notes",
+      "noValue": "Seeds have no monetary value and cannot be transferred, sold, or exchanged",
+      "noManipulation": "Attempting to manipulate or exploit the seed system is strictly prohibited and may result in account suspension",
+      "adjustments": "Givea reserves the right to adjust seed balances in cases of abuse or system errors",
+      "purpose": "The seed system is designed to encourage genuine community participation and maintain a healthy giving ecosystem"
+    },
+    "tips": {
+      "title": "Tips for Managing Your Seeds",
+      "donate": "Donate items regularly to earn seeds and help others in your community",
+      "useWisely": "Use seeds wisely - only contact users or request items you're genuinely interested in",
+      "completeDonations": "Complete your donations successfully to earn reward seeds",
+      "checkBalance": "Keep an eye on your seed balance - it's displayed in your navigation bar"
+    },
+    "footer": "Made with ❤️ by the Givea team"
   }
 }

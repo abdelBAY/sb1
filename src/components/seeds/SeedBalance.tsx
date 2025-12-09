@@ -13,6 +13,7 @@ interface SeedBalanceProps {
   showEmptyMessage?: boolean;
   className?: string;
   emptyMessage?: string;
+  onClick?: () => void;
 }
 
 const sizeMap = {
@@ -57,6 +58,7 @@ export default function SeedBalance({
   showEmptyMessage = false,
   className = '',
   emptyMessage,
+  onClick,
 }: SeedBalanceProps) {
   const [delta, setDelta] = useState(0);
   const [showDelta, setShowDelta] = useState(false);
@@ -157,10 +159,21 @@ export default function SeedBalance({
   return (
     <div className={`flex flex-col items-start gap-2 ${className}`}>
       <div
+        onClick={onClick}
         className={`
           relative flex items-center gap-2 rounded-2xl ${padding} ${variantClasses}
           transition-all duration-300 ease-out backdrop-blur-sm
+          ${onClick ? 'cursor-pointer hover:scale-105 active:scale-95' : ''}
         `}
+        role={onClick ? 'button' : undefined}
+        tabIndex={onClick ? 0 : undefined}
+        onKeyDown={onClick ? (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        } : undefined}
+        aria-label={onClick ? 'Click to learn more about seeds' : undefined}
       >
         <div
           className={`flex items-center justify-center rounded-full bg-white/20 backdrop-blur px-2 py-1 shadow-inner`}
