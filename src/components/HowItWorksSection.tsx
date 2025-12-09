@@ -1,7 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import giveaHowItWorksVideo from "../assets/givea-how-it-works.mp4";
+// Use optimized version if available, otherwise fallback to original
+import giveaHowItWorksVideoOriginal from "../assets/givea-how-it-works.mp4";
+// Optimized version will be used when available - update import path after compression
+const giveaHowItWorksVideo = giveaHowItWorksVideoOriginal;
 
 const HowItWorksSection: React.FC = () => {
   const { t } = useTranslation('common');

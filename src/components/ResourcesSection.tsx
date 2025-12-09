@@ -94,7 +94,7 @@ const ResourcesSection: React.FC = () => {
                 loading="lazy"
                 onError={(e) => {
                   const target = e.currentTarget as HTMLImageElement;
-                  target.src = "/logo1.png";
+                  target.src = "/optimized/logo1.webp";
                 }}
               />
               {/* Quote Box Overlay */}

@@ -1,5 +1,6 @@
 import React from "react";
-import heroImg from "../assets/givea-image2.png";
+import heroImgWebp from "../assets/optimized/givea-image2.webp";
+import heroImgFallback from "../assets/givea-image2.png";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
@@ -13,16 +14,19 @@ const HeroSection: React.FC = () => {
     >
       {/* Hero Image as Background */}
       <div className="absolute inset-0 w-full h-full">
-        <img
-          src={heroImg}
-          alt="Community helping"
-          className="w-full h-full object-cover"
-          loading="eager"
-          onError={(e) => {
-            const target = e.currentTarget as HTMLImageElement;
-            target.src = "/logo1.png";
-          }}
-        />
+        <picture>
+          <source srcSet={heroImgWebp} type="image/webp" />
+          <img
+            src={heroImgFallback}
+            alt="Community helping"
+            className="w-full h-full object-cover"
+            loading="eager"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.src = "/optimized/logo1.webp";
+            }}
+          />
+        </picture>
         {/* Darkened overlay for text readability - only on left side */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
       </div>

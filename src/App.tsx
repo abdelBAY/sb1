@@ -9,7 +9,8 @@ import ResourcesSection from "./components/ResourcesSection.tsx";
 import HowItWorksSection from "./components/HowItWorksSection.tsx";
 import TestimonialsSection from "./components/TestimonialsSection.tsx";
 import Footer from "./components/Footer.tsx"; // 👈 Import Footer
-import ctaImage from "./assets/givea-image3 (1).png";
+import ctaImageWebp from "./assets/optimized/givea-image3.webp";
+import ctaImageFallback from "./assets/givea-image3 (1).png";
 
 console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
 console.log('Supabase Key:', import.meta.env.VITE_SUPABASE_ANON_KEY);
@@ -109,16 +110,19 @@ function App() {
       <div className="relative py-12 md:py-16 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 w-full h-full">
-          <img
-            src={ctaImage}
-            alt="Community helping"
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop";
-            }}
-          />
+          <picture>
+            <source srcSet={ctaImageWebp} type="image/webp" />
+            <img
+              src={ctaImageFallback}
+              alt="Community helping"
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.src = "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop";
+              }}
+            />
+          </picture>
           {/* Darkened overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/80 via-blue-700/80 to-blue-600/80 dark:from-blue-900/80 dark:via-blue-800/80 dark:to-blue-900/80"></div>
         </div>

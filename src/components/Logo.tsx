@@ -1,5 +1,6 @@
 import React from 'react';
-import logo from '../assets/logo.png'; // adjust path if needed
+import logoWebp from '../assets/optimized/logo.webp';
+import logoFallback from '../assets/logo.png';
 
 interface LogoProps {
   className?: string;
@@ -14,12 +15,15 @@ const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
   };
 
   return (
-    <img
-      src={logo}
-      alt="Logo"
-      loading={size === 'lg' ? 'lazy' : 'eager'}
-      className={`${sizes[size]} ${className} object-contain`}
-    />
+    <picture>
+      <source srcSet={logoWebp} type="image/webp" />
+      <img
+        src={logoFallback}
+        alt="Logo"
+        loading={size === 'lg' ? 'lazy' : 'eager'}
+        className={`${sizes[size]} ${className} object-contain`}
+      />
+    </picture>
   );
 };
 

@@ -11,7 +11,10 @@
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
     "build:netlify": "npm run build:client",
     "preview": "cross-env NODE_ENV=production node server.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "compress:images": "node compress-assets.js",
+    "compress:video": "node compress-video.js",
+    "check:large-files": "node check-large-files.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.0",
@@ -48,6 +51,7 @@
     "express": "^4.18.2",
     "globals": "^13.24.0",
     "postcss": "^8.4.35",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "typescript-eslint": "^7.0.2",
