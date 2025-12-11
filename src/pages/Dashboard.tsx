@@ -303,7 +303,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="md:flex md:items-center md:justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dashboard.title')}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white" >{t('dashboard.title')}</h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t('dashboard.subtitle')}
             </p>
@@ -312,7 +312,7 @@ export default function Dashboard() {
             to="/create-item"
             className="mt-4 md:mt-0 inline-flex items-center justify-center gap-3 px-6 py-3 text-white font-semibold uppercase tracking-wide rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 hover:from-orange-500 hover:via-orange-600 hover:to-orange-700"
           >
-            <span>{t('dashboard.createNewItem')}</span>
+            <span >{t('dashboard.createNewItem')}</span>
             <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm">
               <ChevronRight className="w-5 h-5" />
             </div>
