@@ -14,6 +14,7 @@ import Messages from './pages/Messages';
 import DonorProfile from './pages/DonorProfile';
 import About from './pages/About';
 import ContactUs from './pages/ContactUs';
+import FAQ from './pages/FAQ';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import Resources from './pages/Resources';
@@ -43,6 +44,7 @@ export const routes: RouteObject[] = [
       { path: 'resources', element: <Resources /> },
       { path: 'seeds-info', element: <SeedsInfo /> },
       { path: 'contact', element: <ContactUs /> },
+      { path: 'faq', element: <FAQ /> },
       { path: 'about', element: <About /> },
       { path: '*', element: <NotFound /> },
     ],

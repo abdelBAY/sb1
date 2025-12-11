@@ -36,8 +36,8 @@
       "button": "Get Started"
     },
     "testimonials": {
-      "subtitle": "10,000+ people love us",
-      "itemsCount": "10,000+",
+      "subtitle": "1,000+ people love us",
+      "itemsCount": "1,000",
       "items": "items",
       "shared": "shared",
       "cards": {
@@ -780,6 +780,113 @@
       }
     },
     "footer": "Made with ❤️ in Morocco by the Givea team"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find quick answers to common questions about using Givea",
+    "quickNavigation": "Quick Navigation",
+    "needMoreHelp": "Still have questions?",
+    "contactUs": "Contact Us",
+    "createListing": {
+      "title": "How to Create a Donation Listing",
+      "intro": "Creating a donation listing on Givea is simple and straightforward. Follow these steps to share your items with the community:",
+      "step1": {
+        "title": "1. Sign In or Register",
+        "description": "First, make sure you're logged into your Givea account. If you don't have an account yet, you can register for free in just a few minutes."
+      },
+      "step2": {
+        "title": "2. Click 'Create Item'",
+        "description": "Navigate to the 'Create Item' page from your dashboard or use the navigation menu. This will open the donation listing form."
+      },
+      "step3": {
+        "title": "3. Fill in Item Details",
+        "description": "Provide accurate information about your item: title, description, category, condition, and location. Upload clear photos that show the item from different angles. The more details you provide, the easier it is for recipients to find your listing."
+      },
+      "step4": {
+        "title": "4. Set Pickup Details",
+        "description": "Specify when and where the item can be picked up. You can choose to meet at a public location or arrange for pickup at your address. Always prioritize your safety when sharing location information."
+      },
+      "step5": {
+        "title": "5. Publish Your Listing",
+        "description": "Review all the information, then click 'Publish' to make your listing live. Once published, members of the community can see your item and send you requests."
+      },
+      "tip": {
+        "title": "Tip:",
+        "description": "Keep your listing updated! If your item is claimed or no longer available, remember to mark it as 'Given Away' to avoid confusion."
+      }
+    },
+    "securityTips": {
+      "title": "Account Security Tips",
+      "intro": "Protecting your account and personal information is crucial. Here are essential security practices to keep your Givea account safe:",
+      "password": {
+        "title": "Strong Password",
+        "description": "Use a unique, strong password that combines uppercase and lowercase letters, numbers, and special characters. Avoid using personal information or common words. Consider using a password manager to generate and store secure passwords."
+      },
+      "twoFactor": {
+        "title": "Two-Factor Authentication",
+        "description": "Enable two-factor authentication (2FA) if available. This adds an extra layer of security by requiring a second form of verification when logging in from a new device."
+      },
+      "personalInfo": {
+        "title": "Protect Personal Information",
+        "description": "Be cautious about sharing personal information in messages or listings. Never share your full address publicly - use general location information instead. Only share detailed contact information through the platform's secure messaging system."
+      },
+      "suspiciousActivity": {
+        "title": "Report Suspicious Activity",
+        "description": "If you notice any suspicious activity on your account or receive suspicious messages, report it immediately to our support team. We take security seriously and will investigate all reports promptly."
+      }
+    },
+    "matchingWorks": {
+      "title": "How Matching Works",
+      "intro": "Our matching system connects donors with recipients efficiently. Here's how the process works:",
+      "step1": {
+        "title": "Item Listing",
+        "description": "When you create a donation listing, it becomes visible to all members of the Givea community. Your item appears in search results based on category, location, and keywords."
+      },
+      "step2": {
+        "title": "Request Submission",
+        "description": "Interested recipients can send you a request through the platform. They'll include a message explaining why they need the item and how they plan to use it. You'll receive a notification when someone requests your item."
+      },
+      "step3": {
+        "title": "Donor Selection",
+        "description": "As the donor, you have the freedom to choose who receives your item. You can review the requester's profile, read their message, and select the recipient that aligns best with your giving goals. You're not obligated to give to the first requester."
+      },
+      "step4": {
+        "title": "Coordination & Pickup",
+        "description": "Once you've selected a recipient, you can communicate through the platform's messaging system to arrange pickup details. Coordinate a safe, convenient time and location for both parties."
+      },
+      "benefit": {
+        "title": "Benefit:",
+        "description": "Both donors and recipients earn seeds (our reward points) for successful matches, encouraging positive community participation!"
+      }
+    },
+    "guidelines": {
+      "title": "Community Guidelines",
+      "intro": "To maintain a positive and safe environment for everyone, please follow these community guidelines:",
+      "respect": {
+        "title": "Respect & Kindness",
+        "description": "Treat all community members with respect and kindness. Use polite language in all communications, whether you're requesting an item or responding to a request. Remember that everyone is here to help and be helped."
+      },
+      "honesty": {
+        "title": "Honesty & Accuracy",
+        "description": "Be honest about the condition of items you're donating. Provide accurate descriptions and photos. If you're requesting an item, be truthful about your needs and intentions. Misrepresentation damages trust in the community."
+      },
+      "safety": {
+        "title": "Safety First",
+        "description": "Prioritize your safety when arranging pickups. Meet in public places when possible, bring a friend if you feel more comfortable, and trust your instincts. If something feels off, don't proceed with the transaction."
+      },
+      "communication": {
+        "title": "Timely Communication",
+        "description": "Respond to messages and requests promptly. If you're no longer interested in an item or can't fulfill a request, communicate this clearly and respectfully. Good communication builds trust and makes the platform work smoothly for everyone."
+      },
+      "prohibited": {
+        "title": "Prohibited Items & Behavior",
+        "description": "Do not list illegal items, dangerous materials, or items that violate our terms of service. Do not spam, harass, or engage in fraudulent activities. Violations may result in account suspension or removal from the platform."
+      },
+      "violation": {
+        "title": "Reporting Violations:",
+        "description": "If you encounter behavior that violates these guidelines, please report it to our support team immediately. We review all reports and take appropriate action to maintain community standards."
+      }
+    }
   },
   "resources": {
     "title": "Resources",

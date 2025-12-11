@@ -36,8 +36,8 @@
       "button": "Commencer"
     },
     "testimonials": {
-      "subtitle": "Plus de 10 000 personnes nous aiment",
-      "itemsCount": "10 000+",
+      "subtitle": "Plus de 1 000 personnes nous aiment",
+      "itemsCount": "1 000",
       "items": "articles",
       "shared": "partagés",
       "cards": {
@@ -780,6 +780,113 @@
       }
     },
     "footer": "Fait avec ❤️ au Maroc par l'équipe Givea"
+  },
+  "faq": {
+    "title": "Questions Fréquemment Posées",
+    "subtitle": "Trouvez des réponses rapides aux questions courantes sur l'utilisation de Givea",
+    "quickNavigation": "Navigation Rapide",
+    "needMoreHelp": "Vous avez encore des questions ?",
+    "contactUs": "Contactez-Nous",
+    "createListing": {
+      "title": "Comment Créer une Annonce de Don",
+      "intro": "Créer une annonce de don sur Givea est simple et direct. Suivez ces étapes pour partager vos articles avec la communauté :",
+      "step1": {
+        "title": "1. Connectez-vous ou Inscrivez-vous",
+        "description": "Tout d'abord, assurez-vous d'être connecté à votre compte Givea. Si vous n'avez pas encore de compte, vous pouvez vous inscrire gratuitement en quelques minutes."
+      },
+      "step2": {
+        "title": "2. Cliquez sur 'Créer un Article'",
+        "description": "Accédez à la page 'Créer un Article' depuis votre tableau de bord ou utilisez le menu de navigation. Cela ouvrira le formulaire d'annonce de don."
+      },
+      "step3": {
+        "title": "3. Remplissez les Détails de l'Article",
+        "description": "Fournissez des informations précises sur votre article : titre, description, catégorie, état et localisation. Téléchargez des photos claires montrant l'article sous différents angles. Plus vous fournissez de détails, plus il est facile pour les destinataires de trouver votre annonce."
+      },
+      "step4": {
+        "title": "4. Définissez les Détails de Récupération",
+        "description": "Spécifiez quand et où l'article peut être récupéré. Vous pouvez choisir de vous rencontrer dans un lieu public ou organiser une récupération à votre adresse. Priorisez toujours votre sécurité lors du partage d'informations de localisation."
+      },
+      "step5": {
+        "title": "5. Publiez Votre Annonce",
+        "description": "Vérifiez toutes les informations, puis cliquez sur 'Publier' pour rendre votre annonce active. Une fois publiée, les membres de la communauté peuvent voir votre article et vous envoyer des demandes."
+      },
+      "tip": {
+        "title": "Astuce :",
+        "description": "Gardez votre annonce à jour ! Si votre article est réclamé ou n'est plus disponible, n'oubliez pas de le marquer comme 'Donné' pour éviter toute confusion."
+      }
+    },
+    "securityTips": {
+      "title": "Conseils de Sécurité du Compte",
+      "intro": "Protéger votre compte et vos informations personnelles est crucial. Voici des pratiques de sécurité essentielles pour garder votre compte Givea en sécurité :",
+      "password": {
+        "title": "Mot de Passe Fort",
+        "description": "Utilisez un mot de passe unique et fort qui combine des majuscules et minuscules, des chiffres et des caractères spéciaux. Évitez d'utiliser des informations personnelles ou des mots courants. Envisagez d'utiliser un gestionnaire de mots de passe pour générer et stocker des mots de passe sécurisés."
+      },
+      "twoFactor": {
+        "title": "Authentification à Deux Facteurs",
+        "description": "Activez l'authentification à deux facteurs (2FA) si disponible. Cela ajoute une couche supplémentaire de sécurité en exigeant une deuxième forme de vérification lors de la connexion depuis un nouvel appareil."
+      },
+      "personalInfo": {
+        "title": "Protégez les Informations Personnelles",
+        "description": "Soyez prudent lors du partage d'informations personnelles dans les messages ou les annonces. Ne partagez jamais votre adresse complète publiquement - utilisez plutôt des informations de localisation générales. Ne partagez des informations de contact détaillées que via le système de messagerie sécurisé de la plateforme."
+      },
+      "suspiciousActivity": {
+        "title": "Signaler une Activité Suspecte",
+        "description": "Si vous remarquez une activité suspecte sur votre compte ou recevez des messages suspects, signalez-le immédiatement à notre équipe de support. Nous prenons la sécurité au sérieux et enquêterons sur tous les rapports rapidement."
+      }
+    },
+    "matchingWorks": {
+      "title": "Comment Fonctionne le Jumelage",
+      "intro": "Notre système de jumelage connecte efficacement les donateurs aux destinataires. Voici comment fonctionne le processus :",
+      "step1": {
+        "title": "Annonce d'Article",
+        "description": "Lorsque vous créez une annonce de don, elle devient visible pour tous les membres de la communauté Givea. Votre article apparaît dans les résultats de recherche en fonction de la catégorie, de la localisation et des mots-clés."
+      },
+      "step2": {
+        "title": "Soumission de Demande",
+        "description": "Les destinataires intéressés peuvent vous envoyer une demande via la plateforme. Ils incluront un message expliquant pourquoi ils ont besoin de l'article et comment ils prévoient de l'utiliser. Vous recevrez une notification lorsque quelqu'un demande votre article."
+      },
+      "step3": {
+        "title": "Sélection du Donateur",
+        "description": "En tant que donateur, vous avez la liberté de choisir qui reçoit votre article. Vous pouvez consulter le profil du demandeur, lire son message et sélectionner le destinataire qui correspond le mieux à vos objectifs de don. Vous n'êtes pas obligé de donner au premier demandeur."
+      },
+      "step4": {
+        "title": "Coordination et Récupération",
+        "description": "Une fois que vous avez sélectionné un destinataire, vous pouvez communiquer via le système de messagerie de la plateforme pour organiser les détails de récupération. Coordonnez un moment et un lieu sûrs et pratiques pour les deux parties."
+      },
+      "benefit": {
+        "title": "Avantage :",
+        "description": "Les donateurs et les destinataires gagnent des graines (nos points de récompense) pour les jumelages réussis, encourageant une participation communautaire positive !"
+      }
+    },
+    "guidelines": {
+      "title": "Règles de la Communauté",
+      "intro": "Pour maintenir un environnement positif et sûr pour tous, veuillez suivre ces règles de la communauté :",
+      "respect": {
+        "title": "Respect et Gentillesse",
+        "description": "Traitez tous les membres de la communauté avec respect et gentillesse. Utilisez un langage poli dans toutes les communications, que vous demandiez un article ou répondiez à une demande. N'oubliez pas que tout le monde est là pour aider et être aidé."
+      },
+      "honesty": {
+        "title": "Honnêteté et Précision",
+        "description": "Soyez honnête sur l'état des articles que vous donnez. Fournissez des descriptions et des photos précises. Si vous demandez un article, soyez véridique sur vos besoins et intentions. La fausse représentation nuit à la confiance dans la communauté."
+      },
+      "safety": {
+        "title": "Sécurité d'Abord",
+        "description": "Priorisez votre sécurité lors de l'organisation des récupérations. Rencontrez-vous dans des lieux publics lorsque c'est possible, amenez un ami si vous vous sentez plus à l'aise, et faites confiance à votre instinct. Si quelque chose ne va pas, ne procédez pas à la transaction."
+      },
+      "communication": {
+        "title": "Communication Ponctuelle",
+        "description": "Répondez aux messages et aux demandes rapidement. Si vous n'êtes plus intéressé par un article ou ne pouvez pas satisfaire une demande, communiquez-le clairement et respectueusement. Une bonne communication renforce la confiance et fait fonctionner la plateforme en douceur pour tous."
+      },
+      "prohibited": {
+        "title": "Articles et Comportements Interdits",
+        "description": "Ne listez pas d'articles illégaux, de matériaux dangereux ou d'articles qui violent nos conditions d'utilisation. Ne spammez pas, ne harcèle pas et ne vous engagez pas dans des activités frauduleuses. Les violations peuvent entraîner la suspension du compte ou le retrait de la plateforme."
+      },
+      "violation": {
+        "title": "Signaler les Violations :",
+        "description": "Si vous rencontrez un comportement qui viole ces règles, veuillez le signaler immédiatement à notre équipe de support. Nous examinons tous les rapports et prenons les mesures appropriées pour maintenir les normes de la communauté."
+      }
+    }
   },
   "resources": {
     "title": "Ressources",

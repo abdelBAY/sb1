@@ -61,7 +61,7 @@ const TestimonialsSection: React.FC = () => {
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
               <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
-                {t('home.testimonials.itemsCount', '10,000+')}
+                {t('home.testimonials.itemsCount', '1,000')}
               </span>{' '}
               <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
                 {t('home.testimonials.items', 'items')}
@@ -69,7 +69,7 @@ const TestimonialsSection: React.FC = () => {
               <span className="text-purple-400">{t('home.testimonials.shared', 'shared')}</span>
             </h2>
             <p className="text-xl md:text-2xl text-white/90 font-medium">
-              {t('home.testimonials.subtitle', '10,000+ people love us')}
+              {t('home.testimonials.subtitle', '1,000+ people love us')}
             </p>
           </motion.div>
 

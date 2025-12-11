@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const ContactUs: React.FC = () => {
   const { t } = useTranslation('common');
@@ -227,36 +228,36 @@ const ContactUs: React.FC = () => {
                 </p>
                 <ul className="space-y-3">
                   <li>
-                    <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                    <Link to="/faq#create-listing" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                       {t('contact.quickHelp.createListing')}
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                    <Link to="/faq#security-tips" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                       {t('contact.quickHelp.securityTips')}
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                    <Link to="/faq#matching-works" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                       {t('contact.quickHelp.matchingWorks')}
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
+                    <Link to="/faq#guidelines" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center">
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                       {t('contact.quickHelp.guidelines')}
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>

@@ -9,10 +9,7 @@ import {
   Grid,
   List,
   Star,
-  Heart,
-  Share2,
   Printer,
-  Clock,
   Info,
   Package,
   DollarSign,
@@ -760,28 +757,6 @@ export default function Search() {
                       >
                         {t('search.viewDetails')}
                       </Link>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => toggleFavorite(item.id)}
-                          className={`p-2 rounded-full ${
-                            favorites.includes(item.id)
-                              ? 'text-red-600 dark:text-red-400'
-                              : 'text-gray-400 dark:text-gray-500'
-                          } hover:text-red-700 dark:hover:text-red-300 transition-colors`}
-                        >
-                          <Heart className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                        >
-                          <Share2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                        >
-                          <Clock className="w-4 h-4" />
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
