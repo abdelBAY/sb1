@@ -161,6 +161,16 @@
     "costTag_one": "-{{count}} بیج",
     "costTag_other": "-{{count}} بیج"
   },
+  "requestModal": {
+    "title": "عطیہ دہندہ کو پیغام بھیجیں",
+    "itemLabel": "شے:",
+    "donorLabel": "عطیہ دہندہ:",
+    "yourMessage": "آپ کا پیغام",
+    "messagePlaceholder": "یہاں اپنا پیغام ٹائپ کریں...",
+    "cancel": "منسوخ کریں",
+    "defaultMessage": "ہیلو! مجھے اس شے میں دلچسپی ہے۔ کیا یہ ابھی بھی دستیاب ہے؟",
+    "failedToSend": "درخواست بھیجنے میں ناکام"
+  },
   "logout": {
     "title": "لاگ آؤٹ",
     "message": "آپ کو اپنے اکاؤنٹ سے لاگ آؤٹ کر دیا جائے گا: {{account}}",

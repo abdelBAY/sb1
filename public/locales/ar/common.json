@@ -169,6 +169,16 @@
     "costTag_many": "-{{count}} بذور",
     "costTag_other": "-{{count}} بذرة"
   },
+  "requestModal": {
+    "title": "إرسال رسالة إلى المتبرع",
+    "itemLabel": "العنصر:",
+    "donorLabel": "المتبرع:",
+    "yourMessage": "رسالتك",
+    "messagePlaceholder": "اكتب رسالتك هنا...",
+    "cancel": "إلغاء",
+    "defaultMessage": "مرحباً! أنا مهتم بهذا العنصر. هل لا يزال متاحاً؟",
+    "failedToSend": "فشل إرسال الطلب"
+  },
   "logout": {
     "title": "تسجيل الخروج",
     "message": "سيتم تسجيل خروجك من حسابك: {{account}}",

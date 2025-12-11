@@ -161,6 +161,16 @@
     "costTag_one": "-{{count}} graine",
     "costTag_other": "-{{count}} graines"
   },
+  "requestModal": {
+    "title": "Envoyer un message au donateur",
+    "itemLabel": "Article :",
+    "donorLabel": "Donateur :",
+    "yourMessage": "Votre message",
+    "messagePlaceholder": "Tapez votre message ici...",
+    "cancel": "Annuler",
+    "defaultMessage": "Bonjour ! Je suis intéressé par cet article. Est-il toujours disponible ?",
+    "failedToSend": "Échec de l'envoi de la demande"
+  },
   "logout": {
     "title": "Déconnexion",
     "message": "Vous serez déconnecté de votre compte : {{account}}",

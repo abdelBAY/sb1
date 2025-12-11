@@ -25,13 +25,13 @@ export default function RequestModal({
   seedBalance,
   seedEmptyMessage,
 }: RequestModalProps) {
-  const [message, setMessage] = useState('Hi! I\'m interested in this item. Is it still available?');
+  const { t } = useTranslation('common');
+  const [message, setMessage] = useState(t('requestModal.defaultMessage', 'Hi! I\'m interested in this item. Is it still available?'));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { t } = useTranslation('common');
   const helperCopy = t(
     'seeds.requestHelper',
-    'Sending a new request costs 1 seed. You’ll earn more when you donate.'
+    "Sending a new request costs 1 seed. You'll earn more when you donate."
   );
 
   const submitRequest = async () => {
@@ -44,7 +44,7 @@ export default function RequestModal({
       onClose();
     } catch (error) {
       console.error('RequestModal error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to send request');
+      setError(error instanceof Error ? error.message : t('requestModal.failedToSend', 'Failed to send request'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export default function RequestModal({
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
               <MessageCircle className="w-5 h-5 mr-2" />
-              Send a Message to the Donor
+              {t('requestModal.title', 'Send a Message to the Donor')}
             </h2>
             <button
               onClick={onClose}
@@ -69,10 +69,10 @@ export default function RequestModal({
 
           <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Item:</strong> {itemName}
+              <strong>{t('requestModal.itemLabel', 'Item:')}</strong> {itemName}
             </p>
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Donor:</strong> {donorName}
+              <strong>{t('requestModal.donorLabel', 'Donor:')}</strong> {donorName}
             </p>
           </div>
 
@@ -86,14 +86,14 @@ export default function RequestModal({
           <form className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Your Message
+                {t('requestModal.yourMessage', 'Your Message')}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={4}
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 p-3 resize-none"
-                placeholder="Type your message here..."
+                placeholder={t('requestModal.messagePlaceholder', 'Type your message here...')}
                 required
               />
             </div>
@@ -104,7 +104,7 @@ export default function RequestModal({
                 onClick={onClose}
                 className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Cancel
+                {t('requestModal.cancel', 'Cancel')}
               </button>
               <button
                 type="button"
