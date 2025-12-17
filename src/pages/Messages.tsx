@@ -15,7 +15,6 @@ import {
   AlertCircle,
   X,
   Trash2,
-  Filter,
   Plus
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -823,9 +822,6 @@ export default function Messages() {
                     />
                     <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   </div>
-                  <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                    <Filter className="h-5 w-5" />
-                  </button>
                 </div>
                 
                 {/* Tabs for Donations and Requests */}

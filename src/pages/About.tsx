@@ -254,10 +254,10 @@ const About: React.FC = () => {
             </p>
             <div className="space-y-3">
               <p className="text-gray-800 dark:text-gray-200">
-                <strong>{t('about.contact.email')}</strong> hello@givea.ma
+                <strong>{t('about.contact.email')}</strong> support@givea.shop
               </p>
               <p className="text-gray-800 dark:text-gray-200">
-                <strong>{t('about.contact.support')}</strong> support@givea.ma
+                <strong>{t('about.contact.support')}</strong> support@givea.shop
               </p>
               <p className="text-gray-800 dark:text-gray-200">
                 <strong>{t('about.contact.location')}</strong> Rabat, Morocco

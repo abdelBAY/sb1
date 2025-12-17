@@ -21,7 +21,25 @@ const ContactUs: React.FC = () => {
 
   const handleSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
-    // Here you would integrate with your backend
+    
+    // Validate form fields
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      return;
+    }
+
+    // Construct the email body
+    const emailBody = `Name: ${formData.name}
+Email: ${formData.email}
+Subject: ${formData.subject}
+
+Message:
+${formData.message}`;
+
+    // Create mailto link and open it
+    const mailtoLink = `mailto:support@givea.shop?subject=${encodeURIComponent(`[Contact Form] ${formData.subject}`)}&body=${encodeURIComponent(emailBody)}`;
+    
+    window.open(mailtoLink, '_blank');
+    
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
@@ -167,8 +185,8 @@ const ContactUs: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">{t('contact.contactInfo.email')}</p>
-                      <a href="mailto:support@givea.ma" className="text-blue-600 dark:text-blue-400 hover:underline break-all">
-                        support@givea.netlify.app
+                      <a href="mailto:support@givea.shop" className="text-blue-600 dark:text-blue-400 hover:underline break-all">
+                        support@givea.shop
                       </a>
                     </div>
                   </div>

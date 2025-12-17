@@ -187,7 +187,7 @@ const PrivacyPolicy: React.FC = () => {
             </p>
             <div className="bg-blue-50 dark:bg-gray-700 rounded-lg p-6">
               <p className="text-gray-800 dark:text-gray-200 mb-2">
-                <strong>{t('privacyPolicy.contact.email')}</strong> privacy@givea.ma
+                <strong>{t('privacyPolicy.contact.email')}</strong> support@givea.shop
               </p>
               <p className="text-gray-800 dark:text-gray-200 mb-2">
                 <strong>{t('privacyPolicy.contact.address')}</strong> Givea Team, Rabat, Morocco
