@@ -1,12 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import SEOHead from "../components/SEOHead";
 
 const About: React.FC = () => {
   const { t } = useTranslation('common');
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+    <>
+      <SEOHead
+        title="About Us - Givea"
+        description="Learn about Givea's mission to connect donors and beneficiaries in communities worldwide. Discover our story, values, and how we're making a difference."
+        keywords="about givea, donation platform, community giving, our mission, charity, sharing platform"
+        url="https://www.givea.shop/about"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
@@ -274,6 +282,7 @@ const About: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

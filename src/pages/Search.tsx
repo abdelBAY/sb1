@@ -17,10 +17,11 @@ import {
   BarChart2,
   Navigation
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ImageOverlay from '../components/ImageOverlay';
 import OptimizedImage from '../components/OptimizedImage';
+import SEOHead from '../components/SEOHead';
 
 interface SearchResult {
   id: string;
@@ -53,7 +54,9 @@ const ITEMS_PER_PAGE = 12;
 
 export default function Search() {
   const { t } = useTranslation('common');
-  const [query, setQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const urlQuery = searchParams.get('q') || '';
+  const [query, setQuery] = useState(urlQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -457,9 +460,28 @@ export default function Search() {
     return colors[status] || '';
   };
 
+  const searchTitle = query 
+    ? `${t('search.title')} - "${query}"`
+    : t('search.title');
+  
+  const searchDescription = query
+    ? `Find donations matching "${query}" on Givea. Browse available items in your community.`
+    : 'Browse available donations in your community. Find items you need or donate items you no longer use.';
+
+  const searchUrl = query 
+    ? `https://www.givea.shop/search?q=${encodeURIComponent(query)}`
+    : 'https://www.givea.shop/search';
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <>
+      <SEOHead
+        title={searchTitle}
+        description={searchDescription}
+        keywords={`search, ${query}, ${selectedCategory}, donations, givea, community giving, browse items`}
+        url={searchUrl}
+      />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
         <div className="mb-8 space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -799,7 +821,8 @@ export default function Search() {
             onClose={() => setSelectedItem(null)}
           />
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import SEOHead from "../components/SEOHead";
 
 const ContactUs: React.FC = () => {
   const { t } = useTranslation('common');
@@ -48,7 +49,14 @@ ${formData.message}`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+    <>
+      <SEOHead
+        title="Contact Us - Givea"
+        description="Get in touch with Givea. We're here to help with questions, support, donations, partnerships, and feedback. Contact our team today."
+        keywords="contact givea, support, help, customer service, donation platform, get in touch"
+        url="https://www.givea.shop/contact"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
@@ -366,6 +374,7 @@ ${formData.message}`;
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -14,7 +14,8 @@
     "lint": "eslint .",
     "compress:images": "node compress-assets.js",
     "compress:video": "node compress-video.js",
-    "check:large-files": "node check-large-files.js"
+    "check:large-files": "node check-large-files.js",
+    "generate:sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.0",

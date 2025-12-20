@@ -6,7 +6,14 @@ const PrivacyPolicy: React.FC = () => {
   const lastUpdated = "November 8, 2025";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+    <>
+      <SEOHead
+        title="Privacy Policy - Givea"
+        description="Read Givea's privacy policy to understand how we collect, use, and protect your personal information. Your privacy is important to us."
+        keywords="privacy policy, data protection, privacy, givea privacy, user privacy"
+        url="https://www.givea.shop/privacy"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
@@ -207,6 +214,7 @@ const PrivacyPolicy: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

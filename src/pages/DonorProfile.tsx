@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import OptimizedImage from '../components/OptimizedImage';
+import SEOHead from '../components/SEOHead';
 
 interface DonorProfile {
   id: string;
@@ -187,8 +188,19 @@ export default function DonorProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      {donorProfile && (
+        <SEOHead
+          title={`${donorProfile.full_name || 'Donor'} - Donor Profile on Givea`}
+          description={`View ${donorProfile.full_name || 'this donor'}'s donation history and profile. ${reviewCount} reviews, ${rating.toFixed(1)} star rating. Located in ${donorProfile.city || 'unknown location'}.`}
+          keywords={`${donorProfile.full_name}, donor, givea, donation profile, ${donorProfile.city}, community giving`}
+          image={donorProfile.avatar_url || '/logo1.png'}
+          url={`https://www.givea.shop/donor/${id}`}
+          type="profile"
+        />
+      )}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -447,8 +459,9 @@ export default function DonorProfile() {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -67,7 +67,14 @@ const FAQ: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+    <>
+      <SEOHead
+        title="Frequently Asked Questions - Givea"
+        description="Find answers to common questions about Givea. Learn how to donate items, request donations, use the platform, and stay safe while giving back to your community."
+        keywords="givea faq, frequently asked questions, help, support, how to donate, how to request"
+        url="https://www.givea.shop/faq"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
@@ -351,6 +358,7 @@ const FAQ: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

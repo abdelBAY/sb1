@@ -2,12 +2,20 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { BookOpen, FileText, HelpCircle, Shield, Mail, ExternalLink } from "lucide-react";
+import SEOHead from "../components/SEOHead";
 
 const Resources: React.FC = () => {
   const { t } = useTranslation('common');
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+    <>
+      <SEOHead
+        title="Resources - Givea"
+        description="Helpful resources, guides, and information for using Givea. Learn how to donate, request items, stay safe, and make the most of our community donation platform."
+        keywords="givea resources, donation guides, how to donate, community giving, help, tutorials"
+        url="https://www.givea.shop/resources"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
@@ -225,6 +233,7 @@ const Resources: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

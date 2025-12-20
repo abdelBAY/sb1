@@ -23,6 +23,7 @@ import RequestStatus from '../components/RequestStatus';
 import LocationMap from '../components/LocationMap';
 import { useTranslation } from 'react-i18next';
 import OptimizedImage from '../components/OptimizedImage';
+import SEOHead from '../components/SEOHead';
 
 interface ReviewProfile {
   full_name: string | null;
@@ -648,8 +649,19 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <>
+      {product && (
+        <SEOHead
+          title={`${product.title} - Donate on Givea`}
+          description={product.description || `Donate ${product.title} to help others in your community. ${getConditionTranslation(product.condition)} condition. Located in ${product.location}.`}
+          keywords={`${product.title}, ${product.category}, donation, ${product.location}, ${getConditionTranslation(product.condition)}, givea, community giving`}
+          image={product.photos && product.photos.length > 0 ? product.photos[0] : '/logo1.png'}
+          url={`https://www.givea.shop/product/${id}`}
+          type="product"
+        />
+      )}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
@@ -1175,6 +1187,8 @@ export default function ProductDetail() {
           seedEmptyMessage={seedsEmptyMessage}
         />
       )}
-    </div>
+        </div>
+      </div>
+    </>
   );
 }

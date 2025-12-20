@@ -6,7 +6,14 @@ const TermsAndConditions: React.FC = () => {
   const lastUpdated = "November 13, 2025";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+    <>
+      <SEOHead
+        title="Terms and Conditions - Givea"
+        description="Read Givea's terms and conditions to understand the rules and guidelines for using our community donation platform."
+        keywords="terms and conditions, terms of service, user agreement, givea terms"
+        url="https://www.givea.shop/terms"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
       {/* Header Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
@@ -235,6 +242,7 @@ const TermsAndConditions: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
