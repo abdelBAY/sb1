@@ -31,7 +31,7 @@ export default defineConfig({
         configure: (proxy, _options) => {
           proxy.on('proxyReq', (proxyReq, req, _res) => {
             // Add required headers for Nominatim
-            proxyReq.setHeader('User-Agent', 'Givea-Donation-App/1.0 (https://givea.app)');
+            proxyReq.setHeader('User-Agent', 'Givea-Donation-App/1.0 (https://www.givea.shop)');
             proxyReq.setHeader('Accept', 'application/json');
             proxyReq.setHeader('Accept-Language', 'en-US,en;q=0.9');
           });

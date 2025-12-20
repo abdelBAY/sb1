@@ -6,7 +6,7 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://givea.netlify.app/</loc>
+    <loc>https://www.givea.shop/</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,21 +14,21 @@
   
   <!-- Public Pages -->
   <url>
-    <loc>https://givea.netlify.app/about</loc>
+    <loc>https://www.givea.shop/about</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://givea.netlify.app/contact</loc>
+    <loc>https://www.givea.shop/contact</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://givea.netlify.app/resources</loc>
+    <loc>https://www.givea.shop/resources</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -36,14 +36,14 @@
   
   <!-- Legal Pages -->
   <url>
-    <loc>https://givea.netlify.app/privacy</loc>
+    <loc>https://www.givea.shop/privacy</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <url>
-    <loc>https://givea.netlify.app/terms</loc>
+    <loc>https://www.givea.shop/terms</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -51,21 +51,21 @@
   
   <!-- Authentication Pages -->
   <url>
-    <loc>https://givea.netlify.app/login</loc>
+    <loc>https://www.givea.shop/login</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://givea.netlify.app/register</loc>
+    <loc>https://www.givea.shop/register</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://givea.netlify.app/reset-password</loc>
+    <loc>https://www.givea.shop/reset-password</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
@@ -73,7 +73,7 @@
   
   <!-- User Pages (Dynamic - these would be generated dynamically in production) -->
   <url>
-    <loc>https://givea.netlify.app/search</loc>
+    <loc>https://www.givea.shop/search</loc>
     <lastmod>2025-01-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>

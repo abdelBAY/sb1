@@ -4,7 +4,7 @@ This document outlines the complete URL structure for the Givea community donati
 
 ## Base URL
 ```
-https://givea.netlify.app/
+https://www.givea.shop/
 ```
 
 ## URL Structure Overview
@@ -201,14 +201,14 @@ https://givea.netlify.app/
 
 The sitemap is available at:
 ```
-https://givea.netlify.app/sitemap.xml
+https://www.givea.shop/sitemap.xml
 ```
 
 ## Robots.txt
 
 The robots.txt file is available at:
 ```
-https://givea.netlify.app/robots.txt
+https://www.givea.shop/robots.txt
 ```
 
 ---

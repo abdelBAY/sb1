@@ -1,5 +1,5 @@
 # robots.txt for Givea - Community Donation Platform
-# https://givea.netlify.app/
+# https://www.givea.shop/
 
 User-agent: *
 Allow: /
@@ -22,7 +22,7 @@ Allow: /privacy
 Allow: /terms
 
 # Sitemap location
-Sitemap: https://givea.netlify.app/sitemap.xml
+Sitemap: https://www.givea.shop/sitemap.xml
 
 
 
