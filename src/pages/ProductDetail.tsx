@@ -1187,8 +1187,6 @@ export default function ProductDetail() {
           seedEmptyMessage={seedsEmptyMessage}
         />
       )}
-        </div>
-      </div>
     </>
   );
 }
