@@ -83,6 +83,7 @@ export default function SEOHead({
     updateMetaTag('og:url', currentUrl, true);
     updateMetaTag('og:type', type, true);
     updateMetaTag('og:site_name', 'Givea', true);
+    updateMetaTag('fb:app_id', '1525916958651080', true);
 
     // Update Twitter Card tags
     updateMetaTag('twitter:title', fullTitle);
