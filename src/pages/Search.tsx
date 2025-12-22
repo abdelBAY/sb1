@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { debounce } from 'lodash';
 import { supabase } from '../lib/supabase';
 import { 
@@ -10,11 +10,7 @@ import {
   List,
   Star,
   Printer,
-  Info,
   Package,
-  DollarSign,
-  Truck,
-  BarChart2,
   Navigation
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -65,7 +61,6 @@ export default function Search() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedCondition, setSelectedCondition] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('created_at-desc');
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
   const [pendingOnly, setPendingOnly] = useState<boolean>(false);
@@ -341,7 +336,7 @@ export default function Search() {
       const [sortField, sortDirection] = sortBy.split('-');
       queryBuilder = queryBuilder.order(sortField, { ascending: sortDirection === 'asc' });
 
-      const { data, error, count } = await queryBuilder;
+      const { data, error } = await queryBuilder;
 
       if (error) throw error;
 
@@ -420,14 +415,6 @@ export default function Search() {
     return () => debouncedSearch.cancel();
   }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly, searchCoordinates, distanceRadius]);
 
-  const toggleFavorite = (itemId: string) => {
-    setFavorites(prev => 
-      prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
-
   const handlePrint = () => {
     window.print();
   };
@@ -441,7 +428,7 @@ export default function Search() {
   };
 
   const getConditionColor = (condition: string) => {
-    const colors = {
+    const colors: { [key: string]: string } = {
       'LIKE_NEW': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
       'GOOD': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
       'WORN': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
@@ -451,7 +438,7 @@ export default function Search() {
   };
 
   const getStatusColor = (status: string) => {
-    const colors = {
+    const colors: { [key: string]: string } = {
       'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
       'CLAIMED': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
       'COMPLETED': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',

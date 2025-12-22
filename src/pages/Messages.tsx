@@ -21,7 +21,6 @@ import { supabase } from '../lib/supabase';
 import { useStore } from '../lib/store';
 import ConfirmationModal from '../components/ConfirmationModal';
 import FeedbackModal from '../components/FeedbackModal';
-import SeedBalance from '../components/seeds/SeedBalance';
 import OptimizedImage from '../components/OptimizedImage';
 
 interface Message {

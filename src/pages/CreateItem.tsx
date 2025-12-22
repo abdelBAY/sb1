@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Upload, 
   MapPin, 
   AlertCircle, 
   X,
@@ -69,7 +68,6 @@ export default function CreateItem() {
   const [error, setError] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState('');
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationDetected, setLocationDetected] = useState(false);
@@ -422,33 +420,31 @@ export default function CreateItem() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setUploadProgress(0);
 
     try {
       // Validate form
       validateForm();
 
+      if (!user) {
+        throw new Error(t('createItem.errors.signInRequired'));
+      }
+
       // Check Supabase connection
-      const { data: connectionTest, error: connectionError } = await supabase.from('announcements').select('count').limit(1);
+      const { error: connectionError } = await supabase.from('announcements').select('count').limit(1);
       if (connectionError) {
         throw new Error(t('createItem.errors.databaseConnectionFailed'));
       }
 
       // Upload photos first
       const photoUrls = await Promise.all(
-        formData.photos.map(async (photo, index) => {
+        formData.photos.map(async (photo) => {
           const fileExt = photo.name.split('.').pop();
           const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
           const filePath = `${user.id}/${fileName}`;
 
-          const { error: uploadError, data } = await supabase.storage
+          const { error: uploadError } = await supabase.storage
             .from('item-photos')
-            .upload(filePath, photo, {
-              onUploadProgress: (progress) => {
-                const totalProgress = ((index + (progress.percent || 0) / 100) / formData.photos.length) * 100;
-                setUploadProgress(Math.round(totalProgress));
-              }
-            });
+            .upload(filePath, photo);
 
           if (uploadError) {
             throw new Error(t('createItem.errors.uploadFailed', { message: uploadError.message }));
@@ -496,7 +492,6 @@ export default function CreateItem() {
       setError(error instanceof Error ? error.message : t('createItem.errors.genericError'));
     } finally {
       setLoading(false);
-      setUploadProgress(0);
     }
   };
 

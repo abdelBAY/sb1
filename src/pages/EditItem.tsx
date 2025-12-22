@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-  Upload, 
   MapPin, 
   AlertCircle, 
   X,
@@ -58,7 +57,6 @@ export default function EditItem() {
   const [error, setError] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentTag, setCurrentTag] = useState('');
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationDetected, setLocationDetected] = useState(false);
@@ -448,26 +446,24 @@ export default function EditItem() {
 
     setLoading(true);
     setError(null);
-    setUploadProgress(0);
 
     try {
       validateForm();
 
+      if (!user) {
+        throw new Error('Please sign in to update the listing');
+      }
+
       // Upload new photos
       const newPhotoUrls = await Promise.all(
-        formData.newPhotos.map(async (photo, index) => {
+        formData.newPhotos.map(async (photo) => {
           const fileExt = photo.name.split('.').pop();
           const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
           const filePath = `${user.id}/${fileName}`;
 
           const { error: uploadError } = await supabase.storage
             .from('item-photos')
-            .upload(filePath, photo, {
-              onUploadProgress: (progress) => {
-                const totalProgress = ((index + (progress.percent || 0) / 100) / formData.newPhotos.length) * 100;
-                setUploadProgress(Math.round(totalProgress));
-              }
-            });
+            .upload(filePath, photo);
 
           if (uploadError) {
             throw new Error(`Failed to upload photo: ${uploadError.message}`);
@@ -508,7 +504,6 @@ export default function EditItem() {
       setError(error instanceof Error ? error.message : 'Failed to update listing');
     } finally {
       setLoading(false);
-      setUploadProgress(0);
       setShowConfirmation(false);
     }
   };

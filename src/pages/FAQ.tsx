@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, Link, useNavigate } from "react-router-dom";
+import SEOHead from "../components/SEOHead";
 
 const FAQ: React.FC = () => {
   const { t } = useTranslation('common');

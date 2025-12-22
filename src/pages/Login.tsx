@@ -72,7 +72,7 @@ export default function Login() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/search`,
@@ -110,9 +110,8 @@ export default function Login() {
       console.log('Sending password reset email to:', resetEmail);
       console.log('Redirect URL:', redirectUrl);
 
-      const { data, error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: redirectUrl,
-        emailRedirectTo: redirectUrl,
       });
 
       if (error) {
