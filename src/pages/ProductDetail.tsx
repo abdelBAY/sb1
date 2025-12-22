@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ChevronRight, 
@@ -213,9 +213,22 @@ export default function ProductDetail() {
 
       if (reviewsError) throw reviewsError;
 
+      // Transform reviews to match ProductReview interface
+      const transformedReviews: ProductReview[] = (reviews || []).map((review: any) => ({
+        id: review.id,
+        reviewer_id: review.reviewer_id,
+        announcement_id: review.announcement_id,
+        rating: review.rating,
+        comment: review.comment,
+        created_at: review.created_at,
+        profiles: Array.isArray(review.profiles) 
+          ? (review.profiles[0] || null)
+          : (review.profiles || null)
+      }));
+
       // Calculate user rating safely
-      const userRating = reviews && reviews.length > 0
-        ? reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length
+      const userRating = transformedReviews.length > 0
+        ? transformedReviews.reduce((acc: number, review: ProductReview) => acc + review.rating, 0) / transformedReviews.length
         : 0;
 
       // Fetch related items
@@ -234,9 +247,9 @@ export default function ProductDetail() {
         user: {
           ...profile,
           rating: userRating,
-          review_count: reviews?.length || 0
+          review_count: transformedReviews.length
         },
-        reviews: reviews || [],
+        reviews: transformedReviews,
         related_items: relatedItems
       };
 
@@ -332,7 +345,21 @@ export default function ProductDetail() {
           .maybeSingle();
 
         if (error) throw error;
-        persistedReview = data;
+        if (!data) {
+          throw new Error('Failed to update review');
+        }
+        // Transform the data to match ProductReview interface
+        persistedReview = {
+          id: data.id,
+          reviewer_id: data.reviewer_id,
+          announcement_id: data.announcement_id,
+          rating: data.rating,
+          comment: data.comment,
+          created_at: data.created_at,
+          profiles: Array.isArray(data.profiles) 
+            ? (data.profiles[0] || null)
+            : (data.profiles || null)
+        };
       } else {
         // Check if user already has a review for this item
         const { data: existingReview } = await supabase
@@ -359,7 +386,21 @@ export default function ProductDetail() {
           .maybeSingle();
 
         if (error) throw error;
-        persistedReview = data;
+        if (!data) {
+          throw new Error('Failed to create review');
+        }
+        // Transform the data to match ProductReview interface
+        persistedReview = {
+          id: data.id,
+          reviewer_id: data.reviewer_id,
+          announcement_id: data.announcement_id,
+          rating: data.rating,
+          comment: data.comment,
+          created_at: data.created_at,
+          profiles: Array.isArray(data.profiles) 
+            ? (data.profiles[0] || null)
+            : (data.profiles || null)
+        };
       }
 
       if (!persistedReview) {
@@ -370,8 +411,8 @@ export default function ProductDetail() {
 
       const existingReviews = product.reviews || [];
       const nextReviews = userReview
-        ? existingReviews.map((review) => (review.id === persistedReview.id ? persistedReview : review))
-        : [persistedReview, ...existingReviews];
+        ? existingReviews.map((review) => (review.id === persistedReview!.id ? persistedReview! : review))
+        : [persistedReview!, ...existingReviews];
 
       updateProductReviews(nextReviews);
 
@@ -649,7 +690,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <>
+    <Fragment>
       {product && (
         <SEOHead
           title={`${product.title} - Donate on Givea`}
@@ -1174,6 +1215,7 @@ export default function ProductDetail() {
           )}
         </div>
       </div>
+      </div>
 
       {/* Request Modal */}
       {showRequestModal && product && (
@@ -1187,6 +1229,6 @@ export default function ProductDetail() {
           seedEmptyMessage={seedsEmptyMessage}
         />
       )}
-    </>
+    </Fragment>
   );
 }
