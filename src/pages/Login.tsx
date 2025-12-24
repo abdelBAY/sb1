@@ -120,9 +120,12 @@ export default function Login() {
       // Use the current origin for redirect URL
       const redirectUrl = `${window.location.origin}/reset-password`;
       
-      console.log('Sending password reset email to:', resetEmail);
+      console.log('=== Password Reset Request ===');
+      console.log('Email:', resetEmail);
       console.log('Redirect URL:', redirectUrl);
       console.log('CAPTCHA token:', tokenToUse ? 'Present' : 'Not provided');
+      console.log('Environment:', isLocal ? 'Local' : 'Production');
+      console.log('==============================');
 
       // Build options object
       const resetOptions: { redirectTo: string; captchaToken?: string } = {
@@ -139,14 +142,25 @@ export default function Login() {
 
       if (error) {
         console.error('Password reset error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
+        
         // Provide more helpful error messages
-        if (error.message.includes('rate limit')) {
+        if (error.message.includes('rate limit') || error.message.includes('too many')) {
           setResetError('Too many requests. Please wait a few minutes before trying again.');
-        } else if (error.message.includes('email')) {
+        } else if (error.message.includes('Error sending recovery email') || error.message.includes('recovery email')) {
+          setResetError('Failed to send recovery email. Please check: 1) Email service is enabled in Supabase, 2) Redirect URL is added to allowed URLs, 3) SMTP is configured. See SUPABASE_EMAIL_SETUP.md for details.');
+        } else if (error.message.includes('Invalid email') || error.message.includes('email format')) {
           setResetError('Invalid email address. Please check and try again.');
         } else if (error.message.includes('captcha')) {
           setResetError('CAPTCHA verification failed. Please check Supabase settings. See SUPABASE_CAPTCHA_SETUP.md for configuration instructions.');
+        } else if (error.message.includes('redirect') || error.message.includes('redirect_to')) {
+          setResetError('Invalid redirect URL. Please add this URL to Supabase allowed redirect URLs: ' + redirectUrl);
         } else {
+          // Show the actual error message for debugging
           setResetError(error.message || t('login.errors.resetError'));
         }
         return;

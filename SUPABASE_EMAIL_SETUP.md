@@ -57,14 +57,58 @@ If you're not receiving password reset emails, follow these steps to configure S
 
 ## Step 7: Common Issues and Solutions
 
+### Issue: "Error sending recovery email" (500 Internal Server Error)
+**This is the most common issue. Try these solutions in order:**
+
+1. **Check Redirect URL Configuration:**
+   - Go to **Authentication** → **URL Configuration** in Supabase Dashboard
+   - Add your exact redirect URL: `https://www.givea.shop/reset-password`
+   - Also add: `https://givea.shop/reset-password` (without www)
+   - Add both with and without trailing slashes
+   - Save and wait 1-2 minutes
+
+2. **Enable Email Service:**
+   - Go to **Settings** → **Auth** → **Email**
+   - Make sure email service is enabled
+   - If using Supabase's default email, ensure it's not disabled
+   - If using custom SMTP, verify SMTP settings are correct
+
+3. **Check Email Templates:**
+   - Go to **Authentication** → **Email Templates**
+   - Find **Reset Password** template
+   - Make sure it's enabled
+   - Verify it contains: `{{ .ConfirmationURL }}` or `{{ .ConfirmationLink }}`
+
+4. **Verify Site URL:**
+   - Go to **Settings** → **Auth**
+   - Check **Site URL** is set to: `https://www.givea.shop` or `https://givea.shop`
+   - This should match your production domain
+
+5. **Check SMTP Configuration (if using custom SMTP):**
+   - Go to **Settings** → **Auth** → **SMTP Settings**
+   - Verify all SMTP credentials are correct
+   - Test the SMTP connection
+   - Make sure SMTP server allows emails from Supabase
+
+6. **Check Email Rate Limits:**
+   - Go to **Settings** → **Auth** → **Email**
+   - Check if you've exceeded the email rate limit
+   - Wait a few minutes if rate limited
+
 ### Issue: "Email rate limit exceeded"
 **Solution:** Wait a few minutes before requesting another reset email
 
 ### Issue: "Invalid redirect URL"
-**Solution:** Add the exact redirect URL to Supabase's allowed URLs list
+**Solution:** Add the exact redirect URL to Supabase's allowed URLs list:
+- `https://www.givea.shop/reset-password`
+- `https://givea.shop/reset-password`
+- Add both with and without trailing slashes
 
 ### Issue: "Email not configured"
-**Solution:** Enable email service in Supabase Dashboard → Settings → Auth
+**Solution:** 
+- Enable email service in Supabase Dashboard → Settings → Auth
+- Configure SMTP if using custom email service
+- Verify email templates are enabled
 
 ### Issue: "Email in spam folder"
 **Solution:** 
