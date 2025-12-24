@@ -524,6 +524,10 @@
     "acceptTerms": "I agree to the",
     "termsAndConditions": "Terms & Conditions",
     "orContinueWith": "Or continue with",
+    "emailConfirmationTitle": "Check Your Email",
+    "emailConfirmationMessage": "We've sent a confirmation email to {{email}}. Please check your inbox and click the confirmation link to activate your account.",
+    "checkSpamFolder": "Don't forget to check your spam folder!",
+    "backToLogin": "Back to Login",
     "errors": {
       "captchaRequired": "Please complete the CAPTCHA before creating an account.",
       "termsRequired": "You must accept the Terms & Conditions to create an account.",

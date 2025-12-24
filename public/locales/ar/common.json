@@ -532,6 +532,10 @@
     "acceptTerms": "أوافق على",
     "termsAndConditions": "الشروط والأحكام",
     "orContinueWith": "أو المتابعة مع",
+    "emailConfirmationTitle": "تحقق من بريدك الإلكتروني",
+    "emailConfirmationMessage": "لقد أرسلنا بريدًا إلكترونيًا للتأكيد إلى {{email}}. يرجى التحقق من صندوق الوارد الخاص بك والنقر على رابط التأكيد لتفعيل حسابك.",
+    "checkSpamFolder": "لا تنس التحقق من مجلد الرسائل غير المرغوب فيها!",
+    "backToLogin": "العودة إلى تسجيل الدخول",
     "errors": {
       "captchaRequired": "يرجى إكمال التحقق (CAPTCHA) قبل إنشاء الحساب.",
       "termsRequired": "يجب عليك الموافقة على الشروط والأحكام لإنشاء حساب.",

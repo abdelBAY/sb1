@@ -129,7 +129,7 @@ export default function Register() {
               {t('register.emailConfirmationTitle') || 'Check Your Email'}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {t('register.emailConfirmationMessage') || `We've sent a confirmation email to ${email}. Please check your inbox and click the confirmation link to activate your account.`}
+              {t('register.emailConfirmationMessage', { email }) || `We've sent a confirmation email to ${email}. Please check your inbox and click the confirmation link to activate your account.`}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 italic">
               {t('register.checkSpamFolder') || 'Don\'t forget to check your spam folder!'}

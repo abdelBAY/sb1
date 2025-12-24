@@ -524,6 +524,10 @@
     "acceptTerms": "J'accepte les",
     "termsAndConditions": "Conditions générales",
     "orContinueWith": "Ou continuer avec",
+    "emailConfirmationTitle": "Vérifiez votre e-mail",
+    "emailConfirmationMessage": "Nous avons envoyé un e-mail de confirmation à {{email}}. Veuillez vérifier votre boîte de réception et cliquer sur le lien de confirmation pour activer votre compte.",
+    "checkSpamFolder": "N'oubliez pas de vérifier votre dossier spam !",
+    "backToLogin": "Retour à la connexion",
     "errors": {
       "captchaRequired": "Veuillez compléter le CAPTCHA avant de créer un compte.",
       "termsRequired": "Vous devez accepter les conditions générales pour créer un compte.",

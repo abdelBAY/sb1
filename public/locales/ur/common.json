@@ -524,6 +524,10 @@
     "acceptTerms": "میں اس سے متفق ہوں",
     "termsAndConditions": "شرائط و ضوابط",
     "orContinueWith": "یا اس کے ساتھ جاری رکھیں",
+    "emailConfirmationTitle": "اپنا ای میل چیک کریں",
+    "emailConfirmationMessage": "ہم نے {{email}} پر تصدیقی ای میل بھیج دیا ہے۔ براہ کرم اپنا ان باکس چیک کریں اور اپنے اکاؤنٹ کو فعال کرنے کے لیے تصدیقی لنک پر کلک کریں۔",
+    "checkSpamFolder": "اسپام فولڈر چیک کرنا مت بھولیں!",
+    "backToLogin": "لاگ ان پر واپس",
     "errors": {
       "captchaRequired": "اکاؤنٹ بنانے سے پہلے براہ کرم CAPTCHA مکمل کریں۔",
       "termsRequired": "اکاؤنٹ بنانے کے لیے آپ کو شرائط و ضوابط سے اتفاق کرنا ہوگا۔",
