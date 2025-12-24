@@ -105,9 +105,12 @@ export default function Login() {
     }
 
     // ⚙️ Skip CAPTCHA locally (simulate token)
+    // Make CAPTCHA optional - only include if token exists (for flexibility with Supabase settings)
     const tokenToUse = isLocal ? 'test_token_local_skip' : resetCaptchaToken;
 
-    if (!tokenToUse) {
+    // Only require CAPTCHA in production if token is not available
+    // This allows the code to work whether CAPTCHA is enabled or disabled in Supabase
+    if (!isLocal && !tokenToUse) {
       setResetError(t('login.errors.captchaRequired'));
       setResetLoading(false);
       return;
@@ -119,11 +122,20 @@ export default function Login() {
       
       console.log('Sending password reset email to:', resetEmail);
       console.log('Redirect URL:', redirectUrl);
+      console.log('CAPTCHA token:', tokenToUse ? 'Present' : 'Not provided');
 
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      // Build options object
+      const resetOptions: { redirectTo: string; captchaToken?: string } = {
         redirectTo: redirectUrl,
-        captchaToken: tokenToUse, // 🧩 send the CAPTCHA token
-      });
+      };
+      
+      // Include captchaToken if we have one (required if CAPTCHA is enabled in Supabase)
+      // Skip test token in production - only send real tokens
+      if (tokenToUse && (!isLocal || tokenToUse !== 'test_token_local_skip')) {
+        resetOptions.captchaToken = tokenToUse;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, resetOptions);
 
       if (error) {
         console.error('Password reset error:', error);
@@ -132,6 +144,8 @@ export default function Login() {
           setResetError('Too many requests. Please wait a few minutes before trying again.');
         } else if (error.message.includes('email')) {
           setResetError('Invalid email address. Please check and try again.');
+        } else if (error.message.includes('captcha')) {
+          setResetError('CAPTCHA verification failed. Please check Supabase settings. See SUPABASE_CAPTCHA_SETUP.md for configuration instructions.');
         } else {
           setResetError(error.message || t('login.errors.resetError'));
         }
