@@ -132,7 +132,7 @@ export default function Login() {
         } else if (error.message.includes('Invalid email') || error.message.includes('email format')) {
           setResetError('Invalid email address. Please check and try again.');
         } else if (error.message.includes('captcha')) {
-          setResetError('CAPTCHA verification failed. Please check Supabase settings. See SUPABASE_CAPTCHA_SETUP.md for configuration instructions.');
+          setResetError('CAPTCHA is required by Supabase. To fix this: 1) Go to Supabase Dashboard → Settings → Authentication → Bot and Abuse Protection, 2) Turn OFF "Enable CAPTCHA protection", 3) Save and wait 1-2 minutes, then try again.');
         } else if (error.message.includes('redirect') || error.message.includes('redirect_to')) {
           setResetError('Invalid redirect URL. Please add this URL to Supabase allowed redirect URLs: ' + redirectUrl);
         } else {

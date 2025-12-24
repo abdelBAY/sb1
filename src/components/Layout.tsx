@@ -137,15 +137,16 @@ export default function Layout() {
       async (event, session) => {
         console.log('Auth state changed:', event, session ? 'User authenticated' : 'User not authenticated');
         
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Check if profile exists for OAuth users
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+          // Check if profile exists (for OAuth users and email-confirmed users)
           const { data: profile, error: _profileError } = await supabase
             .from('profiles')
             .select('id')
             .eq('id', session.user.id)
             .maybeSingle();
 
-          // If profile doesn't exist, create one (for OAuth users)
+          // If profile doesn't exist, create one
+          // This handles both OAuth users and email-confirmed users
           if (!profile) {
             const userMetadata = session.user.user_metadata || {};
             const fullName = userMetadata.full_name || userMetadata.name || 
@@ -170,9 +171,9 @@ export default function Layout() {
               ]);
 
             if (insertError) {
-              console.error('Error creating profile for OAuth user:', insertError);
+              console.error('Error creating profile:', insertError);
             } else {
-              console.log('Profile created for OAuth user');
+              console.log('Profile created successfully');
             }
           }
         }

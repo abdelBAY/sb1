@@ -124,12 +124,30 @@ async function cacheFirstStrategy(request) {
 
 // Network First Strategy - good for API calls
 async function networkFirstStrategy(request) {
+  // Don't cache POST, PUT, DELETE, PATCH requests
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+    // Just pass through without caching
+    try {
+      return await fetch(request);
+    } catch (error) {
+      console.error('[Service Worker] Network request failed:', error);
+      return new Response(
+        JSON.stringify({ error: 'Offline - Please check your connection' }),
+        {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+  }
+  
   const cache = await caches.open(RUNTIME_CACHE);
   
   try {
     const response = await fetch(request);
     
-    if (response.status === 200) {
+    // Only cache successful GET requests
+    if (response.status === 200 && request.method === 'GET') {
       cache.put(request, response.clone());
     }
     

@@ -16,6 +16,7 @@ export default function Register() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailConfirmationSent, setEmailConfirmationSent] = useState(false);
   const navigate = useNavigate();
   const setUser = useStore((state) => state.setUser);
 
@@ -46,31 +47,42 @@ export default function Register() {
       if (authError) throw authError;
       if (!authData.user) throw new Error(t('register.errors.registrationFailed'));
 
-      // 2️⃣ إنشاء سجل الملف الشخصي
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            id: authData.user.id,
-            username: email.split('@')[0],
-            full_name: fullName,
-            role: role,
-            biography: '',
-            city: '',
-            visibility: true,
-            avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
-          },
-        ])
-        .select()
-        .single();
+      // Check if email confirmation is required
+      // If user has a session, they're already confirmed (email confirmation disabled)
+      // If no session, email confirmation is enabled
+      if (authData.session) {
+        // Email confirmation is disabled - create profile immediately
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: authData.user.id,
+              username: email.split('@')[0],
+              full_name: fullName,
+              role: role,
+              biography: '',
+              city: '',
+              visibility: true,
+              avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`,
+            },
+          ])
+          .select()
+          .single();
 
-      if (profileError) {
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        throw profileError;
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Don't try to delete user - admin API doesn't work from client
+          throw new Error('Failed to create profile. Please contact support.');
+        }
+
+        setUser(authData.user);
+        navigate('/search');
+      } else {
+        // Email confirmation is enabled - profile will be created after email confirmation
+        // The Layout component will create the profile when user confirms email and signs in
+        setError(null);
+        setEmailConfirmationSent(true);
       }
-
-      setUser(authData.user);
-      navigate('/search');
     } catch (error) {
       setError(error instanceof Error ? error.message : t('register.errors.registrationError'));
     } finally {
@@ -101,6 +113,38 @@ export default function Register() {
       setLoading(false);
     }
   };
+
+  // Show email confirmation message if email was sent
+  if (emailConfirmationSent) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+          <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/20 mb-4">
+              <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              {t('register.emailConfirmationTitle') || 'Check Your Email'}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              {t('register.emailConfirmationMessage') || `We've sent a confirmation email to ${email}. Please check your inbox and click the confirmation link to activate your account.`}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-6 italic">
+              {t('register.checkSpamFolder') || 'Don\'t forget to check your spam folder!'}
+            </p>
+            <Link
+              to="/login"
+              className="w-full inline-flex justify-center px-4 py-2 border border-transparent rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              {t('register.backToLogin') || 'Back to Login'}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
