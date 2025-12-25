@@ -15,6 +15,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [resetCaptchaToken, setResetCaptchaToken] = useState<string | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
   const [resetSuccess, setResetSuccess] = useState(false);
@@ -103,6 +104,15 @@ export default function Login() {
       return;
     }
 
+    // ⚙️ Skip CAPTCHA locally (simulate token)
+    const tokenToUse = isLocal ? 'test_token_local_skip' : resetCaptchaToken;
+
+    if (!tokenToUse) {
+      setResetError(t('login.errors.captchaRequired') || 'Please complete the CAPTCHA verification');
+      setResetLoading(false);
+      return;
+    }
+
     try {
       // Use the current origin for redirect URL
       const redirectUrl = `${window.location.origin}/reset-password`;
@@ -114,6 +124,7 @@ export default function Login() {
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: redirectUrl,
+        captchaToken: tokenToUse, // 🧩 send the token (real or fake)
       });
 
       if (error) {
@@ -335,6 +346,7 @@ export default function Login() {
                 setResetEmail('');
                 setResetError(null);
                 setResetSuccess(false);
+                setResetCaptchaToken(null);
               }}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
@@ -378,6 +390,17 @@ export default function Login() {
                     />
                   </div>
 
+                  {/* 🧠 Hide Turnstile widget when local */}
+                  {!isLocal && (
+                    <div className="flex justify-center">
+                      <Turnstile
+                        sitekey={siteKey}
+                        onVerify={(token) => setResetCaptchaToken(token)}
+                        onExpire={() => setResetCaptchaToken(null)}
+                      />
+                    </div>
+                  )}
+
                   <div className="flex gap-3">
                     <button
                       type="button"
@@ -385,6 +408,7 @@ export default function Login() {
                         setShowForgotPassword(false);
                         setResetEmail('');
                         setResetError(null);
+                        setResetCaptchaToken(null);
                       }}
                       className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                     >
@@ -392,7 +416,7 @@ export default function Login() {
                     </button>
                     <button
                       type="submit"
-                      disabled={resetLoading}
+                      disabled={resetLoading || (!resetCaptchaToken && !isLocal)}
                       className="flex-1 px-4 py-2 border border-transparent rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {resetLoading ? t('login.sendingResetLink') : t('login.sendResetLink')}
@@ -422,6 +446,7 @@ export default function Login() {
                     setResetEmail('');
                     setResetError(null);
                     setResetSuccess(false);
+                    setResetCaptchaToken(null);
                   }}
                   className="w-full px-4 py-2 border border-transparent rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
