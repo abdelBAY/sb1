@@ -12,7 +12,8 @@ import {
   Printer,
   Package,
   Navigation,
-  X
+  X,
+  Check
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -704,10 +705,19 @@ export default function Search() {
                   }
                 }}
                 disabled={gettingLocation}
-                className="px-3 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title={locationSearch.trim() ? t('search.location.confirm') || 'Search' : t('search.location.useCurrent')}
+                className={`px-3 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
+                  locationSearch.trim() ? 'px-4' : ''
+                }`}
+                title={locationSearch.trim() ? t('search.location.confirm') : t('search.location.useCurrent')}
               >
-                <Navigation className={`w-5 h-5 ${gettingLocation ? 'animate-spin' : ''}`} />
+                {locationSearch.trim() ? (
+                  <span className="flex items-center gap-2 text-sm font-medium">
+                    <Check className="w-4 h-4" />
+                    {t('search.location.confirm')}
+                  </span>
+                ) : (
+                  <Navigation className={`w-5 h-5 ${gettingLocation ? 'animate-spin' : ''}`} />
+                )}
               </button>
             </div>
 
