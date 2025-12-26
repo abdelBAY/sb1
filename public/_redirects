@@ -1,1 +1,3 @@
-/*  /index.html  200
+# Redirects are now handled in netlify.toml
+# This file is kept for reference but redirects are managed in netlify.toml
+# Netlify automatically serves existing files (CSS, JS, images) before applying redirects

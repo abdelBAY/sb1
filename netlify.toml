@@ -10,6 +10,8 @@
   NODE_VERSION = "20"
 
 # Redirect rules for SPA routing
+# Note: Netlify automatically serves existing files before applying redirects
+# This redirect only applies to paths that don't match existing files
 [[redirects]]
   from = "/*"
   to = "/index.html"
