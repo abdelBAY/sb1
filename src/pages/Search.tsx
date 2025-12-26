@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { debounce } from 'lodash';
 import { supabase } from '../lib/supabase';
 import { 
@@ -11,7 +11,8 @@ import {
   Star,
   Printer,
   Package,
-  Navigation
+  Navigation,
+  X
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -69,6 +70,13 @@ export default function Search() {
   const [distanceRadius, setDistanceRadius] = useState<number>(15);
   const [gettingLocation, setGettingLocation] = useState<boolean>(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [locationSearchActive, setLocationSearchActive] = useState<boolean>(false);
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [searchingLocation, setSearchingLocation] = useState<boolean>(false);
+  const locationInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Category mapping: English database values to translation keys
   const categoryMap: { [key: string]: string } = {
@@ -240,6 +248,8 @@ export default function Search() {
             setLocationSearch(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
           }
           
+          // Activate location search after getting location
+          setLocationSearchActive(true);
           setGettingLocation(false);
         } catch (error) {
           setLocationError(t('search.location.error'));
@@ -290,19 +300,144 @@ export default function Search() {
     [t]
   );
 
+  // Search for location suggestions
+  const searchLocation = useCallback(async (query: string) => {
+    if (!query || query.trim().length < 2) {
+      setLocationSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Debounce the search
+    searchTimeoutRef.current = setTimeout(async () => {
+      setSearchingLocation(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=10&addressdetails=1`,
+          {
+            headers: {
+              'User-Agent': 'Givea-Donation-App/1.0',
+              'Accept': 'application/json',
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to search locations');
+        }
+
+        const data = await response.json();
+        setLocationSuggestions(data || []);
+        setShowSuggestions(true);
+      } catch (error) {
+        // Silently fail - user can still type manually
+        setLocationSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setSearchingLocation(false);
+      }
+    }, 300);
+  }, []);
+
   // Handle location search input change with debounce
   const handleLocationSearchChange = useCallback((value: string) => {
     setLocationSearch(value);
     setLocationError(null);
+    // Deactivate location search when input changes - user needs to click button again
+    setLocationSearchActive(false);
     
     if (!value.trim()) {
       setSearchCoordinates(null);
+      setLocationSuggestions([]);
+      setShowSuggestions(false);
       debouncedGeocode.cancel();
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
       return;
     }
 
+    // Search for suggestions
+    searchLocation(value);
+    
+    // Also geocode for coordinates (but don't activate search yet)
     debouncedGeocode(value);
-  }, [debouncedGeocode]);
+  }, [debouncedGeocode, searchLocation]);
+
+  // Select a location from suggestions
+  const selectLocation = (suggestion: { display_name: string; lat: string; lon: string }) => {
+    setLocationSearch(suggestion.display_name);
+    setSearchCoordinates({ lat: parseFloat(suggestion.lat), lon: parseFloat(suggestion.lon) });
+    setLocationSuggestions([]);
+    setShowSuggestions(false);
+    setLocationError(null);
+    if (locationInputRef.current) {
+      locationInputRef.current.blur();
+    }
+  };
+
+  // Clear location search
+  const clearLocation = () => {
+    setLocationSearch('');
+    setSearchCoordinates(null);
+    setLocationSuggestions([]);
+    setShowSuggestions(false);
+    setLocationError(null);
+    setLocationSearchActive(false);
+    if (locationInputRef.current) {
+      locationInputRef.current.focus();
+    }
+  };
+
+  // Trigger location-based search
+  const triggerLocationSearch = async () => {
+    if (!locationSearch.trim()) {
+      setLocationError(t('search.location.addressPlaceholder'));
+      return;
+    }
+
+    // If coordinates are not set, try to geocode first
+    if (!searchCoordinates) {
+      const coords = await geocodeAddress(locationSearch);
+      if (coords) {
+        setSearchCoordinates(coords);
+        setLocationError(null);
+        setLocationSearchActive(true);
+      } else {
+        setLocationError(t('search.location.addressNotFound'));
+        return;
+      }
+    } else {
+      setLocationSearchActive(true);
+    }
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node) &&
+        locationInputRef.current &&
+        !locationInputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const performSearch = async () => {
     setLoading(true);
@@ -346,7 +481,7 @@ export default function Search() {
 
       // Filter by distance if location search is active
       let filteredData = data || [];
-      if (searchCoordinates && distanceRadius > 0) {
+      if (locationSearchActive && searchCoordinates && distanceRadius > 0) {
         const itemsWithCoords: any[] = [];
         const itemsWithoutCoords: any[] = [];
         
@@ -413,7 +548,7 @@ export default function Search() {
     const debouncedSearch = debounce(performSearch, 300);
     debouncedSearch();
     return () => debouncedSearch.cancel();
-  }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly, searchCoordinates, distanceRadius]);
+  }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly, locationSearchActive, distanceRadius]);
 
   const handlePrint = () => {
     window.print();
@@ -515,19 +650,62 @@ export default function Search() {
             <div className="flex items-center gap-2">
               <div className="relative flex-1 min-w-[200px]">
                 <input
+                  ref={locationInputRef}
                   type="text"
                   value={locationSearch}
                   onChange={(e) => handleLocationSearchChange(e.target.value)}
+                  onFocus={() => {
+                    if (locationSuggestions.length > 0) {
+                      setShowSuggestions(true);
+                    }
+                  }}
                   placeholder={t('search.location.addressPlaceholder')}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
+                  className="w-full pl-10 pr-10 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm"
                 />
                 <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                {locationSearch && (
+                  <button
+                    type="button"
+                    onClick={clearLocation}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-r-lg transition-colors"
+                  >
+                    <X className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+                  </button>
+                )}
+                {showSuggestions && locationSuggestions.length > 0 && (
+                  <div
+                    ref={suggestionsRef}
+                    className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-80 overflow-y-auto"
+                  >
+                    {locationSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => selectLocation(suggestion)}
+                        className="w-full px-4 py-3 flex items-start space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                      >
+                        <MapPin className="h-5 w-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5" />
+                        <span className="flex-1 text-sm text-gray-900 dark:text-white">
+                          {suggestion.display_name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <button
-                onClick={getCurrentLocation}
+                onClick={() => {
+                  if (locationSearch.trim()) {
+                    // If address is entered, trigger location search
+                    triggerLocationSearch();
+                  } else {
+                    // If no address, get current location
+                    getCurrentLocation();
+                  }
+                }}
                 disabled={gettingLocation}
                 className="px-3 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title={t('search.location.useCurrent')}
+                title={locationSearch.trim() ? t('search.location.confirm') || 'Search' : t('search.location.useCurrent')}
               >
                 <Navigation className={`w-5 h-5 ${gettingLocation ? 'animate-spin' : ''}`} />
               </button>
