@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import seed1Img from '../../assets/seed1.png';
-import seedImg from '../../assets/seed.png';
-import sproutImg from '../../assets/sprout.png';
+import seed1ImgWebp from '../../assets/optimized/seed1.webp';
+import seed1ImgFallback from '../../assets/seed1.png';
+import seedImgWebp from '../../assets/optimized/seed.webp';
+import seedImgFallback from '../../assets/seed.png';
+import sproutImgWebp from '../../assets/optimized/sprout.webp';
+import sproutImgFallback from '../../assets/sprout.png';
 
 interface SeedBalanceProps {
   balance?: number | null;
@@ -134,14 +137,14 @@ export default function SeedBalance({
   // Determine which seed image to use based on balance
   const getSeedImage = useMemo(() => {
     const seedCount = balance ?? 0;
-    if (seedCount <= 3) return seed1Img; // Low: 0-3 seeds
-    if (seedCount <= 10) return seedImg; // Medium: 4-10 seeds
-    return sproutImg; // Full: 11+ seeds
+    if (seedCount <= 3) return { webp: seed1ImgWebp, fallback: seed1ImgFallback }; // Low: 0-3 seeds
+    if (seedCount <= 10) return { webp: seedImgWebp, fallback: seedImgFallback }; // Medium: 4-10 seeds
+    return { webp: sproutImgWebp, fallback: sproutImgFallback }; // Full: 11+ seeds
   }, [balance]);
 
   const getFloatingSeedImage = (direction: 'up' | 'down') => {
     // For floating animations, use the current balance's image
-    return getSeedImage;
+    return getSeedImage.webp;
   };
 
   const { padding, font, icon, image, floatingImage, badge } = sizeMap[size];
@@ -178,11 +181,15 @@ export default function SeedBalance({
         <div
           className={`flex items-center justify-center rounded-full bg-white/20 backdrop-blur px-2 py-1 shadow-inner`}
         >
-          <img
-            src={getSeedImage}
-            alt="Seed"
-            className={`${image} object-contain`}
-          />
+          <picture>
+            <source srcSet={getSeedImage.webp} type="image/webp" />
+            <img
+              src={getSeedImage.fallback}
+              alt="Seed"
+              className={`${image} object-contain`}
+              loading="lazy"
+            />
+          </picture>
         </div>
         <div className="flex flex-col leading-tight">
           {showLabel && (
@@ -209,15 +216,9 @@ export default function SeedBalance({
         )}
 
         {floatingSeeds.map((seed) => (
-          <img
+          <picture
             key={seed.id}
-            src={getFloatingSeedImage(seed.direction)}
-            alt=""
-            className={`pointer-events-none absolute ${floatingImage} object-contain ${
-              seed.direction === 'up'
-                ? 'seed-floating-up'
-                : 'seed-floating-down opacity-90'
-            }`}
+            className="pointer-events-none absolute"
             style={
               {
                 right: '8px',
@@ -228,18 +229,34 @@ export default function SeedBalance({
               } as CSSProperties & Record<string, string>
             }
             aria-hidden="true"
-          />
+          >
+            <source srcSet={getSeedImage.webp} type="image/webp" />
+            <img
+              src={getSeedImage.fallback}
+              alt=""
+              className={`${floatingImage} object-contain ${
+                seed.direction === 'up'
+                  ? 'seed-floating-up'
+                  : 'seed-floating-down opacity-90'
+              }`}
+              loading="lazy"
+            />
+          </picture>
         ))}
       </div>
 
       {showEmptyMessage && (balance ?? 0) <= 0 && (
         <div className="flex items-center gap-2 rounded-xl bg-emerald-50/80 dark:bg-emerald-900/30 border border-emerald-100/80 dark:border-emerald-800/40 px-4 py-3 shadow-sm text-sm text-emerald-700 dark:text-emerald-200">
-          <img
-            src={seed1Img}
-            alt="Seed"
-            className="w-8 h-8 object-contain"
-            aria-label="seed"
-          />
+          <picture>
+            <source srcSet={seed1ImgWebp} type="image/webp" />
+            <img
+              src={seed1ImgFallback}
+              alt="Seed"
+              className="w-8 h-8 object-contain"
+              aria-label="seed"
+              loading="lazy"
+            />
+          </picture>
           <p className="font-medium">
             {fallbackEmptyMessage}
           </p>

@@ -2,9 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Sprout, Gift, MessageCircle, Info } from 'lucide-react';
-import seed1Img from '../assets/seed1.png';
-import seedImg from '../assets/seed.png';
-import sproutImg from '../assets/sprout.png';
+import seed1ImgWebp from '../assets/optimized/seed1.webp';
+import seed1ImgFallback from '../assets/seed1.png';
+import seedImgWebp from '../assets/optimized/seed.webp';
+import seedImgFallback from '../assets/seed.png';
+import sproutImgWebp from '../assets/optimized/sprout.webp';
+import sproutImgFallback from '../assets/sprout.png';
 
 const SeedsInfo: React.FC = () => {
   const { t } = useTranslation('common');
@@ -25,11 +28,15 @@ const SeedsInfo: React.FC = () => {
 
           <div className="flex items-center gap-4 mb-6">
             <div className="relative">
-              <img
-                src={sproutImg}
-                alt="Seed"
-                className="w-16 h-16 object-contain"
-              />
+              <picture>
+                <source srcSet={sproutImgWebp} type="image/webp" />
+                <img
+                  src={sproutImgFallback}
+                  alt="Seed"
+                  className="w-16 h-16 object-contain"
+                  loading="lazy"
+                />
+              </picture>
             </div>
             <div>
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
@@ -128,7 +135,10 @@ const SeedsInfo: React.FC = () => {
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center gap-3 mb-3">
-                  <img src={seed1Img} alt="Low seeds" className="w-10 h-10 object-contain" />
+                  <picture>
+                    <source srcSet={seed1ImgWebp} type="image/webp" />
+                    <img src={seed1ImgFallback} alt="Low seeds" className="w-10 h-10 object-contain" loading="lazy" />
+                  </picture>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
                     {t('seedsInfo.balanceIndicators.low.title', 'Low (0-3 seeds)')}
                   </h3>
@@ -139,7 +149,10 @@ const SeedsInfo: React.FC = () => {
               </div>
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center gap-3 mb-3">
-                  <img src={seedImg} alt="Medium seeds" className="w-10 h-10 object-contain" />
+                  <picture>
+                    <source srcSet={seedImgWebp} type="image/webp" />
+                    <img src={seedImgFallback} alt="Medium seeds" className="w-10 h-10 object-contain" loading="lazy" />
+                  </picture>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
                     {t('seedsInfo.balanceIndicators.medium.title', 'Medium (4-10 seeds)')}
                   </h3>
@@ -150,7 +163,10 @@ const SeedsInfo: React.FC = () => {
               </div>
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center gap-3 mb-3">
-                  <img src={sproutImg} alt="High seeds" className="w-10 h-10 object-contain" />
+                  <picture>
+                    <source srcSet={sproutImgWebp} type="image/webp" />
+                    <img src={sproutImgFallback} alt="High seeds" className="w-10 h-10 object-contain" loading="lazy" />
+                  </picture>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
                     {t('seedsInfo.balanceIndicators.high.title', 'High (11+ seeds)')}
                   </h3>

@@ -705,8 +705,10 @@ export default function Search() {
                   }
                 }}
                 disabled={gettingLocation}
-                className={`px-3 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
-                  locationSearch.trim() ? 'px-4' : ''
+                className={`px-3 py-3 rounded-lg border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  locationSearch.trim() 
+                    ? 'px-4 bg-yellow-400 dark:bg-yellow-500 border-yellow-500 dark:border-yellow-600 text-gray-900 dark:text-gray-900 hover:bg-yellow-500 dark:hover:bg-yellow-600 font-semibold' 
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
                 title={locationSearch.trim() ? t('search.location.confirm') : t('search.location.useCurrent')}
               >

@@ -39,10 +39,15 @@ async function compressImage(inputPath, outputPath, options = {}) {
         .png({ quality: 90, compressionLevel: 9 })
         .toFile(outputPath.replace(/\.webp$/, '.png'));
     } else if (ext === '.jpg' || ext === '.jpeg') {
-      // Optimize JPEG
+      // Convert JPEG to WebP with high quality
+      await sharpInstance
+        .webp({ quality: 85, effort: 6 })
+        .toFile(outputPath.replace(/\.(jpg|jpeg)$/i, '.webp'));
+      
+      // Also create optimized JPEG as fallback
       await sharpInstance
         .jpeg({ quality: 85, mozjpeg: true })
-        .toFile(outputPath);
+        .toFile(outputPath.replace(/\.webp$/, '.jpg'));
     } else if (ext === '.ico') {
       // For ICO files, create optimized PNG versions
       await sharpInstance
@@ -51,11 +56,21 @@ async function compressImage(inputPath, outputPath, options = {}) {
         .toFile(outputPath.replace(/\.ico$/i, '.png'));
     }
     
-    const newStats = fs.statSync(outputPath.replace(/\.png$/i, '.webp').replace(/\.ico$/i, '.png'));
+    // Determine the actual output file path
+    let actualOutputPath = outputPath;
+    if (ext === '.png') {
+      actualOutputPath = outputPath.replace(/\.png$/i, '.webp');
+    } else if (ext === '.jpg' || ext === '.jpeg') {
+      actualOutputPath = outputPath.replace(/\.(jpg|jpeg)$/i, '.webp');
+    } else if (ext === '.ico') {
+      actualOutputPath = outputPath.replace(/\.ico$/i, '.png');
+    }
+    
+    const newStats = fs.statSync(actualOutputPath);
     const newSizeMB = (newStats.size / (1024 * 1024)).toFixed(2);
     const savings = ((1 - newStats.size / stats.size) * 100).toFixed(1);
     
-    console.log(`  ✓ Created: ${path.basename(outputPath)} (${newSizeMB} MB) - Saved ${savings}%`);
+    console.log(`  ✓ Created: ${path.basename(actualOutputPath)} (${newSizeMB} MB) - Saved ${savings}%`);
     
     return { originalSizeMB, newSizeMB, savings };
   } catch (error) {
@@ -81,6 +96,30 @@ async function compressAssets() {
     {
       input: path.join(__dirname, 'src', 'assets', 'logo.png'),
       output: path.join(optimizedDir, 'logo.webp')
+    },
+    {
+      input: path.join(__dirname, 'src', 'assets', 'photo-ResourcesSection9.jpg'),
+      output: path.join(optimizedDir, 'photo-ResourcesSection9.webp')
+    },
+    {
+      input: path.join(__dirname, 'src', 'assets', 'chat.png'),
+      output: path.join(optimizedDir, 'chat.webp')
+    },
+    {
+      input: path.join(__dirname, 'src', 'assets', 'notification.png'),
+      output: path.join(optimizedDir, 'notification.webp')
+    },
+    {
+      input: path.join(__dirname, 'src', 'assets', 'seed.png'),
+      output: path.join(optimizedDir, 'seed.webp')
+    },
+    {
+      input: path.join(__dirname, 'src', 'assets', 'seed1.png'),
+      output: path.join(optimizedDir, 'seed1.webp')
+    },
+    {
+      input: path.join(__dirname, 'src', 'assets', 'sprout.png'),
+      output: path.join(optimizedDir, 'sprout.webp')
     },
     {
       input: path.join(__dirname, 'public', 'logo1.png'),
@@ -133,5 +172,58 @@ async function compressAssets() {
   console.log('\nNote: Original files are preserved. Update your code to use the optimized versions.');
 }
 
-compressAssets().catch(console.error);
+// Create mobile-optimized version of hero image
+async function createMobileHeroImage() {
+  const heroInput = path.join(__dirname, 'src', 'assets', 'givea-image2.png');
+  const heroWebpMobile = path.join(optimizedDir, 'givea-image2-mobile.webp');
+  const heroPngMobile = path.join(optimizedDir, 'givea-image2-mobile.png');
+  
+  if (!fs.existsSync(heroInput)) {
+    console.log('\n⚠ Hero image not found, skipping mobile version creation');
+    return;
+  }
+  
+  try {
+    console.log('\n' + '='.repeat(60));
+    console.log('Creating mobile-optimized hero image...');
+    console.log('='.repeat(60));
+    
+    // Create mobile version: max width 768px, optimized for mobile
+    await sharp(heroInput)
+      .resize(768, null, {
+        fit: 'cover',
+        withoutEnlargement: true
+      })
+      .webp({ quality: 80, effort: 6 })
+      .toFile(heroWebpMobile);
+    
+    await sharp(heroInput)
+      .resize(768, null, {
+        fit: 'cover',
+        withoutEnlargement: true
+      })
+      .png({ quality: 85, compressionLevel: 9 })
+      .toFile(heroPngMobile);
+    
+    const stats = fs.statSync(heroInput);
+    const mobileStats = fs.statSync(heroWebpMobile);
+    const originalSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
+    const mobileSizeMB = (mobileStats.size / (1024 * 1024)).toFixed(2);
+    const savings = ((1 - mobileStats.size / stats.size) * 100).toFixed(1);
+    
+    console.log(`\n✓ Created mobile hero image:`);
+    console.log(`  Original: ${originalSizeMB} MB`);
+    console.log(`  Mobile: ${mobileSizeMB} MB`);
+    console.log(`  Savings: ${savings}%`);
+  } catch (error) {
+    console.error(`\n✗ Error creating mobile hero image:`, error.message);
+  }
+}
+
+async function main() {
+  await compressAssets();
+  await createMobileHeroImage();
+}
+
+main().catch(console.error);
 

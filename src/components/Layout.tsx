@@ -20,7 +20,8 @@ import LogoutModal from './LogoutModal';
 import { useTranslation } from 'react-i18next';
 import SeedBalance from './seeds/SeedBalance';
 import OptimizedImage from './OptimizedImage';
-import chatIcon from '../assets/chat.png';
+import chatIconWebp from '../assets/optimized/chat.webp';
+import chatIconFallback from '../assets/chat.png';
 
 interface ReviewNotificationItem {
   id: string;
@@ -538,7 +539,10 @@ export default function Layout() {
                       onClick={() => navigate('/messages')}
                       className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
                     >
-                      <img src={chatIcon} alt="Messages" className="w-5 h-5" />
+                      <picture>
+                        <source srcSet={chatIconWebp} type="image/webp" />
+                        <img src={chatIconFallback} alt="Messages" className="w-5 h-5" loading="lazy" />
+                      </picture>
                       {unreadMessagesCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
                           {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
@@ -724,7 +728,10 @@ export default function Layout() {
                           onClick={() => setIsProfileOpen(false)}
                         >
                           <div className="flex items-center space-x-2">
-                            <img src={chatIcon} alt="Messages" className="w-4 h-4" />
+                            <picture>
+                              <source srcSet={chatIconWebp} type="image/webp" />
+                              <img src={chatIconFallback} alt="Messages" className="w-4 h-4" loading="lazy" />
+                            </picture>
                             <span>Messages</span>
                           </div>
                           <div className="flex items-center space-x-1">
@@ -871,7 +878,10 @@ export default function Layout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <div className="flex items-center space-x-2">
-                    <img src={chatIcon} alt="Messages" className="w-4 h-4" />
+                    <picture>
+                      <source srcSet={chatIconWebp} type="image/webp" />
+                      <img src={chatIconFallback} alt="Messages" className="w-4 h-4" loading="lazy" />
+                    </picture>
                     <span>Messages</span>
                   </div>
                   {unreadMessagesCount > 0 && (

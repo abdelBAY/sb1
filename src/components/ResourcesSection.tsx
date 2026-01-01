@@ -2,6 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { MapPin, MessageCircle, Search } from "lucide-react";
 import { motion } from "framer-motion";
+import photoResourcesSection9Webp from "../assets/optimized/photo-ResourcesSection9.webp";
+import photoResourcesSection9Fallback from "../assets/photo-ResourcesSection9.jpg";
 
 const ResourcesSection: React.FC = () => {
   const { t } = useTranslation('common');
@@ -87,16 +89,19 @@ const ResourcesSection: React.FC = () => {
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&h=1000&fit=crop"
-                alt="Community support"
-                className="w-full h-full object-cover aspect-[3/4]"
-                loading="lazy"
-                onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  target.src = "/optimized/logo1.webp";
-                }}
-              />
+              <picture>
+                <source srcSet={photoResourcesSection9Webp} type="image/webp" />
+                <img
+                  src={photoResourcesSection9Fallback}
+                  alt="Community support"
+                  className="w-full h-full object-cover aspect-[3/4]"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = "/optimized/logo1.webp";
+                  }}
+                />
+              </picture>
               {/* Quote Box Overlay */}
               <div className="absolute bottom-6 right-6 max-w-xs bg-green-700 dark:bg-green-800 p-6 rounded-lg shadow-xl">
                 <p className="text-white text-lg leading-relaxed italic">

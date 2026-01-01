@@ -1,6 +1,8 @@
 import React from "react";
 import heroImgWebp from "../assets/optimized/givea-image2.webp";
+import heroImgWebpMobile from "../assets/optimized/givea-image2-mobile.webp";
 import heroImgFallback from "../assets/givea-image2.png";
+import heroImgFallbackMobile from "../assets/optimized/givea-image2-mobile.png";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +17,19 @@ const HeroSection: React.FC = () => {
       {/* Hero Image as Background */}
       <div className="absolute inset-0 w-full h-full">
         <picture>
+          {/* Mobile version (up to 768px) */}
+          <source 
+            media="(max-width: 768px)" 
+            srcSet={heroImgWebpMobile} 
+            type="image/webp" 
+          />
+          {/* Desktop version */}
           <source srcSet={heroImgWebp} type="image/webp" />
+          {/* Fallback images */}
+          <source 
+            media="(max-width: 768px)" 
+            srcSet={heroImgFallbackMobile} 
+          />
           <img
             src={heroImgFallback}
             alt="Community helping"
