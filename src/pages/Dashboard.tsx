@@ -20,7 +20,7 @@ import { useStore } from '../lib/store';
 interface DashboardItem {
   id: string;
   title: string;
-  status: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
+  status: 'AVAILABLE' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   created_at: string;
   category: string;
   description: string;
@@ -84,7 +84,7 @@ export default function Dashboard() {
       // Calculate stats
       const stats = {
         totalDonations: announcements?.length || 0,
-        activeDonations: announcements?.filter(a => a.status === 'PENDING').length || 0,
+        activeDonations: announcements?.filter(a => a.status === 'AVAILABLE').length || 0,
         completedDonations: announcements?.filter(a => a.status === 'COMPLETED' || a.status === 'GIVEN_AWAY').length || 0,
         totalBeneficiaries: new Set(announcements?.map(a => a.claimed_by)).size || 0
       };
@@ -169,7 +169,7 @@ export default function Dashboard() {
       setStats(prevStats => ({
         ...prevStats,
         totalDonations: prevStats.totalDonations - 1,
-        activeDonations: itemToDelete.status === 'PENDING' 
+        activeDonations: itemToDelete.status === 'AVAILABLE' 
           ? prevStats.activeDonations - 1 
           : prevStats.activeDonations,
         completedDonations: itemToDelete.status === 'COMPLETED'
@@ -230,8 +230,8 @@ export default function Dashboard() {
       setStats(prevStats => {
         const newStats = { ...prevStats };
         
-        // If it was PENDING, decrease active donations
-        if (previousStatus === 'PENDING') {
+        // If it was AVAILABLE, decrease active donations
+        if (previousStatus === 'AVAILABLE') {
           newStats.activeDonations = Math.max(0, prevStats.activeDonations - 1);
         }
         
@@ -449,7 +449,7 @@ export default function Dashboard() {
                               {item.category}
                             </span>
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              item.status === 'PENDING'
+                              item.status === 'AVAILABLE'
                                 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                                 : item.status === 'CLAIMED'
                                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'

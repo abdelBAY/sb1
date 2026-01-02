@@ -56,7 +56,7 @@ DO $$ BEGIN
     AND column_name = 'status'
   ) THEN
     ALTER TABLE announcements
-    ADD COLUMN status text DEFAULT 'PENDING';
+    ADD COLUMN status text DEFAULT 'AVAILABLE';
   END IF;
 
   -- Remove existing status constraint if it exists
@@ -66,5 +66,5 @@ DO $$ BEGIN
   -- Add the status check constraint
   ALTER TABLE announcements
   ADD CONSTRAINT announcements_status_check
-  CHECK (status IN ('PENDING', 'CLAIMED', 'COMPLETED'));
+  CHECK (status IN ('AVAILABLE', 'CLAIMED', 'COMPLETED'));
 END $$;

@@ -31,7 +31,7 @@ interface SearchResult {
   tags: string[];
   created_at: string;
   condition: 'LIKE_NEW' | 'GOOD' | 'WORN' | 'BROKEN';
-  status: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
+  status: 'AVAILABLE' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   dimensions?: {
     length: number;
     width: number;
@@ -462,7 +462,7 @@ export default function Search() {
       queryBuilder = queryBuilder.neq('status', 'GIVEN_AWAY');
 
       if (pendingOnly) {
-        queryBuilder = queryBuilder.eq('status', 'PENDING');
+        queryBuilder = queryBuilder.eq('status', 'AVAILABLE');
       }
 
       if (typeof query === 'string' && query.trim()) {
@@ -575,7 +575,7 @@ export default function Search() {
 
   const getStatusColor = (status: string) => {
     const colors: { [key: string]: string } = {
-      'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+      'AVAILABLE': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
       'CLAIMED': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
       'COMPLETED': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
       'GIVEN_AWAY': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'

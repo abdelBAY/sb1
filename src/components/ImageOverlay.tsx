@@ -161,7 +161,7 @@ export default function ImageOverlay({ item, onClose }: ImageOverlayProps) {
                   {item.condition}
                 </span>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  item.status === 'PENDING'
+                  item.status === 'AVAILABLE'
                     ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300'
                     : item.status === 'CLAIMED'
                     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300'

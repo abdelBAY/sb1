@@ -17,5 +17,5 @@ DROP CONSTRAINT IF EXISTS announcements_status_check;
 -- Add the updated status check constraint with GIVEN_AWAY
 ALTER TABLE announcements
 ADD CONSTRAINT announcements_status_check
-CHECK (status IN ('PENDING', 'CLAIMED', 'COMPLETED', 'GIVEN_AWAY'));
+CHECK (status IN ('AVAILABLE', 'CLAIMED', 'COMPLETED', 'GIVEN_AWAY'));
 

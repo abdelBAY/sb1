@@ -23,7 +23,7 @@ interface EditItemForm {
   photos: string[];
   newPhotos: File[];
   location: string;
-  availability: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
+  availability: 'AVAILABLE' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   pickupInstructions: string;
   tags: string[];
 }
@@ -76,7 +76,7 @@ export default function EditItem() {
     photos: [],
     newPhotos: [],
     location: '',
-    availability: 'PENDING',
+    availability: 'AVAILABLE',
     pickupInstructions: '',
     tags: []
   });
@@ -121,7 +121,7 @@ export default function EditItem() {
         photos: item.photos || [],
         newPhotos: [],
         location: item.location || '',
-        availability: item.status || 'PENDING',
+        availability: item.status || 'AVAILABLE',
         pickupInstructions: item.pickup_instructions || '',
         tags: item.tags || []
       });

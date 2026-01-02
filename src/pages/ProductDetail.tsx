@@ -50,7 +50,7 @@ interface ProductDetails {
   photos: string[];
   tags: string[];
   created_at: string;
-  status: 'PENDING' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
+  status: 'AVAILABLE' | 'CLAIMED' | 'COMPLETED' | 'GIVEN_AWAY';
   pickup_instructions?: string;
   dimensions?: {
     length: number;
@@ -817,7 +817,7 @@ export default function ProductDetail() {
                       {getConditionTranslation(product.condition)}
                     </span>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      product.status === 'PENDING'
+                      product.status === 'AVAILABLE'
                         ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                         : product.status === 'CLAIMED'
                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'
@@ -1197,7 +1197,7 @@ export default function ProductDetail() {
                         {getConditionTranslation(item.condition)}
                       </span>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        item.status === 'PENDING'
+                        item.status === 'AVAILABLE'
                           ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200'
                           : item.status === 'CLAIMED'
                           ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200'

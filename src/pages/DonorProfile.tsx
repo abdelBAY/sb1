@@ -148,7 +148,7 @@ export default function DonorProfile() {
 
   const getStatusTranslation = (status: string) => {
     const statusMap: { [key: string]: string } = {
-      'PENDING': 'pending',
+      'AVAILABLE': 'available',
       'CLAIMED': 'claimed',
       'COMPLETED': 'completed',
       'GIVEN_AWAY': 'givenAway'
@@ -370,7 +370,7 @@ export default function DonorProfile() {
                     </div>
                     <div className="flex items-center">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        item.status === 'PENDING' 
+                        item.status === 'AVAILABLE' 
                           ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200'
                           : item.status === 'CLAIMED'
                           ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'

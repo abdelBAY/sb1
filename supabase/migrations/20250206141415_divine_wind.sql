@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS announcements (
   location text,
   pickup_instructions text,
   tags text[],
-  status text DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'CLAIMED', 'COMPLETED')),
+  status text DEFAULT 'AVAILABLE' CHECK (status IN ('AVAILABLE', 'CLAIMED', 'COMPLETED')),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
