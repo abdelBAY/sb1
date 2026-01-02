@@ -222,6 +222,7 @@
       "broken": "مرمت کی ضرورت"
     },
     "status": {
+      "available": "دستیاب",
       "pending": "زیر التواء",
       "claimed": "دعویٰ کیا گیا",
       "completed": "مکمل",
@@ -271,6 +272,7 @@
       "totalBeneficiaries": "کل مستفید ہونے والے"
     },
     "status": {
+      "available": "دستیاب",
       "pending": "زیر التواء",
       "claimed": "دعویٰ کیا گیا",
       "completed": "مکمل",
@@ -414,6 +416,7 @@
       "givenAwayAlert": "یہ شے پہلے ہی دے دی گئی ہے۔ عطیہ دہندہ اب اس شے کے لیے درخواستیں قبول نہیں کر رہا۔"
     },
     "status": {
+      "available": "دستیاب",
       "pending": "زیر التواء",
       "claimed": "دعویٰ کیا گیا",
       "completed": "مکمل",

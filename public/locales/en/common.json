@@ -222,6 +222,7 @@
       "broken": "Needs Repair"
     },
     "status": {
+      "available": "AVAILABLE",
       "pending": "PENDING",
       "claimed": "CLAIMED",
       "completed": "COMPLETED",
@@ -271,6 +272,7 @@
       "totalBeneficiaries": "Total Beneficiaries"
     },
     "status": {
+      "available": "AVAILABLE",
       "pending": "PENDING",
       "claimed": "CLAIMED",
       "completed": "COMPLETED",
@@ -414,6 +416,7 @@
       "givenAwayAlert": "This item has already been given away. The donor is no longer accepting requests."
     },
     "status": {
+      "available": "AVAILABLE",
       "pending": "PENDING",
       "claimed": "CLAIMED",
       "completed": "COMPLETED",

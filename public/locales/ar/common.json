@@ -230,6 +230,7 @@
       "broken": "يحتاج إصلاح"
     },
     "status": {
+      "available": "متاح",
       "pending": "قيد الانتظار",
       "claimed": "مطالب به",
       "completed": "مكتمل",
@@ -279,6 +280,7 @@
       "totalBeneficiaries": "إجمالي المستفيدين"
     },
     "status": {
+      "available": "متاح",
       "pending": "قيد الانتظار",
       "claimed": "مطالب به",
       "completed": "مكتمل",
@@ -422,6 +424,7 @@
       "givenAwayAlert": "تم التبرع بهذا العنصر بالفعل. المتبرع لم يعد يقبل الطلبات."
     },
     "status": {
+      "available": "متاح",
       "pending": "قيد الانتظار",
       "claimed": "مطالب به",
       "completed": "مكتمل",

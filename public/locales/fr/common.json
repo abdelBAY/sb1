@@ -222,6 +222,7 @@
       "broken": "Nécessite une réparation"
     },
     "status": {
+      "available": "DISPONIBLE",
       "pending": "EN ATTENTE",
       "claimed": "RÉCLAMÉ",
       "completed": "TERMINÉ",
@@ -271,6 +272,7 @@
       "totalBeneficiaries": "Total des bénéficiaires"
     },
     "status": {
+      "available": "DISPONIBLE",
       "pending": "EN ATTENTE",
       "claimed": "RÉCLAMÉ",
       "completed": "TERMINÉ",
@@ -414,6 +416,7 @@
       "givenAwayAlert": "Cet article a déjà été donné. Le donneur n'accepte plus de demandes."
     },
     "status": {
+      "available": "DISPONIBLE",
       "pending": "EN ATTENTE",
       "claimed": "RÉCLAMÉ",
       "completed": "TERMINÉ",
