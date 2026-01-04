@@ -22,23 +22,18 @@ export default defineConfig({
           'vendor-ui': ['framer-motion'],
           'vendor-i18n': ['react-i18next', 'i18next'],
         },
-        // Optimize for mobile devices
-        chunkSizeWarningLimit: 500,
       },
     },
-    // Android optimization: Enable minification and compression
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
-      },
-    },
+    // Android optimization: Use esbuild (faster, built-in, no extra dependency)
+    minify: 'esbuild',
     // Optimize chunk size for mobile
     chunkSizeWarningLimit: 500,
     // Enable source maps only in development
     sourcemap: !process.env.PROD,
+    // Remove console.log in production using esbuild
+    esbuild: {
+      drop: process.env.PROD ? ['console', 'debugger'] : [],
+    },
   },
   ssr: {
     noExternal: ['react-router-dom'],
