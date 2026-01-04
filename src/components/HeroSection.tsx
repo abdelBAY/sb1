@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import heroImgWebp from "../assets/optimized/givea-image2.webp";
 import heroImgWebpMobile from "../assets/optimized/givea-image2-mobile.webp";
 import heroImgFallback from "../assets/givea-image2.png";
@@ -8,6 +8,15 @@ import { useTranslation } from "react-i18next";
 
 const HeroSection: React.FC = () => {
   const { t } = useTranslation('common');
+  const [animationsEnabled, setAnimationsEnabled] = useState(false);
+
+  useEffect(() => {
+    // Delay animations to allow text to appear first
+    const timer = setTimeout(() => {
+      setAnimationsEnabled(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <section
@@ -34,7 +43,8 @@ const HeroSection: React.FC = () => {
             src={heroImgFallback}
             alt="Community helping"
             className="w-full h-full object-cover"
-            loading="eager"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "/optimized/logo1.webp";
@@ -50,10 +60,10 @@ const HeroSection: React.FC = () => {
         <div className="max-w-2xl">
           <motion.div
             className="text-white"
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: -40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight text-white drop-shadow-lg">
               {t('home.hero.titlePart1', 'Connect, Share,')}{" "}
@@ -67,8 +77,8 @@ const HeroSection: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <motion.a
                 href="/register"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={animationsEnabled ? { scale: 1.05 } : undefined}
+                whileTap={animationsEnabled ? { scale: 0.95 } : undefined}
                 className="inline-block bg-white text-blue-700 font-semibold px-8 py-3 rounded-full 
                   shadow-lg hover:bg-blue-50 transition-all duration-300 border-2 border-white"
               >
@@ -77,8 +87,8 @@ const HeroSection: React.FC = () => {
               
               <motion.a
                 href="/search"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={animationsEnabled ? { scale: 1.05 } : undefined}
+                whileTap={animationsEnabled ? { scale: 0.95 } : undefined}
                 className="inline-block border-2 border-white text-white font-semibold px-8 py-3 rounded-full 
                   hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
               >

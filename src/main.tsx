@@ -7,11 +7,17 @@ import './lib/i18n';
 import './index.css';
 import { registerServiceWorker } from './utils/serviceWorker';
 
+// Android optimization: Adjust query client settings for mobile
+const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
+      retry: isAndroid ? 2 : 1, // More retries on Android for slower connections
+      refetchOnWindowFocus: false, // Don't refetch on focus for better battery life
+      refetchOnReconnect: true,
+      refetchOnMount: false, // Use cached data when possible
     },
   },
 });

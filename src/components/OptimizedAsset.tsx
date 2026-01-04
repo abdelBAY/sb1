@@ -46,6 +46,7 @@ const OptimizedAsset: React.FC<OptimizedAssetProps> = ({
           alt={alt}
           className={className}
           loading={loading}
+          decoding="async"
           onError={handleError}
         />
       </picture>
@@ -59,6 +60,7 @@ const OptimizedAsset: React.FC<OptimizedAssetProps> = ({
       alt={alt}
       className={className}
       loading={loading}
+      decoding="async"
       onError={handleError}
     />
   );

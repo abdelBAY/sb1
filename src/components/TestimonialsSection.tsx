@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
@@ -12,6 +12,15 @@ interface Testimonial {
 
 const TestimonialsSection: React.FC = () => {
   const { t } = useTranslation('common');
+  const [animationsEnabled, setAnimationsEnabled] = useState(false);
+
+  useEffect(() => {
+    // Delay animations to allow text to appear first
+    const timer = setTimeout(() => {
+      setAnimationsEnabled(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const testimonials: Testimonial[] = [
     {
@@ -53,10 +62,10 @@ const TestimonialsSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Headline */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: -40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
             className="space-y-6"
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
@@ -75,19 +84,19 @@ const TestimonialsSection: React.FC = () => {
 
           {/* Right Column - Testimonials Grid */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: 40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"
           >
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={testimonial.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={animationsEnabled ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+                whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
                 className={`rounded-2xl p-6 shadow-xl ${
                   testimonial.gradient
                     ? 'bg-gradient-to-br from-purple-500 to-blue-500 text-white'

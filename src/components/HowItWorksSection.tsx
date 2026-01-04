@@ -11,6 +11,7 @@ const HowItWorksSection: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [userPaused, setUserPaused] = useState(false);
+  const [animationsEnabled, setAnimationsEnabled] = useState(false);
   
   const steps = [
     {
@@ -87,6 +88,14 @@ const HowItWorksSection: React.FC = () => {
     };
   }, [userPaused]);
 
+  useEffect(() => {
+    // Delay animations to allow text to appear first
+    const timer = setTimeout(() => {
+      setAnimationsEnabled(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section ref={sectionRef} className="relative py-16 md:py-24 overflow-hidden">
       {/* Diagonal Split Background */}
@@ -103,10 +112,10 @@ const HowItWorksSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Video Player */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: -40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-black">
@@ -127,10 +136,10 @@ const HowItWorksSection: React.FC = () => {
 
           {/* Right Column - How It Works Content */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: 40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
             className="space-y-8"
           >
             {/* Light Blue Rounded Panel */}
@@ -144,10 +153,10 @@ const HowItWorksSection: React.FC = () => {
                 {steps.map((step, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={animationsEnabled ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+                    whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
                     className="space-y-2"
                   >
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white">

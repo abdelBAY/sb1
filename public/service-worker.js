@@ -1,6 +1,8 @@
 // Service Worker for Offline Support and Caching
-const CACHE_NAME = 'givea-v1';
-const RUNTIME_CACHE = 'givea-runtime-v1';
+const CACHE_NAME = 'givea-v2-android';
+const RUNTIME_CACHE = 'givea-runtime-v2';
+const IMAGE_CACHE = 'givea-images-v2';
+const MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB max cache size for Android
 
 // Assets to cache on install
 const STATIC_ASSETS = [
@@ -74,6 +76,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Android optimization: Skip caching for very large files
+  if (request.headers.get('content-length') && parseInt(request.headers.get('content-length')) > 10 * 1024 * 1024) {
+    // Files larger than 10MB - don't cache on Android
+    return;
+  }
+  
   // Network First strategy for API calls and Supabase
   if (NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(url.href))) {
     event.respondWith(networkFirstStrategy(request));
@@ -110,7 +118,11 @@ async function cacheFirstStrategy(request) {
     const response = await fetch(request);
     
     if (response.status === 200) {
-      cache.put(request, response.clone());
+      // Check cache size before adding (Android optimization)
+      const cacheSize = await getCacheSize();
+      if (cacheSize < MAX_CACHE_SIZE) {
+        cache.put(request, response.clone());
+      }
     }
     
     return response;
@@ -119,6 +131,38 @@ async function cacheFirstStrategy(request) {
     // Return offline page if available
     const offlinePage = await cache.match('/index.html');
     return offlinePage || new Response('Offline', { status: 503 });
+  }
+}
+
+// Get total cache size (Android optimization)
+async function getCacheSize() {
+  let totalSize = 0;
+  const cacheNames = await caches.keys();
+  
+  for (const cacheName of cacheNames) {
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    
+    for (const key of keys) {
+      const response = await cache.match(key);
+      if (response) {
+        const blob = await response.blob();
+        totalSize += blob.size;
+      }
+    }
+  }
+  
+  return totalSize;
+}
+
+// Clean old cache entries if size exceeds limit (Android optimization)
+async function cleanOldCacheEntries() {
+  const cacheSize = await getCacheSize();
+  
+  if (cacheSize > MAX_CACHE_SIZE) {
+    console.log('[Service Worker] Cache size exceeded, cleaning old entries...');
+    // Implementation for cleaning old entries
+    // This is a simplified version - you might want to implement LRU cache
   }
 }
 

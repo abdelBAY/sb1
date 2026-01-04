@@ -104,9 +104,11 @@ export default function OptimizedImage({
   useEffect(() => {
     if (priority || !imgRef.current) return;
 
+    // Android optimization: Larger rootMargin for slower connections
+    const isAndroid = /Android/i.test(navigator.userAgent);
     const observerOptions = {
       root: null,
-      rootMargin: '50px', // Start loading 50px before the image enters viewport
+      rootMargin: isAndroid ? '100px' : '50px', // Start loading earlier on Android
       threshold: 0.01,
     };
 
@@ -182,6 +184,7 @@ export default function OptimizedImage({
         srcSet={width ? generateSrcSet(src) : undefined}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
+        fetchpriority={priority ? 'high' : 'auto'}
         className={`transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         } ${className}`}

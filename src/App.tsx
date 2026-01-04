@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Gift, MessageCircle, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from './lib/store';
@@ -21,6 +21,7 @@ function App() {
   const setDarkMode = useStore((state) => state.setDarkMode);
   const user = useStore((state) => state.user);
   const { t } = useTranslation();
+  const [animationsEnabled, setAnimationsEnabled] = useState(false);
 
   useEffect(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -31,6 +32,14 @@ function App() {
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [setDarkMode]);
+
+  useEffect(() => {
+    // Delay animations to allow text to appear first
+    const timer = setTimeout(() => {
+      setAnimationsEnabled(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleStartDonating = () => {
     if (user) {
@@ -74,18 +83,18 @@ function App() {
             ].map(({ icon: Icon, title, description }, index) => (
               <motion.div
                 key={title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={animationsEnabled ? { opacity: 0, y: 40 } : { opacity: 1, y: 0 }}
+                whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
+                transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
                 className="card p-8 rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-100 dark:border-gray-700"
               >
                 <div className="flex flex-col items-center text-center space-y-6">
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
+                    initial={animationsEnabled ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }}
+                    whileInView={animationsEnabled ? { opacity: 1, scale: 1 } : undefined}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
+                    transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
                     className="p-4 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 text-blue-600 dark:text-blue-400 shadow-lg"
                   >
                     <Icon className="w-10 h-10" />
@@ -117,6 +126,7 @@ function App() {
             alt="Community helping"
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=600&fit=crop";
@@ -129,37 +139,37 @@ function App() {
         
         {/* Content */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={animationsEnabled ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
+          whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
+          transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
           className="relative z-10 max-w-7xl mx-auto py-12 md:py-16 px-4 sm:px-6 lg:px-8 text-center"
         >
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={animationsEnabled ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
             className="text-2xl md:text-3xl font-extrabold text-white drop-shadow-lg"
           >
             {t('home.cta.title')}
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={animationsEnabled ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
             className="mt-4 text-lg md:text-xl text-white/95 drop-shadow-md"
           >
             {t('home.cta.subtitle')}
           </motion.p>
           <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={animationsEnabled ? { opacity: 0, scale: 0.9 } : { opacity: 1, scale: 1 }}
+            whileInView={animationsEnabled ? { opacity: 1, scale: 1 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
+            whileHover={animationsEnabled ? { scale: 1.05 } : undefined}
+            whileTap={animationsEnabled ? { scale: 0.95 } : undefined}
             onClick={handleStartDonating}
             className="mt-6 md:mt-8 inline-flex items-center px-8 md:px-10 py-4 md:py-5 border border-transparent text-lg md:text-xl font-bold rounded-2xl text-blue-600 dark:text-blue-400 bg-white dark:bg-dark-50 hover:bg-blue-50 dark:hover:bg-dark-100 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500"
           >

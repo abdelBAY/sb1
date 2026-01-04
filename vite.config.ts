@@ -15,7 +15,30 @@ export default defineConfig({
     outDir: 'dist/client',
     rollupOptions: {
       input: resolve(__dirname, 'index.html'),
+      output: {
+        // Android optimization: Smaller chunks for better loading
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['framer-motion'],
+          'vendor-i18n': ['react-i18next', 'i18next'],
+        },
+        // Optimize for mobile devices
+        chunkSizeWarningLimit: 500,
+      },
     },
+    // Android optimization: Enable minification and compression
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.log in production
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info'],
+      },
+    },
+    // Optimize chunk size for mobile
+    chunkSizeWarningLimit: 500,
+    // Enable source maps only in development
+    sourcemap: !process.env.PROD,
   },
   ssr: {
     noExternal: ['react-router-dom'],

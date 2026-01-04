@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { MapPin, MessageCircle, Search } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,6 +7,15 @@ import photoResourcesSection9Fallback from "../assets/photo-ResourcesSection9.jp
 
 const ResourcesSection: React.FC = () => {
   const { t } = useTranslation('common');
+  const [animationsEnabled, setAnimationsEnabled] = useState(false);
+
+  useEffect(() => {
+    // Delay animations to allow text to appear first
+    const timer = setTimeout(() => {
+      setAnimationsEnabled(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const resources = [
     {
@@ -32,10 +41,10 @@ const ResourcesSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Text Content */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: -40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
             className="space-y-8"
           >
             <div>
@@ -54,10 +63,10 @@ const ResourcesSection: React.FC = () => {
                 return (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={animationsEnabled ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+                    whileInView={animationsEnabled ? { opacity: 1, y: 0 } : undefined}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    transition={animationsEnabled ? { duration: 0.2 } : { duration: 0 }}
                     className="flex items-start space-x-4"
                   >
                     {/* Orange Circular Icon */}
@@ -82,10 +91,10 @@ const ResourcesSection: React.FC = () => {
 
           {/* Right Column - Image */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={animationsEnabled ? { opacity: 0, x: 40 } : { opacity: 1, x: 0 }}
+            whileInView={animationsEnabled ? { opacity: 1, x: 0 } : undefined}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={animationsEnabled ? { duration: 0.3 } : { duration: 0 }}
             className="relative"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
@@ -96,6 +105,7 @@ const ResourcesSection: React.FC = () => {
                   alt="Community support"
                   className="w-full h-full object-cover aspect-[3/4]"
                   loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
                     target.src = "/optimized/logo1.webp";
