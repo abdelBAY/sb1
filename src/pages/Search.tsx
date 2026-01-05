@@ -65,7 +65,6 @@ export default function Search() {
   const [sortBy, setSortBy] = useState<string>('created_at-desc');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
-  const [pendingOnly, setPendingOnly] = useState<boolean>(false);
   const [locationSearch, setLocationSearch] = useState<string>('');
   const [searchCoordinates, setSearchCoordinates] = useState<{ lat: number; lon: number } | null>(null);
   const [distanceRadius, setDistanceRadius] = useState<number>(15);
@@ -461,10 +460,6 @@ export default function Search() {
       // Always exclude GIVEN_AWAY items from search results
       queryBuilder = queryBuilder.neq('status', 'GIVEN_AWAY');
 
-      if (pendingOnly) {
-        queryBuilder = queryBuilder.eq('status', 'AVAILABLE');
-      }
-
       if (typeof query === 'string' && query.trim()) {
         queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
       }
@@ -549,7 +544,7 @@ export default function Search() {
     const debouncedSearch = debounce(performSearch, 300);
     debouncedSearch();
     return () => debouncedSearch.cancel();
-  }, [query, selectedCategory, selectedCondition, sortBy, page, pendingOnly, locationSearchActive, distanceRadius]);
+  }, [query, selectedCategory, selectedCondition, sortBy, page, locationSearchActive, distanceRadius]);
 
   const handlePrint = () => {
     window.print();
@@ -611,15 +606,6 @@ export default function Search() {
               {t('search.title')}
             </h1>
             <div className="flex items-center space-x-4">
-              <label className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={pendingOnly}
-                  onChange={(e) => setPendingOnly(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 dark:text-blue-400 rounded border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                />
-                <span>{t('search.pendingOnly')}</span>
-              </label>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
