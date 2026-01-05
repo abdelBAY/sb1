@@ -171,7 +171,7 @@ function App() {
             whileHover={animationsEnabled ? { scale: 1.05 } : undefined}
             whileTap={animationsEnabled ? { scale: 0.95 } : undefined}
             onClick={handleStartDonating}
-            className="mt-6 md:mt-8 inline-flex items-center px-8 md:px-10 py-4 md:py-5 border border-transparent text-lg md:text-xl font-bold rounded-2xl text-blue-600 dark:text-blue-400 bg-white dark:bg-dark-50 hover:bg-blue-50 dark:hover:bg-dark-100 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-blue-500"
+            className="mt-6 md:mt-8 inline-flex items-center px-8 md:px-10 py-4 md:py-5 border border-transparent text-lg md:text-xl font-bold rounded-2xl text-white bg-yellow-500 hover:bg-yellow-600 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-yellow-500"
           >
             {user ? t('home.hero.browseItems') : t('home.cta.button')}
           </motion.button>

@@ -351,7 +351,7 @@ const FAQ: React.FC = () => {
             </p>
             <Link
               to="/contact"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+              className="inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
               {t('faq.contactUs')}
             </Link>
