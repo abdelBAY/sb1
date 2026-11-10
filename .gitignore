@@ -22,4 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
+# Environment and local Supabase CLI state
+.env*
+!.env.example
+**/.temp/
